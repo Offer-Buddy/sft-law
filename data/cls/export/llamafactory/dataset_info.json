@@ -1,0 +1,16 @@
+{
+  "cls_law": {
+    "file_name": "cls_train.jsonl",
+    "columns": {
+      "prompt": "instruction",
+      "response": "output"
+    }
+  },
+  "cls_law_val": {
+    "file_name": "cls_val.jsonl",
+    "columns": {
+      "prompt": "instruction",
+      "response": "output"
+    }
+  }
+}
