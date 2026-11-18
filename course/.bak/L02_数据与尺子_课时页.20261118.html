@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L01 · 微调选型</title>
+<style>
+:root{
+  --primary:#0d9488; --primary-d:#0f766e; --blue:#2563eb; --blue-d:#1d4ed8;
+  --bg:#eef2f7; --card:#ffffff; --text:#1e293b; --muted:#64748b;
+  --line:#e2e8f0; --soft:#f8fafc; --warn:#b45309; --warn-bg:#fffbeb;
+  --deep:#163a5f; --code-bg:#0e1a2b; --code-fg:#dbe6ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.78;padding:24px 16px 40px;
+  font-size:15px;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;}
+
+/* ── 页头 ── */
+.chead{background:linear-gradient(135deg,#0f766e 0%,#155e93 52%,#1d4ed8 100%);color:#fff;border-radius:16px;padding:26px 30px 20px;position:relative;overflow:hidden;}
+.chead::after{content:"";position:absolute;right:-46px;top:-58px;width:180px;height:180px;background:rgba(255,255,255,.10);border-radius:28px;transform:rotate(18deg);}
+.chead::before{content:"";position:absolute;right:86px;bottom:-58px;width:110px;height:110px;background:rgba(255,255,255,.07);border-radius:50%;}
+.kicker{display:flex;align-items:center;gap:9px;flex-wrap:wrap;position:relative;z-index:1;margin-bottom:9px;}
+.lid{background:rgba(255,255,255,.95);color:#0f766e;font-weight:800;font-size:12.4px;padding:2px 10px;border-radius:6px;letter-spacing:.6px;}
+.lname{font-size:12.2px;color:#d6ecff;letter-spacing:.4px;}
+.ltotal{margin-left:auto;font-size:11.8px;color:#a8cdf0;}
+.chead h1{font-size:27px;line-height:1.36;letter-spacing:-.4px;font-weight:800;position:relative;z-index:1;}
+.chead .sub{font-size:13.4px;color:#d5e8fb;margin-top:7px;max-width:770px;position:relative;z-index:1;}
+
+/* ── 正文容器 ── */
+main{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 28px 20px;margin-top:14px;box-shadow:0 1px 3px rgba(15,23,42,.05);}
+h2{font-size:19px;font-weight:800;margin:30px 0 10px;color:#0f2f4d;line-height:1.45;display:flex;align-items:center;gap:9px;}
+h2:first-child{margin-top:0;}
+h2[id]{scroll-margin-top:64px;}
+h2::before{content:"";width:4px;height:17px;background:linear-gradient(180deg,var(--primary),var(--blue));border-radius:2px;flex:0 0 auto;}
+h3{font-size:15.2px;font-weight:800;margin:20px 0 8px;color:#173a5c;line-height:1.5;}
+p{margin:9px 0;font-size:14.3px;}
+strong,b{color:#0b2a45;}
+.hl{background:linear-gradient(transparent 62%,#d7f2ee 62%);font-weight:700;padding:0 1px;}
+ul,ol{margin:8px 0 8px 20px;font-size:14.2px;}
+li{margin:4px 0;line-height:1.75;}
+small{font-size:11.6px;color:var(--muted);line-height:1.5;}
+p.note{font-size:12.6px;color:var(--muted);line-height:1.7;margin:7px 0 2px;}
+
+/* ── 决策卡 ── */
+.dec{border:1px solid #d9e6f6;border-radius:11px;overflow:hidden;margin:14px 0 6px;background:#fff;}
+.dec .hd{background:#eff5ff;padding:8px 14px;font-size:12.4px;font-weight:800;color:#1d4ed8;letter-spacing:.3px;}
+.dec .row{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:9px 14px;border-top:1px solid #eef2f8;font-size:13.4px;}
+.dec .row .k{color:var(--muted);font-weight:700;font-size:12.3px;padding-top:1px;}
+.dec .row .v{line-height:1.72;}
+.dec .row.no .v{color:#b91c1c;}
+.dec .row.yes .v{color:#0f766e;}
+
+/* ── 提示块 ── */
+.why{background:#f0fbf9;border-left:3px solid var(--primary);border-radius:0 9px 9px 0;padding:11px 15px;margin:13px 0;font-size:13.8px;line-height:1.75;}
+.why .tag{display:inline-block;background:var(--primary);color:#fff;font-size:11.4px;font-weight:700;padding:1px 8px;border-radius:5px;margin-right:8px;}
+.pit{background:var(--warn-bg);border:1px solid #fde68a;border-radius:9px;padding:10px 14px;margin:12px 0;font-size:13.5px;color:#78350f;line-height:1.75;}
+.pit b{color:var(--warn);}
+.chk{background:#f0fdfa;border:1px solid #99f6e4;border-radius:9px;padding:11px 14px;margin:14px 0 4px;font-size:13.5px;line-height:1.75;}
+.chk b{color:#0f766e;}
+
+/* ── 双栏对比 ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0;}
+.two .col{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column;}
+.two .col .hd{padding:7px 12px;font-size:12.2px;font-weight:800;letter-spacing:.2px;}
+.two .bad{border-color:#fecaca;}
+.two .bad .hd{background:#fef2f2;color:#b91c1c;border-bottom:1px solid #fecaca;}
+.two .good{border-color:#99f6e4;}
+.two .good .hd{background:#f0fdfa;color:#0f766e;border-bottom:1px solid #99f6e4;}
+.two .col .bd{padding:10px 12px;font-size:13.1px;line-height:1.8;white-space:pre-wrap;word-break:break-word;flex:1;font-family:-apple-system,"PingFang SC",sans-serif;}
+.two .col .ft{padding:7px 12px;font-size:12.3px;line-height:1.68;border-top:1px dashed #eef2f8;font-family:-apple-system,"PingFang SC",sans-serif;}
+.two .bad .ft{color:#b91c1c;background:#fffafa;}
+.two .good .ft{color:#0f766e;background:#fafffe;}
+
+/* ── 顶部章节导航 ── */
+.modnav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:12px;margin-top:14px;box-shadow:0 2px 10px rgba(15,23,42,.06);}
+.modnav .in{display:flex;gap:2px;overflow-x:auto;padding:0 8px;scrollbar-width:none;}
+.modnav .in::-webkit-scrollbar{display:none;}
+.modnav a{flex:0 0 auto;padding:10px 11px 9px;font-size:12.7px;font-weight:700;color:#64748b;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;letter-spacing:.2px;}
+.modnav a .n{display:inline-block;min-width:14px;margin-right:4px;font-size:10.6px;font-weight:800;color:#a8b6c8;font-variant-numeric:tabular-nums;letter-spacing:0;}
+.modnav a:hover{color:#0f766e;}
+.modnav a.on{color:#0f766e;border-bottom-color:#0d9488;}
+.modnav a.on .n{color:#0d9488;}
+.modnav + main{margin-top:10px;}
+
+/* ── 课程目标表 ── */
+.goal{border:1px solid #d9e6f6;border-radius:11px;overflow:hidden;background:#fff;margin:0 0 4px;}
+.goal .gh{background:#eff5ff;padding:8px 14px;font-size:12.4px;font-weight:800;color:#1d4ed8;letter-spacing:.3px;}
+.goal .gh em{font-style:normal;font-weight:600;color:#64748b;font-size:12px;margin-left:8px;letter-spacing:0;}
+.goal .tbl{margin:0;}
+.goal .tbl th{padding:8px 14px;background:#f7fafd;}
+.goal .tbl td{padding:10px 14px;}
+.goal .tbl td:first-child{white-space:nowrap;}
+.goal .tier{display:inline-block;font-size:11.6px;font-weight:800;color:#fff;padding:2px 9px;border-radius:5px;letter-spacing:.4px;}
+.goal .tier.a{background:#0d9488;}
+.goal .tier.b{background:#2563eb;}
+.goal .tier.c{background:#b45309;}
+.goal .tbl b{color:#0b2a45;}
+.bound{font-size:12.3px;color:#64748b;border-top:1px dashed var(--line);padding:8px 14px;line-height:1.7;}
+.bound b{color:var(--warn);}
+
+/* ── 代码 ── */
+pre.code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:12px 15px;font-family:"JetBrains Mono",Consolas,"Courier New",monospace;font-size:12.4px;line-height:1.82;overflow-x:auto;margin:11px 0;white-space:pre;}
+pre.code .c{color:#7c8fa8;}
+pre.code .k{color:#7dd3fc;}
+pre.code .s{color:#a5e8b0;}
+code{font-family:Consolas,monospace;}
+p code,li code,td code{background:#eef2f7;padding:1px 5px;border-radius:4px;font-size:12.2px;color:#0f766e;}
+.fname{font-family:Consolas,monospace;font-size:12px;color:var(--muted);margin:12px 0 -4px;}
+.fname::before{content:"▤ ";color:var(--primary);}
+
+/* ── 表格 ── */
+.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+.tbl th{text-align:left;padding:8px 10px;background:#f4f7fb;color:#334155;font-weight:700;font-size:12.4px;border-bottom:1px solid var(--line);}
+.tbl td{padding:8px 10px;border-bottom:1px solid #eef2f7;vertical-align:top;line-height:1.7;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl .ok{color:#0f766e;font-weight:700;}
+.tbl .no2{color:#b91c1c;font-weight:700;}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap;}
+
+/* ── 图 ── */
+figure{margin:16px 0 6px;background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:14px 14px 8px;}
+figure svg{display:block;width:100%;height:auto;}
+figcaption{font-size:12.2px;color:var(--muted);text-align:center;margin-top:6px;padding-bottom:2px;}
+.bx{fill:#fff;stroke:#94a3b8;stroke-width:1.4;}
+.bxA{fill:#eef5ff;stroke:#2563eb;stroke-width:1.6;}
+.bxG{fill:#eefbf7;stroke:#0d9488;stroke-width:1.6;}
+.bxW{fill:#fff8e8;stroke:#d97706;stroke-width:1.5;}
+.bxR{fill:#fef1f1;stroke:#dc2626;stroke-width:1.4;}
+.bxD{fill:#163a5f;stroke:#163a5f;}
+.lb{font-size:12.4px;fill:#0f2f4d;font-weight:700;}
+.lb2{font-size:11.4px;fill:#475569;}
+.lbw{font-size:12.2px;fill:#fff;font-weight:700;}
+.sm{font-size:10.8px;fill:#64748b;}
+.mono{font-family:Consolas,"Courier New",monospace;}
+.ar{stroke:#64748b;stroke-width:1.5;fill:none;}
+.arB{stroke:#2563eb;stroke-width:1.7;fill:none;}
+.arG{stroke:#0d9488;stroke-width:1.6;fill:none;}
+.arR{stroke:#dc2626;stroke-width:1.5;fill:none;}
+
+/* ── 练习 ── */
+.drill{border:1px dashed #a5b4fc;background:#f5f7ff;border-radius:11px;padding:13px 16px;margin:14px 0 4px;}
+.drill .dh{font-size:12.9px;font-weight:800;color:#4338ca;margin-bottom:6px;}
+.drill ol{margin:6px 0 0 18px;font-size:13.4px;}
+.drill li{margin:5px 0;line-height:1.72;}
+
+/* ── 一句话带走 ── */
+.takeaway{background:var(--deep);color:#eaf3ff;border-radius:10px;padding:11px 16px;margin-top:18px;display:flex;align-items:center;gap:11px;font-size:13.6px;line-height:1.6;}
+.takeaway span.t{flex:0 0 auto;background:var(--primary);color:#fff;font-size:11.2px;font-weight:800;padding:2px 9px;border-radius:999px;letter-spacing:.4px;}
+.takeaway b{color:#a7f3d0;}
+
+/* ── 章末小结 ── */
+.recap{background:var(--soft);border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:10px;padding:11px 15px;margin:16px 0 0;font-size:13.2px;line-height:1.72;}
+.recap b{display:block;font-size:12.8px;color:#0f766e;margin-bottom:4px;}
+.recap ul{margin:0 0 0 17px;}
+.recap li{margin:3px 0;}
+
+/* ── 结论条 ── */
+.lede{background:#eef4ff;border-left:3px solid var(--blue);border-radius:0 9px 9px 0;padding:10px 15px;margin:0 0 12px;font-size:14px;line-height:1.7;color:#12305c;font-weight:600;}
+.lede b{display:inline-block;margin-right:8px;background:var(--blue);color:#fff;font-size:11.2px;font-weight:800;padding:1px 8px;border-radius:999px;letter-spacing:.4px;vertical-align:1px;}
+.lede code{background:#dde9ff;color:#0b3d91;border-color:#c9dbfb;}
+
+/* ── 表格外壳 ── */
+.tblwrap{overflow-x:auto;margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#fff;}
+.tblwrap .tbl{width:100%;min-width:560px;margin:0;}
+.goal .tblwrap{border:none;border-radius:0;margin:0;background:transparent;}
+
+/* ── 补充说明块 ── */
+.exp{background:#f0fdfa;border:1px solid #99f6e4;border-left:3px solid var(--primary);border-radius:9px;padding:10px 14px;margin:12px 0;font-size:13.3px;line-height:1.75;}
+.exp b{color:#0f766e;}
+.exp pre.code{margin:8px 0 2px;font-size:12px;}
+
+/* ── 终端输出 ── */
+pre.term{background:#f6f8fb;border:1px dashed #cbd5e1;border-radius:9px;padding:10px 14px;font-family:Consolas,"Courier New",monospace;font-size:12.3px;line-height:1.78;color:#334155;overflow-x:auto;white-space:pre;margin:10px 0;}
+pre.term .d{color:#0f766e;}
+
+/* ── 章号块 ── */
+h2 .num{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:8px;background:#eaf0ff;color:var(--blue-d);font-size:13px;font-weight:800;flex:0 0 auto;}
+h2:has(.num)::before{display:none;}
+
+/* ── 上下页导航 ── */
+.nav{display:flex;gap:12px;margin-top:16px;}
+.nav a{flex:1;display:block;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 15px;text-decoration:none;color:var(--text);transition:.15s;}
+.nav a:hover{border-color:#b9cde6;box-shadow:0 2px 8px rgba(15,23,42,.07);}
+.nav .dir{font-size:11.4px;color:var(--muted);font-weight:700;letter-spacing:.4px;}
+.nav .tt{font-size:13.4px;font-weight:700;color:#12406b;margin-top:2px;}
+.nav .nx{text-align:right;}
+.nav .ph{flex:1;border:1px dashed var(--line);border-radius:11px;padding:11px 15px;color:#b6c2d2;font-size:12.4px;}
+
+.footnote{text-align:center;font-size:12px;color:#94a3b8;margin-top:22px;}
+
+@media (max-width:900px){
+  .chead{padding:22px 20px 18px;}
+  .chead h1{font-size:22.5px;}
+  main{padding:20px 17px;}
+  .dec .row{grid-template-columns:1fr;gap:2px;}
+  .nav{flex-direction:column;}
+  .two{grid-template-columns:1fr;}
+  figure{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#c3cfdd transparent;}
+  figure svg{min-width:520px;}
+  main table{display:block;overflow-x:auto;}
+  main table.tbl th,main table.tbl td{min-width:104px;}
+  main table.tbl.stack,main table.tbl.stack tbody,main table.tbl.stack tr,main table.tbl.stack td,main table.tbl.stack th{display:block;min-width:0;width:auto;}
+  main table.tbl.stack tr:first-child{display:none;}
+  main table.tbl.stack tr{border-bottom:1px solid var(--line);padding:9px 14px;}
+  main table.tbl.stack tr:last-child{border-bottom:none;}
+  main table.tbl.stack td{border:none;padding:2px 0;}
+  main table.tbl.stack td:first-child{margin-bottom:3px;}
+  pre.code{font-size:11.4px;}
+}
+@media print{
+  body{background:#fff;padding:0;font-size:11.5px;}
+  .chead{border-radius:0;}
+  main{box-shadow:none;border:none;padding:0;margin-top:8px;}
+  .nav,.footnote,.modnav{display:none;}
+  .dec,.drill,.chk,.recap,.takeaway,.exp,.lede,figure,h2,h3,.two,.goal,pre.code,pre.term{break-inside:avoid;page-break-inside:avoid;}
+  figure{overflow:visible;}
+  figure svg{min-width:0;}
+  h2,h3{break-after:avoid;page-break-after:avoid;}
+  pre.code{background:#f5f7fa;color:#1e293b;border:1px solid #dbe3ec;}
+  pre.code .c{color:#7a8699;} pre.code .k{color:#0b5cbf;} pre.code .s{color:#0f766e;}
+  pre.term{background:#f8fafc;border:1px solid #e2e8f0;color:#334155;}
+  .takeaway{background:#163a5f !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  @page{size:A4;margin:12mm;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="chead">
+  <div class="kicker"><span class="lid">L02</span><span class="lname">数据与尺子</span><span class="ltotal">15 课 · 第 3 课</span></div>
+  <h1>把纸上的结论变成能训的料——数据与尺子</h1>
+  <p class="sub">上一课八环走完，前四环只落在纸上。这一课把它们做成三个文件：一份说得清做什么的需求卡、一份能直接喂进训练的数据集、一份能判好坏的考卷。三个备齐，训前那个数就有了。</p>
+</header>
+
+<nav class="modnav"><div class="in">
+  <a href="#s-map" class="on"><span class="n">1</span>总览</a>
+  <a href="#s-card"><span class="n">2</span>需求卡</a>
+  <a href="#s-spec"><span class="n">3</span>IO 规格</a>
+  <a href="#s-inventory"><span class="n">4</span>清点</a>
+  <a href="#s-build"><span class="n">5</span>造训练对</a>
+  <a href="#s-clean"><span class="n">6</span>清洗切分</a>
+  <a href="#s-exam"><span class="n">7</span>造考卷</a>
+  <a href="#s-baseline"><span class="n">8</span>跑基线</a>
+  <a href="#s-wrap"><span class="n">9</span>小结</a>
+</div></nav>
+
+<main>
+
+<div class="goal" id="goal">
+  <div class="gh">课程目标<em>三档都过，才敢往训练走</em></div>
+  <table class="tbl">
+    <tr><th style="width:74px">档位</th><th>学完你能做到</th><th style="width:296px">怎么算达成</th></tr>
+    <tr><td><span class="tier a">写出</span></td><td>把需求落成一页卡，把一条样本的拼装写成规格</td><td>不看代码手拼一条样本，用 tokenizer decode 出来跟你预期的一字不差</td></tr>
+    <tr><td><span class="tier b">跑通</span></td><td>从原始数据集造出训练集、验证集、考卷，并跑出一个基线</td><td>三个文件都在磁盘上，<code>baseline.json</code> 里有 <code>hit_rate</code> 和 <code>mrr</code></td></tr>
+    <tr><td><span class="tier c">说清</span></td><td>解释考卷为什么必须独立、为什么必须贴线上口语</td><td>举出自己项目里那组数：书面语考卷和口语考卷，命中率差了几个点、差在哪</td></tr>
+  </table>
+  <div class="bound"><b>不处理：</b>蒸馏流水线与自动标注、多轮对话数据、DPO 偏好对的构造、主动学习；也不讲训练本身——这一课到「数据齐、尺子立」为止。</div>
+</div>
+
+<h2 id="s-map"><span class="num">1</span>前四环落成三个文件</h2>
+<div class="lede"><b>结论</b>需求卡定「做什么」，训练集定「学什么」，考卷加基线定「算不算成」。三个文件缺一个，开训就是盲训——训完既说不清学会了什么，也说不清好没好。</div>
+
+<figure>
+  <svg viewBox="0 0 680 250" role="img" aria-label="前四环的结论落成需求卡、训练集、考卷三个文件，同放一个数据目录">
+    <defs>
+      <marker id="m2a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+    </defs>
+
+    <text class="sm" x="10" y="20">上一课的前四环 —— 都是判断，还没有一样能跑的东西</text>
+
+    <rect class="bxW" x="10" y="30" width="152" height="50" rx="8"/>
+    <text class="lb" x="86" y="52" text-anchor="middle">定需求</text>
+    <text class="sm" x="86" y="69" text-anchor="middle">哪一段在失败</text>
+
+    <rect class="bxW" x="176" y="30" width="152" height="50" rx="8"/>
+    <text class="lb" x="252" y="52" text-anchor="middle">看数据</text>
+    <text class="sm" x="252" y="69" text-anchor="middle">哪列能当答案</text>
+
+    <rect class="bxW" x="342" y="30" width="152" height="50" rx="8"/>
+    <text class="lb" x="418" y="52" text-anchor="middle">定验收</text>
+    <text class="sm" x="418" y="69" text-anchor="middle">拿什么量</text>
+
+    <rect class="bxW" x="508" y="30" width="162" height="50" rx="8"/>
+    <text class="lb" x="589" y="52" text-anchor="middle">定任务</text>
+    <text class="sm" x="589" y="69" text-anchor="middle">输入什么出什么</text>
+
+    <line class="ar" x1="86" y1="80" x2="86" y2="98"/>
+    <line class="ar" x1="252" y1="80" x2="252" y2="98"/>
+    <line class="ar" x1="418" y1="80" x2="418" y2="98"/>
+    <line class="ar" x1="589" y1="80" x2="589" y2="98"/>
+    <line class="ar" x1="86" y1="98" x2="589" y2="98"/>
+
+    <line class="ar" x1="120" y1="98" x2="120" y2="126" marker-end="url(#m2a)"/>
+    <line class="ar" x1="340" y1="98" x2="340" y2="126" marker-end="url(#m2a)"/>
+    <line class="ar" x1="560" y1="98" x2="560" y2="126" marker-end="url(#m2a)"/>
+
+    <text class="sm" x="340" y="118" text-anchor="middle" fill="#b45309">这一课要产出的东西</text>
+
+    <rect class="bxA" x="20" y="130" width="200" height="58" rx="8"/>
+    <text class="lb" x="120" y="152" text-anchor="middle">需求卡</text>
+    <text class="lb2" x="120" y="170" text-anchor="middle">为什么做、做成什么样算成</text>
+
+    <rect class="bxA" x="240" y="130" width="200" height="58" rx="8"/>
+    <text class="lb" x="340" y="152" text-anchor="middle">训练集 + 验证集</text>
+    <text class="lb2" x="340" y="170" text-anchor="middle">学什么：输入 → 目标输出</text>
+
+    <rect class="bxG" x="460" y="130" width="200" height="58" rx="8"/>
+    <text class="lb" x="560" y="152" text-anchor="middle">考卷 + 基线</text>
+    <text class="lb2" x="560" y="170" text-anchor="middle">算不算成：题、答案、训前那个数</text>
+
+    <rect class="bx" x="20" y="206" width="640" height="34" rx="7"/>
+    <text class="lb2" x="340" y="227" text-anchor="middle">同一个目录下放齐 —— data/sft/　data/eval/　需求卡.md</text>
+  </svg>
+  <figcaption>三个文件是一条线的三段，不是三件独立的事：卡定形态，数据照着形态造，考卷照着形态判。</figcaption>
+</figure>
+
+<table class="tbl stack">
+  <tr><th style="width:132px">文件</th><th style="width:236px">里面是什么</th><th style="width:150px">谁消费它</th><th>缺了会怎样</th></tr>
+  <tr><td><b>需求卡</b></td><td>四段定位、一句话成功标准、这次不做什么</td><td>你自己，三周后；接手的人</td><td class="no2">做完没人能判断该不该上线，评审会上只能讲过程</td></tr>
+  <tr><td><b>训练集 + 验证集</b></td><td><code>input</code> / <code>output</code> 成对，切好的 train / val</td><td>训练脚本、数据加载器</td><td class="no2">没有料，整条链子断在第一步</td></tr>
+  <tr><td><b>考卷 + 基线</b></td><td>题、标准答案、训前跑出来的那个数</td><td>评测脚本、A/B 对比</td><td class="no2">训完只能说「感觉顺畅多了」</td></tr>
+</table>
+
+<pre class="fname">目录长这样，后面每一步都往里放东西</pre>
+<pre class="code">sft-law/
+├─ data/
+│  ├─ raw/      <span class="c"># 原始数据集，只读。永不修改，改了就无法回溯</span>
+│  ├─ sft/      <span class="c"># train.jsonl / val.jsonl —— 喂给训练的</span>
+│  ├─ eval/     <span class="c"># evalset.jsonl / baseline.json —— 判好坏的</span>
+│  └─ corpus/   <span class="c"># 检索目标库（比如 6432 条法条）</span>
+├─ configs/     <span class="c"># 一次实验一份配置，跟实验编号对应</span>
+├─ scripts/     <span class="c"># 数据、评测、训练、合并、推理五个入口</span>
+└─ runs/        <span class="c"># 每次跑的日志、adapter、指标，一个都不丢</span></pre>
+
+<div class="why"><span class="tag">为什么先分目录</span>数据在微调里改动的次数远多于代码。目录一分，你永远知道手上这份 <code>train.jsonl</code> 是哪一版、由哪份原始数据、哪个脚本、哪个随机种子生成的——这三个信息丢了，任何复现都是空话。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：前四环的结论要落成三个文件——需求卡、训练集、考卷加基线</li>
+  <li>不这么做会：直接冲进训练，训完发现没有题可测，只能凭感觉收工</li>
+  <li>下次遇到同类问题，先问：我这三个文件有哪几个是真的在磁盘上的，哪几个还只在脑子里</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>数据和尺子都是文件，不是想法——落在磁盘上才算备过。</div>
+
+<h2 id="s-card"><span class="num">2</span>需求卡：把「要解决什么」写成一页</h2>
+<div class="lede"><b>结论</b>需求卡不是给领导看的立项书，是给你自己三周后看的证据——证明当初为什么不用改 prompt、为什么非要训。四块内容，一页写完。</div>
+
+<table class="tbl stack">
+  <tr><th style="width:126px">块</th><th style="width:276px">写成什么样</th><th>反例（这么写等于没写）</th></tr>
+  <tr><td><b>① 失败在哪段</b></td><td>指出四段中的一段：理解输入 / 取资料 / 组织输出 / 兜底规则，并附一条真实例子</td><td class="no2">「模型答得不准」「用户反馈不好」</td></tr>
+  <tr><td><b>② 谁在什么场景</b></td><td>一类用户、一个入口、一个动作。带上入口名或日志里能搜到的关键词</td><td class="no2">「所有用户」——等于没有场景</td></tr>
+  <tr><td><b>③ 成功标准</b></td><td>一句话，且这句话能翻成一个指标名和一个方向</td><td class="no2">「回答更像律师」「体验更好」</td></tr>
+  <tr><td><b>④ 这次不做</b></td><td>列三条以上：不管的语种、不管的场景、不追的指标</td><td class="no2">空着——范围会一路膨胀到做不完</td></tr>
+</table>
+
+<p>第 ③ 块是整张卡的命门。它必须能直接翻译成第 7、8 章要建的那个数。翻不成的，说明需求还没想清，退回上一课第 4 章，别往下走。</p>
+
+<div class="two">
+  <div class="col bad">
+    <div class="hd">翻不成指标的写法</div>
+    <div class="bd">让模型更懂劳动法
+回答要专业、准确、有依据
+口语问题也要答得出</div>
+    <div class="ft">三句都对，但没有任何一句能变成一个可计算的数。</div>
+  </div>
+  <div class="col good">
+    <div class="hd">翻得成指标的写法</div>
+    <div class="bd">口语提问经改写后，目标法条进 top-5 的比例
+从 72.5% 提到 85%
+书面语那部分不许掉超过 1 个点</div>
+    <div class="ft">指标、方向、底线三样齐了，后面所有比较都有落点。</div>
+  </div>
+</div>
+
+<div class="pit"><b>第 ④ 块最容易被跳过，也最容易救你。</b>不写「不做什么」，两周后一定有人问「能不能顺便把合同审查也做了」。写在卡上，才有话可回：这一版不做，下一版再说。</div>
+
+<div class="exp"><b>把「不用别的办法」也写进去。</b>在卡上补两行：改 prompt 为什么不够（约束写到多少字还是压不住）、加检索为什么不解决问题（问题出在 query 侧，不在库里）。这两行是你三个月后被质疑时的第一道防线。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：需求卡四块——失败在哪段、谁在什么场景、成功标准、这次不做</li>
+  <li>不这么做会：范围一路膨胀，最后交付的东西跟最初的失败点已经没关系了</li>
+  <li>下次遇到同类问题，先问：成功标准那句话，能不能直接翻成一个指标名和一个方向</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>成功标准翻不成指标，说明需求还没想清——别拿训练去填补这个空白。</div>
+
+<h2 id="s-spec"><span class="num">3</span>IO 规格：一条样本到底怎么拼</h2>
+<div class="lede"><b>结论</b>模型学的就是「你拼出来的那个字符串」。三段：系统提示、用户输入、目标输出，中间用基座认识的模板连起来。模板错一个 token，训出来的东西就差一个档次，而且不报错。</div>
+
+<table class="tbl stack">
+  <tr><th style="width:118px">段</th><th style="width:250px">写什么</th><th>写错会怎样</th></tr>
+  <tr><td><b>系统提示</b></td><td>角色、任务、输出边界。这段是不变的那部分，每条样本都一样</td><td class="no2">写得含糊，模型只能从样本里猜你要什么；写得啰嗦，会挤占有效长度</td></tr>
+  <tr><td><b>用户输入</b></td><td>线上真实会进来的那句话，口语、错别字、说一半就停，都照原样保留</td><td class="no2">改写成规范书面语，等于在教一个线上不存在的场景</td></tr>
+  <tr><td><b>目标输出</b></td><td>你想要它吐出来的那个样子，长度、句式、结尾都照线上标准来</td><td class="no2">答案里带解释、带招呼语，模型会把这些一起学走</td></tr>
+</table>
+
+<p>本项目要训的是 HyDE 改写器：用户口语问一句，模型输出一段带法律概念的检索用文本。系统提示是固定的，长这样：</p>
+
+<pre class="code"><span class="c"># scripts/prepare_hyde_sft_data.py 里的 make_prompt</span>
+请根据用户法律问题生成一段用于语义检索的假设性法律文档。
+要求包含核心法律概念、可能涉及的法律关系、责任类型和检索关键词；
+不要给用户建议，不要写结论，只输出检索用文本。
+
+用户问题：老板让我天天加班不给钱</pre>
+
+<p>这条提示里有三处约束在干活：<b>「假设性法律文档」定文体</b>（不是回答，是文档）、<b>「不要给建议、不要写结论」砍掉跑偏</b>（模型最容易滑向的地方）、<b>「只输出检索用文本」定边界</b>。少任何一句，训出来的东西都会往问答方向滑——因为它见过太多问答。</p>
+
+<h3>模板是硬约束，不是风格问题</h3>
+<p>拼好的三段不能直接用字符串粘起来，必须过基座的 chat 模板：</p>
+
+<pre class="code">msgs = [
+    {<span class="s">"role"</span>: <span class="s">"system"</span>, <span class="s">"content"</span>: SYSTEM_PROMPT},
+    {<span class="s">"role"</span>: <span class="s">"user"</span>,   <span class="s">"content"</span>: question},
+    {<span class="s">"role"</span>: <span class="s">"assistant"</span>, <span class="s">"content"</span>: target},
+]
+text = tokenizer.apply_chat_template(msgs, tokenize=<span class="k">False</span>)
+<span class="k">print</span>(repr(text[:200]))   <span class="c"># 开训前一定打出来看一眼</span></pre>
+
+<pre class="fname">Qwen 系打印出来大致是这个形状（特殊标记已替换成可读文字）</pre>
+<pre class="term">IM_START system
+请根据用户法律问题生成一段用于语义检索的假设性法律文档……
+IM_END
+IM_START user
+老板让我天天加班不给钱
+IM_END
+IM_START assistant
+用人单位安排劳动者延长工作时间的，应当支付不低于工资百分之一百五十的报酬……
+IM_END</pre>
+
+<div class="pit"><b>模板不一致，效果断崖，而且不报错。</b>基座在预训练和对齐时用的是某一套角色标记，你微调时换成另一套，模型看到的就不是它熟悉的对话结构。损失照样下降，曲线照样好看，上线就是不对。<b>唯一的检查办法是把一条样本 decode 出来，用眼睛看。</b></div>
+
+<h3>两个必须掐掉的泄露点</h3>
+<p>公开数据集看着是「现成的问答对」，直接用往往出事。以 DISC-Law Triplet 为例，一条记录的字段长这样：</p>
+
+<pre class="code">{<span class="s">"input"</span>: <span class="s">"&lt;问题&gt;：老板让我天天加班不给钱"</span>,
+ <span class="s">"reference"</span>: [<span class="s">"《中华人民共和国劳动法》第四十四条：……"</span>],
+ <span class="s">"output"</span>: <span class="s">"用人单位安排劳动者延长工作时间的，应当支付不低于百分之一百五十的报酬。"</span>}</pre>
+
+<ul>
+  <li><b>标记是噪声。</b><code>input</code> 不是一句干净的话，是带标记的整段文本。整段喂进去，模型会连标记一起学——它学会了遇到标记就吐答案，而不是学会听懂人话。要用正则把真正的问题抠出来。</li>
+  <li><b>参考法条是答案。</b><code>reference</code> 里就是这条问题该命中的法条原文，也正是输出里要引用的内容。把它放进输入，模型是在抄，不是在学改写。<b>参考字段只能用于造语料和造考卷，不能进训练输入。</b></li>
+</ul>
+
+<div class="why"><span class="tag">判断口诀</span>问自己一句：<b>这条样本里，模型在训练时能看到的那些字，线上推理时它能看到吗？</b>看不到的，一律要删。这是区分「训练数据」和「答案纸」的唯一标准。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：一条样本是系统提示 + 用户输入 + 目标输出，中间必须过基座的 chat 模板</li>
+  <li>不这么做会：模板错、标记没清、参考法条漏进输入，loss 一路下降但线上完全不能用</li>
+  <li>下次遇到同类问题，先问：输入里这些字，线上推理时模型能看到吗——看不到的删掉</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>模型学的就是你拼出来的那个字符串——拼错的地方，它一个字都不会放过。</div>
+
+<h2 id="s-inventory"><span class="num">4</span>清点：手上这批料能训什么</h2>
+<div class="lede"><b>结论</b>清点不是数条数，是逐个字段问「这一列能不能当标准答案」。能，就照着它定任务；不能，要么换任务，要么先造数据——没有第三条路。</div>
+
+<p>先做一张表，把手上的每个文件点清楚。这张表一填完，任务形态基本就定了：</p>
+
+<table class="tbl">
+  <tr><th style="width:104px">文件</th><th style="width:92px">条数</th><th style="width:196px">关键字段</th><th style="width:120px">哪列能当答案</th><th>缺什么</th></tr>
+  <tr><td>Triplet</td><td class="num">23,331</td><td><code>input</code> / <code>reference</code> / <code>output</code></td><td class="ok">output（法律问答答案）</td><td>没有「口语改写」的标注</td></tr>
+  <tr><td>Pair</td><td class="num">79,692</td><td><code>input</code> / <code>output</code></td><td class="ok">output（问答答案）</td><td>同上，且没有法条锚点</td></tr>
+  <tr><td>法条语料</td><td class="num">6,432</td><td><code>key</code> / <code>text</code></td><td class="no2">没有答案列</td><td>是检索目标库，不是训练数据</td></tr>
+</table>
+<p class="note">本项目口径：用法条 6,432 条 / 50 部；Pair 只作对照，不用于训练。</p>
+
+<h3>填完这张表，会发现一个硬事实</h3>
+<p>Triplet 的 <code>output</code> 是「法律问题的答案」，不是「这个问题的检索改写」。你想训改写，手上没有改写的标注——<b>这不是数据量不够，是标注字段对不上。</b>上一课第 3 章说的那句「标注字段决定任务形态」，落到具体项目上就是这件事。</p>
+
+<table class="tbl stack">
+  <tr><th style="width:150px">可选任务</th><th style="width:200px">需要什么标注</th><th>手上有没有</th></tr>
+  <tr><td>法律问答生成</td><td>问题 → 答案</td><td class="ok">有，Triplet 的 output 就是</td></tr>
+  <tr><td>query 改写</td><td>口语问题 → 标准检索式</td><td class="no2">没有。公开集里没有这种标注</td></tr>
+  <tr><td><b>HyDE 假设文档</b></td><td>问题 → 一段含法律概念的检索文本</td><td class="ok"><b>可以造：答案本身就能当那段的来源</b></td></tr>
+</table>
+
+<div class="why"><span class="tag">为什么绕到 HyDE</span>既然没有「改写后的话」这种标注，就换一个同样能提升检索、但目标文本可以造出来的任务：<b>让模型把口语问题写成一段「假设的法条式文本」，再拿这段文本去检索。</b>目标文本从答案里裁——答案本身就是法条语体，截前 700 字正好是那段文档。任务换了，标注的需求就绕开了，而验收指标还是同一个：目标法条进没进 top-k。</div>
+
+<div class="pit"><b>换任务是允许的，换验收指标是不允许的。</b>任务可以为了适配数据而变形，但第 7、8 章的考卷和指标必须从头到尾是同一把尺子。任务一改就把指标也改掉，两次结果就没法比了。</div>
+
+<div class="drill">
+  <div class="dh">动手：给自己的数据填一张清点表</div>
+  <ol>
+    <li>列出所有原始文件，逐个写明条数、字段名、许可（能不能商用）。</li>
+    <li>对每个文件回答一句：哪一列能当「标准答案」，为什么。</li>
+    <li>把「想训的任务」和「有标注的任务」并排写在纸上，中间差的那一格，就是你接下来要造的东西。</li>
+  </ol>
+</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：清点的产出是一张表——每条数据的条数、字段、哪列能当答案、缺什么</li>
+  <li>不这么做会：拿「问题→答案」的数据硬训改写，训出来的模型只会答题，不会改写</li>
+  <li>下次遇到同类问题，先问：我想要的目标输出，在现有字段里有没有对应的那一列</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>没有对应的标注列，就别在模型上硬拧——换任务，或者先造数据。</div>
+
+<h2 id="s-build"><span class="num">5</span>造训练对：从原始字段拼出 input/output</h2>
+<div class="lede"><b>结论</b>造数据这一步只有四个动作：读出问题、洗掉噪声、套上系统提示、配一段目标文本。整个脚本不到一百行，但它决定了模型到底在学什么。</div>
+
+<p>拿本项目说，输入侧要的是「用户原话」，输出侧要的是「一段法条语体的检索文本」。原始 Triplet 里两样都没有现成的，得从字段里加工出来：</p>
+
+<table class="tbl stack">
+  <tr><th style="width:130px">动作</th><th style="width:230px">做的是什么</th><th>为什么非做不可</th></tr>
+  <tr><td><b>提出问题</b></td><td>用正则从带标记的整段文本里，抠出真正那句问话</td><td class="no2">不抠，标记会被当成特征学进去</td></tr>
+  <tr><td><b>洗掉噪声</b></td><td>合并空白、去首尾、丢掉空答案的坏行</td><td class="no2">空白字符在 token 层面是真实存在的，会白白吃掉长度</td></tr>
+  <tr><td><b>套系统提示</b></td><td>把第 3 章那段固定提示拼在问题前面</td><td class="no2">推理时也会带这段，训练不带就是两套输入分布</td></tr>
+  <tr><td><b>配目标文本</b></td><td>从答案里裁前 N 字，作为要学的那段文档</td><td class="no2">答案动辄上千字，学全篇既慢又偏——检索要的是关键词密度，不是完整论证</td></tr>
+</table>
+
+<pre class="fname">scripts/prepare_hyde_sft_data.py（四步串起来）</pre>
+<pre class="code"><span class="k">def</span> extract_triplet_question(text: str) -&gt; str:
+    <span class="c"># 带标记的整段文本 → 真正那句问话</span>
+    m = re.search(<span class="s">r"&lt;问题&gt;\s*[：:]\s*(.+)"</span>, text, flags=re.S)
+    <span class="k">return</span> clean_text(m.group(1), max_chars=1000) <span class="k">if</span> m <span class="k">else</span> clean_text(text)
+
+<span class="k">def</span> clean_text(text: str, max_chars: int) -&gt; str:
+    <span class="c"># 合并空白 + 截断。空白不是"看不见"，它会实打实占 token</span>
+    <span class="k">return</span> re.sub(<span class="s">r"\s+"</span>, <span class="s">" "</span>, text).strip()[:max_chars].strip()
+
+<span class="c"># 一条样本 = 固定提示 + 用户问题  →  从答案裁出的目标文本</span>
+row = {<span class="s">"input"</span>: make_prompt(question),
+       <span class="s">"output"</span>: clean_text(answer, max_chars=700)}</pre>
+
+<pre class="term"><span class="d">$</span> python scripts/prepare_hyde_sft_data.py --max-answer-chars 700
+<span class="d">读到 Triplet 23331 条 / Pair 79692 条</span>
+<span class="d">产出 23331 条 →</span> data/sft/hyde_sft_train.jsonl</pre>
+
+<h3>三个参数，每个都有代价</h3>
+<div class="dec">
+  <div class="hd">动手之前先想清楚，动手之后就别改</div>
+  <div class="row"><div class="k">裁多少字</div><div class="v">默认 700。<b>短了丢关键概念，长了学到整篇论证</b>。判断办法：随机抽 20 条，看 700 字里还有没有那条法条的核心表述——有就够，没有就往上调到 1200 再抽一次</div></div>
+  <div class="row"><div class="k">用哪个源</div><div class="v">Triplet 的答案带法条锚点，Pair 没有。<b>要训检索用的文档，优先 Triplet</b>；Pair 只作补充或对照，别混着训——两批数据的目标文本风格不一样，模型会学到两种口径</div></div>
+  <div class="row"><div class="k">随机种子</div><div class="v">固定 <code>--seed 42</code>。<b>抽样、切分、打乱全用它</b>。种子不固定，换个时间重跑就得到另一份数据，后面任何一次对比都失去意义</div></div>
+</div>
+
+<div class="pit"><b>坏行是静默跳过的。</b>脚本里 <code>except json.JSONDecodeError: continue</code>，一行坏数据不会让程序停下来，也不会告诉你。真正的安全做法是<b>打印计数</b>：读进多少、跳过多少、产出多少，三个数对不上就当场查。同理，<code>re.search</code> 没匹配上的行会被整段兜底当问题用——数量对不上时，先怀疑这一条。</div>
+
+<div class="pit"><b>截断会截在半句上。</b>700 字硬切，最后一句经常是断的。多数情况下无害，但如果你的目标文本必须句式完整（比如要让模型学会固定的结论句），就得在切点往回找最近的句号。这一点要写进脚本，不能靠运气。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：造数据就是四步——提出问题、洗掉噪声、套系统提示、配目标文本</li>
+  <li>不这么做会：原始字段直接进训练，标记变特征、参考法条变答案，训出来的模型在线上完全不对</li>
+  <li>下次遇到同类问题，先看：读进、跳过、产出三个数对不对得上——对不上就是有行被静默处理了</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>造数据不是在整理文件，是在决定模型学什么——每个筛选条件都是一次教学取舍。</div>
+
+<h2 id="s-clean"><span class="num">6</span>清洗、切分与数据卡</h2>
+<div class="lede"><b>结论</b>数据进训练前要过四道闸：重复、长度、坏样本、泄露。过完切成 train / val，再写一张数据卡。这四道里，<b>泄露检查是唯一会让所有努力归零的那道</b>。</div>
+
+<figure>
+  <svg viewBox="0 0 680 196" role="img" aria-label="原始数据过四道闸：去重、长度过滤、坏样本清理、切分，最后得到训练集和考卷">
+    <defs>
+      <marker id="c2a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+    </defs>
+
+    <rect class="bx" x="14" y="34" width="112" height="56" rx="8"/>
+    <text class="lb" x="70" y="58" text-anchor="middle">原始</text>
+    <text class="sm" x="70" y="76" text-anchor="middle">23,331 条</text>
+
+    <line class="ar" x1="128" y1="62" x2="146" y2="62" marker-end="url(#c2a)"/>
+
+    <rect class="bxA" x="150" y="34" width="112" height="56" rx="8"/>
+    <text class="lb" x="206" y="56" text-anchor="middle">① 去重</text>
+    <text class="sm" x="206" y="74" text-anchor="middle">同问不同问法</text>
+
+    <line class="ar" x1="264" y1="62" x2="282" y2="62" marker-end="url(#c2a)"/>
+
+    <rect class="bxA" x="286" y="34" width="112" height="56" rx="8"/>
+    <text class="lb" x="342" y="56" text-anchor="middle">② 长度</text>
+    <text class="sm" x="342" y="74" text-anchor="middle">定 cutoff_len</text>
+
+    <line class="ar" x1="400" y1="62" x2="418" y2="62" marker-end="url(#c2a)"/>
+
+    <rect class="bxA" x="422" y="34" width="112" height="56" rx="8"/>
+    <text class="lb" x="478" y="56" text-anchor="middle">③ 坏样本</text>
+    <text class="sm" x="478" y="74" text-anchor="middle">空 / 乱码 / 超短</text>
+
+    <line class="ar" x1="536" y1="62" x2="554" y2="62" marker-end="url(#c2a)"/>
+
+    <rect class="bxG" x="558" y="34" width="108" height="56" rx="8"/>
+    <text class="lb" x="612" y="56" text-anchor="middle">④ 切分</text>
+    <text class="sm" x="612" y="74" text-anchor="middle">train / val</text>
+
+    <rect class="bxR" x="150" y="112" width="200" height="44" rx="8"/>
+    <text class="lb" x="250" y="130" text-anchor="middle" fill="#b91c1c">还有第五道：泄露</text>
+    <text class="sm" x="250" y="147" text-anchor="middle">考卷里的题，训练集中一条都不能有</text>
+
+    <text class="sm" x="446" y="132" fill="#b45309">前三道只影响效果，</text>
+    <text class="sm" x="446" y="149" fill="#b45309">这一道让所有数字化成假的</text>
+  </svg>
+  <figcaption>前四道是常规清洗，第五道是生死线——泄了，指标会漂亮得离谱，而你没有任何办法从数字上看出它泄了。</figcaption>
+</figure>
+
+<table class="tbl stack">
+  <tr><th style="width:96px">闸</th><th style="width:240px">怎么查</th><th>查到之后怎么办</th></tr>
+  <tr><td><b>重复</b></td><td>问题做归一化（去标点、转小写）后取哈希；答案取前 50 字哈希</td><td>同问题保留答案最长的一条；同答案不同问题要警惕——可能是同一个模板批量生成的</td></tr>
+  <tr><td><b>长度</b></td><td>统计 token 数的 50 / 95 / 99 分位</td><td>95 分位就是 <code>cutoff_len</code> 的初值。定太短，长样本被切掉半个答案；定太长，每步都在算填充</td></tr>
+  <tr><td><b>坏样本</b></td><td>空答案、答案长度小于 20 字、乱码、答案与问题高度重合</td><td>直接删，别修。修一条的时间够你造十条新的</td></tr>
+  <tr><td class="no2"><b>泄露</b></td><td>考卷的每个问题，在训练集里做精确匹配和近似匹配</td><td class="no2">训练集里出现的，从训练集删——不是从考卷删</td></tr>
+</table>
+
+<h3>切分：三份，各干各的</h3>
+<table class="tbl">
+  <tr><th style="width:110px">集合</th><th style="width:92px">比例</th><th style="width:190px">拿来干什么</th><th>能不能动</th></tr>
+  <tr><td>train</td><td class="num">约 90%</td><td>训练，梯度只从这份来</td><td class="ok">随时可调</td></tr>
+  <tr><td>val</td><td class="num">约 5%</td><td>看有没有训过头：val loss 开始回升就是信号</td><td class="ok">可调</td></tr>
+  <tr><td><b>考卷</b></td><td class="num">200 条起</td><td>验收。训前训后各跑一次，只认这个数</td><td class="no2">锁死，定了就不许再碰</td></tr>
+</table>
+
+<div class="pit"><b>val 不是考卷。</b>val 参与了「什么时候停」这个决策，所以它已经间接被用来调整过模型。真正能当裁判的，只有从头到尾没参与过任何决策的那份题。两份混着用，等于自己当运动员又当裁判。</div>
+
+<h3>数据卡：一页纸，让三个月后的你能接手</h3>
+<table class="tbl">
+  <tr><th style="width:130px">字段</th><th>写什么</th></tr>
+  <tr><td><b>来源与许可</b></td><td>原始数据集名称、版本、许可（能不能商用）、下载日期</td></tr>
+  <tr><td><b>条数</b></td><td>原始条数、清洗后条数、train / val / 考卷各多少，掉了多少、为什么掉</td></tr>
+  <tr><td><b>构造规则</b></td><td>系统提示原文、目标文本从哪个字段裁、裁多少字、种子多少</td></tr>
+  <tr><td><b>已知缺口</b></td><td>哪类问题覆盖少、哪种说法没见过、哪个法条样本只有一条</td></tr>
+  <tr><td><b>不要做什么</b></td><td>这份数据训出来的模型不该用来干什么（比如：不能当法律意见、不能答程序性问题）</td></tr>
+</table>
+
+<div class="exp"><b>数据卡最后一行比前面都重要。</b>一份用问答数据训出来的改写器，最容易被误用成「法律咨询助手」。写清「不该干什么」，是在保护使用者，也是在保护你自己。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：四道清洗闸加一道泄露检查；切成 train / val / 考卷三份，考卷锁死</li>
+  <li>不这么做会：考卷的题混在训练集里，训完指标漂亮得不像话，上线一测打回原形</li>
+  <li>下次遇到同类问题，先做泄露检查：考卷里的每一个问题，训练集里到底有没有</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>清洗只影响效果，泄露会让所有数字化成假的——先查泄露，再谈清洗。</div>
+
+<h2 id="s-exam"><span class="num">7</span>造考卷：怎么造才不作弊</h2>
+<div class="lede"><b>结论</b>考卷三条件：独立于训练、贴着线上分布、有能判对错的标准答案。三条里最容易被牺牲的是第二条——而它恰恰决定这个数有没有意义。</div>
+
+<table class="tbl stack">
+  <tr><th style="width:118px">条件</th><th style="width:250px">具体要求</th><th>不满足会怎样</th></tr>
+  <tr><td><b>独立</b></td><td>不参与训练、不参与挑模型、不参与定超参</td><td class="no2">模型见过答案，指标虚高，上线就掉</td></tr>
+  <tr><td><b>贴分布</b></td><td>题面的说话方式、长度、错别字，照着线上日志来</td><td class="no2">训完提升的是「答书面题」的能力，线上一点用没有</td></tr>
+  <tr><td><b>可判</b></td><td>每题有一个明确的正确结果：法条 key、类别、或人工评分标准</td><td class="no2">只能人眼看，两个人打出两套分</td></tr>
+</table>
+
+<h3>本项目的做法：抽题、改写题面、不动答案</h3>
+<pre class="code"><span class="c"># ① 从 Triplet 抽一批题，连同它们该命中的法条 key 一起留下</span>
+python scripts/build_baseline.py evalset --size 400
+
+<span class="c"># ② 题面是书面语，让大模型把它改写成口语（标注一个字都不动）</span>
+<span class="c">#    "用人单位应当如何支付加班工资"</span>
+<span class="c">#      → "老板让我天天加班不给钱，这算不算违法"</span>
+<span class="c"># ③ 人工过一遍：改写后还是不是同一个问题，不像就丢掉</span></pre>
+
+<div class="why"><span class="tag">关键</span>改写只动题面，<b>标准答案（那一组法条 key）一个字都不改</b>。这样考卷既贴了线上分布，又保持了可判性——用模型改写题面不会污染标准答案，这是它和「用模型造答案」的根本区别。</div>
+
+<h3>这组数说明为什么非要贴分布</h3>
+<table class="tbl">
+  <tr><th style="width:168px">考卷</th><th style="width:78px">条数</th><th style="width:108px">hit_rate@5</th><th style="width:96px">MRR</th><th>没进 top-5</th></tr>
+  <tr><td>书面语（全量）</td><td class="num">400</td><td class="num">79.75%</td><td class="num">0.6538</td><td class="num">81 条</td></tr>
+  <tr><td>书面语（抽样对照）</td><td class="num">40</td><td class="num">77.50%</td><td class="num">0.7063</td><td class="num">9 条</td></tr>
+  <tr><td class="no2"><b>口语</b>（同一批题改写）</td><td class="num">40</td><td class="num no2"><b>72.50%</b></td><td class="num no2"><b>0.5792</b></td><td class="num">11 条</td></tr>
+</table>
+<p class="note">同一份法条语料（6,432 条）、同一个向量模型（bge-small-zh-v1.5）、同一个 top-5，只把题面从书面语换成口语：命中率掉 5 个点，MRR 掉 0.13。</p>
+
+<div class="pit"><b>小样本的命中率要谨慎读。</b>40 条里对错各一条，就是 2.5 个点。所以 40 条上的差距只能看方向，不能当结论；要下结论至少 200 条起。用 400 条那组做验收，40 条那组只用来快速自查。</div>
+
+<h3>锁死考卷：三个动作</h3>
+<div class="dec">
+  <div class="hd">不锁死的考卷，迟早会被你自己改掉</div>
+  <div class="row"><div class="k">记指纹</div><div class="v">算一遍文件 sha256 记到数据卡里。以后每次跑评测先核对指纹，对不上就说明考卷被人动过</div></div>
+  <div class="row"><div class="k">设只读</div><div class="v">文件权限改成只读，脚本里对评测集一律只 <code>open(..., "r")</code>。想加题，开新版本，不动旧文件</div></div>
+  <div class="row"><div class="k">带版本号</div><div class="v">文件名或字段里带版本，比如 <code>evalset_v1_oral.jsonl</code>。所有指标记录都必须写清用的是哪一版</div></div>
+</div>
+
+<div class="pit"><b>两个常见的自欺。</b>① <b>拿训练集里的题当考卷</b>——数字会高得让你以为做成了。② <b>拿模型自己生成的答案当标准答案</b>（自评）——模型答错的地方，自评也会判对。<b>标准答案只能来自人工或原始标注，不能来自你要评估的那个模型。</b></div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：考卷要独立、贴线上分布、可判；改写只动题面，标准答案不动</li>
+  <li>不这么做会：用书面题考一个要在口语场景落地的模型，考出来的分和线上没有关系</li>
+  <li>下次遇到同类问题，先问：这套题里，有没有一道是从训练集里来的</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>考卷的题面要像线上，标准答案要像标注——两样混了，这个数就废了。</div>
+
+<h2 id="s-baseline"><span class="num">8</span>跑基线：训前那个数</h2>
+<div class="lede"><b>结论</b>基线是「不微调的情况下，这套题能拿多少分」。它必须在你写第一行训练代码之前跑出来，否则后面所有「提升了」都没有起点。</div>
+
+<p>三条命令，三步走。第一次全跑，之后只重跑第三步：</p>
+
+<pre class="code"><span class="c"># ① 从 Triplet 的 reference 里抽法条，去重成检索目标库</span>
+python scripts/build_baseline.py corpus
+<span class="c"># ② 抽题 + 标准法条 key</span>
+python scripts/build_baseline.py evalset --size 400
+<span class="c"># ③ 建索引、跑检索、算 hit_rate 与 MRR</span>
+python scripts/build_baseline.py run --evalset data/eval/evalset_oral.jsonl</pre>
+
+<pre class="term"><span class="d">法条语料：6432 条 / 50 部法 →</span> data/corpus/articles.jsonl
+<span class="d">评测集：400 条，平均每条 1.62 个标准法条 →</span> data/eval/evalset.jsonl
+<span class="d">语料 6432 条 / 查询 400 条，模型 BAAI/bge-small-zh-v1.5</span>
+<span class="d">hit_rate@5 = 0.7975　MRR = 0.6538　未命中 81 条 →</span> data/eval/baseline.json</pre>
+
+<h3>两个数各管什么</h3>
+<table class="tbl stack">
+  <tr><th style="width:112px">指标</th><th style="width:250px">算什么</th><th>什么时候盯它</th></tr>
+  <tr><td><b>hit_rate@k</b></td><td>标准法条有没有进前 k 条。进了就算对，不管排第几</td><td>验收主指标。它直接对应「用户能不能找到依据」</td></tr>
+  <tr><td><b>MRR</b></td><td>命中的那条排在第几位，取倒数再平均</td><td>辅助指标。hit_rate 不动但 MRR 涨，说明排序变好了——也算进步，可以写进报告</td></tr>
+</table>
+
+<p>还有第三个数容易被漏掉：<b>没命中的那 81 条</b>。跑完把 <code>details</code> 里 <code>hit: false</code> 的挑出来读十来个，你会发现两类：一类是「问法太偏，检索确实抓不到」，另一类更麻烦——「标准答案本身标错了」。第二类要先修考卷，不然后面所有对比都在这条错标上打转。</p>
+
+<div class="why"><span class="tag">基线的完整写法</span>只有数字不够，要连四个条件一起记：<b>哪个向量模型、哪一版语料（多少条）、top_k 取几、考卷是哪一版</b>。四样里换一样，这个数就不可比——不是提升，是换了一把尺子。</div>
+
+<div class="pit"><b>基线的意义是「不许事后改口」。</b>训完发现只提升了 2 个点，很想把验收线从 85% 调到 80%——这一步一旦做，整个实验就废了。基线加上验收线，必须在开训前写进需求卡，训完只许对着勾。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：基线 = 不微调时这套题的分，训前必须跑出来并留档</li>
+  <li>不这么做会：训完只能说「感觉好一点」，评审时被问「好了多少」只能沉默</li>
+  <li>下次遇到同类问题，先看：这个基线是哪一版语料、哪个模型、top 几跑出来的——条件不全就不能比</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>基线不是一个数，是一个数加四个条件——少一个条件，这个数就作废。</div>
+
+<h2 id="s-wrap"><span class="num">9</span>小结</h2>
+<div class="lede"><b>结论</b>这一课交出去的是三样东西：一页卡、两份数据、一个数。三样都在磁盘上，训练才不是盲训。</div>
+
+<table class="tbl">
+  <tr><th style="width:120px">交付物</th><th style="width:210px">落在哪</th><th>验收看什么</th></tr>
+  <tr><td><b>需求卡</b></td><td><code>需求卡.md</code> 放仓库根</td><td>成功标准能被翻译成指标名 + 方向 + 底线</td></tr>
+  <tr><td><b>训练集 + 验证集</b></td><td><code>data/sft/</code></td><td>每条都能过 tokenizer 和模板不报错；猜不出哪条是坏样本</td></tr>
+  <tr><td><b>考卷 + 基线</b></td><td><code>data/eval/</code></td><td>考卷锁死、基线有数、四个条件都记了</td></tr>
+</table>
+
+<h3>开训前，数据侧九项自检</h3>
+<table class="tbl">
+  <tr><th style="width:32px">☐</th><th style="width:190px">项</th><th>怎么验</th></tr>
+  <tr><td>□</td><td>需求卡写完</td><td>四块齐，成功标准翻得成指标</td></tr>
+  <tr><td>□</td><td>一条样本手拼过</td><td><code>print(repr(text))</code> 出来跟预期一字不差</td></tr>
+  <tr><td>□</td><td>模板与基座一致</td><td>角色标记、特殊 token、结尾符逐项对过</td></tr>
+  <tr><td>□</td><td>输入里没有线上看不到的字</td><td>参考法条、格式标记、人工批注都已清掉</td></tr>
+  <tr><td>□</td><td>重复查过</td><td>问题归一化后无大量重复；答案为模板生成的要单独看</td></tr>
+  <tr><td>□</td><td>长度分布统计过</td><td>有 50 / 95 / 99 分位，<code>cutoff_len</code> 有着落</td></tr>
+  <tr><td>□</td><td>泄露检查跑过</td><td>考卷的题在训练集中一条都没有</td></tr>
+  <tr><td>□</td><td>考卷锁死</td><td>sha256 记进数据卡，文件只读，带版本号</td></tr>
+  <tr><td>□</td><td>基线跑出来了</td><td>数 + 模型 + 语料版本 + top_k + 考卷版本，五样齐</td></tr>
+</table>
+
+<h3>四条边界，越界就要返工</h3>
+<ul>
+  <li><b>考卷先于训练。</b>没有考卷和基线就开训，训完拿不出数，等于白跑一轮。</li>
+  <li><b>模板先于数据量。</b>模板不对，两万条好的也训不出对的；模板对了，两千条就能见效。</li>
+  <li><b>泄露一票否决。</b>考卷的题混进训练集，指标再漂亮也是假的，而且从数字上永远看不出来。</li>
+  <li><b>标准答案只来自标注。</b>让被评估的模型自己评分，等于让考生自己改卷。</li>
+</ul>
+
+<div class="why"><span class="tag">下一步</span>数据齐了、尺子立了，机器还没动。下一课把这四环落成实物：机器怎么开、依赖怎么装、框架怎么选、脚本怎么摆——目标是一条命令从数据跑到 adapter。</div>
+
+<div class="recap"><b>这门课留下的判据</b><ul>
+  <li>判据一：前四环的结论必须落成文件，没有文件就是没备过</li>
+  <li>判据二：输入里出现「线上看不到的字」，一律是泄露，不是特征</li>
+  <li>判据三：考卷要独立、贴分布、可判；改写只动题面不动答案</li>
+  <li>判据四：基线是一个数加四个条件，缺一个就不可比</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>先把三个文件备齐、把基线跑出来——训练是后面的事，准备才是这一课的正题。</div>
+
+</main>
+
+<nav class="nav">
+  <a href="L01_微调选型_课时页.html"><div class="dir">← 上一课 · L01</div><div class="tt">微调选型</div></a>
+  <a href="L03_环境框架与脚本_课时页.html" class="nx"><div class="dir">下一课 · L03 →</div><div class="tt">环境、框架与脚本</div></a>
+</nav>
+
+<div class="footnote">L02 · 数据与尺子</div>
+</div>
+
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.modnav a'));
+  if(!links.length) return;
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+
+  function spy(){
+    var line=window.scrollY+90, idx=0;
+    for(var i=0;i<secs.length;i++){
+      var el=secs[i];
+      if(el && el.getBoundingClientRect().top+window.scrollY<=line) idx=i;
+    }
+    links.forEach(function(a,i){a.classList.toggle('on',i===idx);});
+  }
+
+  window.addEventListener('scroll',spy,{passive:true});
+  window.addEventListener('resize',spy);
+
+  links.forEach(function(a){
+    a.addEventListener('click',function(e){
+      var t=document.querySelector(a.getAttribute('href'));
+      if(!t) return;
+      e.preventDefault();
+      var far=Math.abs(t.getBoundingClientRect().top)>2400;
+      t.scrollIntoView({behavior:far?'instant':'smooth',block:'start'});
+      if(history.replaceState) history.replaceState(null,'',a.getAttribute('href'));
+    });
+  });
+
+  spy();
+})();
+</script>
+</body>
+</html>

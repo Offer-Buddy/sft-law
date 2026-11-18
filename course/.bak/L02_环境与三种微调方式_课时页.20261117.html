@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L02 · 环境与三种微调方式</title>
+<style>
+:root{
+  --primary:#0d9488; --primary-d:#0f766e; --blue:#2563eb; --blue-d:#1d4ed8;
+  --bg:#eef2f7; --card:#ffffff; --text:#1e293b; --muted:#64748b;
+  --line:#e2e8f0; --soft:#f8fafc; --warn:#b45309; --warn-bg:#fffbeb;
+  --deep:#163a5f; --code-bg:#0e1a2b; --code-fg:#dbe6ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.78;padding:24px 16px 40px;
+  font-size:15px;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;}
+
+/* ── 页头 ── */
+.chead{background:linear-gradient(135deg,#0f766e 0%,#155e93 52%,#1d4ed8 100%);color:#fff;border-radius:16px;padding:26px 30px 20px;position:relative;overflow:hidden;}
+.chead::after{content:"";position:absolute;right:-46px;top:-58px;width:180px;height:180px;background:rgba(255,255,255,.10);border-radius:28px;transform:rotate(18deg);}
+.chead::before{content:"";position:absolute;right:86px;bottom:-58px;width:110px;height:110px;background:rgba(255,255,255,.07);border-radius:50%;}
+.kicker{display:flex;align-items:center;gap:9px;flex-wrap:wrap;position:relative;z-index:1;margin-bottom:9px;}
+.lid{background:rgba(255,255,255,.95);color:#0f766e;font-weight:800;font-size:12.4px;padding:2px 10px;border-radius:6px;letter-spacing:.6px;}
+.lname{font-size:12.2px;color:#d6ecff;letter-spacing:.4px;}
+.ltotal{margin-left:auto;font-size:11.8px;color:#a8cdf0;}
+.chead h1{font-size:27px;line-height:1.36;letter-spacing:-.4px;font-weight:800;position:relative;z-index:1;}
+.chead .sub{font-size:13.4px;color:#d5e8fb;margin-top:7px;max-width:770px;position:relative;z-index:1;}
+
+/* ── 正文容器 ── */
+main{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 28px 20px;margin-top:14px;box-shadow:0 1px 3px rgba(15,23,42,.05);}
+h2{font-size:19px;font-weight:800;margin:30px 0 10px;color:#0f2f4d;line-height:1.45;display:flex;align-items:center;gap:9px;}
+h2:first-child{margin-top:0;}
+h2[id]{scroll-margin-top:64px;}
+h2::before{content:"";width:4px;height:17px;background:linear-gradient(180deg,var(--primary),var(--blue));border-radius:2px;flex:0 0 auto;}
+h3{font-size:15.2px;font-weight:800;margin:20px 0 8px;color:#173a5c;line-height:1.5;}
+h4{font-size:13.6px;font-weight:700;margin:13px 0 5px;color:#1e3448;}
+p{margin:9px 0;font-size:14.3px;}
+strong,b{color:#0b2a45;}
+.hl{background:linear-gradient(transparent 62%,#d7f2ee 62%);font-weight:700;padding:0 1px;}
+ul,ol{margin:8px 0 8px 20px;font-size:14.2px;}
+li{margin:4px 0;line-height:1.75;}
+small{font-size:11.6px;color:var(--muted);line-height:1.5;}
+p.note{font-size:12.6px;color:var(--muted);line-height:1.7;margin:7px 0 2px;}
+
+/* ── 决策卡 ── */
+.dec{border:1px solid #d9e6f6;border-radius:11px;overflow:hidden;margin:14px 0 6px;background:#fff;}
+.dec .hd{background:#eff5ff;padding:8px 14px;font-size:12.4px;font-weight:800;color:#1d4ed8;letter-spacing:.3px;}
+.dec .row{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:9px 14px;border-top:1px solid #eef2f8;font-size:13.4px;}
+.dec .row .k{color:var(--muted);font-weight:700;font-size:12.3px;padding-top:1px;}
+.dec .row .v{line-height:1.72;}
+.dec .row.no .v{color:#b91c1c;}
+.dec .row.yes .v{color:#0f766e;}
+
+/* ── 提示块 ── */
+.why{background:#f0fbf9;border-left:3px solid var(--primary);border-radius:0 9px 9px 0;padding:11px 15px;margin:13px 0;font-size:13.8px;line-height:1.75;}
+.why .tag{display:inline-block;background:var(--primary);color:#fff;font-size:11.4px;font-weight:700;padding:1px 8px;border-radius:5px;margin-right:8px;}
+.pit{background:var(--warn-bg);border:1px solid #fde68a;border-radius:9px;padding:10px 14px;margin:12px 0;font-size:13.5px;color:#78350f;line-height:1.75;}
+.pit b{color:var(--warn);}
+.chk{background:#f0fdfa;border:1px solid #99f6e4;border-radius:9px;padding:11px 14px;margin:14px 0 4px;font-size:13.5px;line-height:1.75;}
+.chk b{color:#0f766e;}
+
+/* ── 双栏对比 ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0;}
+.two .col{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column;}
+.two .col .hd{padding:7px 12px;font-size:12.2px;font-weight:800;letter-spacing:.2px;}
+.two .bad{border-color:#fecaca;}
+.two .bad .hd{background:#fef2f2;color:#b91c1c;border-bottom:1px solid #fecaca;}
+.two .good{border-color:#99f6e4;}
+.two .good .hd{background:#f0fdfa;color:#0f766e;border-bottom:1px solid #99f6e4;}
+.two .col .bd{padding:10px 12px;font-family:Consolas,"Courier New",monospace;font-size:12.1px;line-height:1.75;white-space:pre-wrap;word-break:break-word;flex:1;}
+.two .col .bd.plain{font-family:-apple-system,"PingFang SC",sans-serif;font-size:13.1px;line-height:1.8;}
+.two .col .ft{padding:7px 12px;font-size:12.3px;line-height:1.68;border-top:1px dashed #eef2f8;font-family:-apple-system,"PingFang SC",sans-serif;}
+.two .bad .ft{color:#b91c1c;background:#fffafa;}
+.two .good .ft{color:#0f766e;background:#fafffe;}
+
+/* ── 顶部章节导航 ── */
+.modnav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:12px;margin-top:14px;box-shadow:0 2px 10px rgba(15,23,42,.06);}
+.modnav .in{display:flex;gap:2px;overflow-x:auto;padding:0 8px;scrollbar-width:none;}
+.modnav .in::-webkit-scrollbar{display:none;}
+.modnav a{flex:0 0 auto;padding:10px 11px 9px;font-size:12.7px;font-weight:700;color:#64748b;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;letter-spacing:.2px;}
+.modnav a .n{display:inline-block;min-width:14px;margin-right:4px;font-size:10.6px;font-weight:800;color:#a8b6c8;font-variant-numeric:tabular-nums;letter-spacing:0;}
+.modnav a:hover{color:#0f766e;}
+.modnav a.on{color:#0f766e;border-bottom-color:#0d9488;}
+.modnav a.on .n{color:#0d9488;}
+.modnav + main{margin-top:10px;}
+
+/* ── 课程目标表 ── */
+.goal{border:1px solid #d9e6f6;border-radius:11px;overflow:hidden;background:#fff;margin:0 0 4px;}
+.goal .gh{background:#eff5ff;padding:8px 14px;font-size:12.4px;font-weight:800;color:#1d4ed8;letter-spacing:.3px;}
+.goal .gh em{font-style:normal;font-weight:600;color:#64748b;font-size:12px;margin-left:8px;letter-spacing:0;}
+.goal .tbl{margin:0;}
+.goal .tbl th{padding:8px 14px;background:#f7fafd;}
+.goal .tbl td{padding:10px 14px;}
+.goal .tbl td:first-child{white-space:nowrap;}
+.goal .tier{display:inline-block;font-size:11.6px;font-weight:800;color:#fff;padding:2px 9px;border-radius:5px;letter-spacing:.4px;}
+.goal .tier.a{background:#0d9488;}
+.goal .tier.b{background:#2563eb;}
+.goal .tier.c{background:#b45309;}
+.goal .tier.d{background:#7c3aed;}
+.goal .tbl b{color:#0b2a45;}
+.bound{font-size:12.3px;color:#64748b;border-top:1px dashed var(--line);padding:8px 14px;line-height:1.7;}
+.bound b{color:var(--warn);}
+
+/* ── 代码 ── */
+pre.code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:12px 15px;font-family:"JetBrains Mono",Consolas,"Courier New",monospace;font-size:12.4px;line-height:1.82;overflow-x:auto;margin:11px 0;white-space:pre;}
+pre.code .c{color:#7c8fa8;}
+pre.code .k{color:#7dd3fc;}
+pre.code .s{color:#a5e8b0;}
+code{font-family:Consolas,monospace;}
+p code,li code,td code{background:#eef2f7;padding:1px 5px;border-radius:4px;font-size:12.2px;color:#0f766e;}
+
+/* ── 表格 ── */
+.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+.tbl th{text-align:left;padding:8px 10px;background:#f4f7fb;color:#334155;font-weight:700;font-size:12.4px;border-bottom:1px solid var(--line);}
+.tbl td{padding:8px 10px;border-bottom:1px solid #eef2f7;vertical-align:top;line-height:1.7;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl .ok{color:#0f766e;font-weight:700;}
+.tbl .no2{color:#b91c1c;font-weight:700;}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap;}
+
+/* ── 图 ── */
+figure{margin:16px 0 6px;background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:14px 14px 8px;}
+figure svg{display:block;width:100%;height:auto;}
+figcaption{font-size:12.2px;color:var(--muted);text-align:center;margin-top:6px;padding-bottom:2px;}
+.bx{fill:#fff;stroke:#94a3b8;stroke-width:1.4;}
+.bxA{fill:#eef5ff;stroke:#2563eb;stroke-width:1.6;}
+.bxG{fill:#eefbf7;stroke:#0d9488;stroke-width:1.6;}
+.bxW{fill:#fff8e8;stroke:#d97706;stroke-width:1.5;}
+.bxR{fill:#fef1f1;stroke:#dc2626;stroke-width:1.4;}
+.bxD{fill:#163a5f;stroke:#163a5f;}
+.lb{font-size:12.4px;fill:#0f2f4d;font-weight:700;}
+.lb2{font-size:11.4px;fill:#475569;}
+.lbw{font-size:12.2px;fill:#fff;font-weight:700;}
+.sm{font-size:10.8px;fill:#64748b;}
+.mono{font-family:Consolas,"Courier New",monospace;}
+.ar{stroke:#64748b;stroke-width:1.5;fill:none;}
+.arB{stroke:#2563eb;stroke-width:1.7;fill:none;}
+.arG{stroke:#0d9488;stroke-width:1.6;fill:none;}
+.arR{stroke:#dc2626;stroke-width:1.5;fill:none;}
+
+/* ── 练习 ── */
+.drill{border:1px dashed #a5b4fc;background:#f5f7ff;border-radius:11px;padding:13px 16px;margin:14px 0 4px;}
+.drill .dh{font-size:12.9px;font-weight:800;color:#4338ca;margin-bottom:6px;}
+.drill ol{margin:6px 0 0 18px;font-size:13.4px;}
+.drill li{margin:5px 0;line-height:1.72;}
+
+/* ── 一句话带走 ── */
+.takeaway{background:var(--deep);color:#eaf3ff;border-radius:10px;padding:11px 16px;margin-top:18px;display:flex;align-items:center;gap:11px;font-size:13.6px;line-height:1.6;}
+.takeaway span.t{flex:0 0 auto;background:var(--primary);color:#fff;font-size:11.2px;font-weight:800;padding:2px 9px;border-radius:999px;letter-spacing:.4px;}
+
+/* ── 章末小结 ── */
+.recap{background:var(--soft);border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:10px;padding:11px 15px;margin:16px 0 0;font-size:13.2px;line-height:1.72;}
+.recap b{display:block;font-size:12.8px;color:#0f766e;margin-bottom:4px;}
+.recap ul{margin:0 0 0 17px;}
+.recap li{margin:3px 0;}
+
+/* ── 结论条 ── */
+.lede{background:#eef4ff;border-left:3px solid var(--blue);border-radius:0 9px 9px 0;padding:10px 15px;margin:0 0 12px;font-size:14px;line-height:1.7;color:#12305c;font-weight:600;}
+.lede b{display:inline-block;margin-right:8px;background:var(--blue);color:#fff;font-size:11.2px;font-weight:800;padding:1px 8px;border-radius:999px;letter-spacing:.4px;vertical-align:1px;}
+.lede code{background:#dde9ff;color:#0b3d91;border-color:#c9dbfb;}
+
+/* ── 表格外壳 ── */
+.tblwrap{overflow-x:auto;margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#fff;}
+.tblwrap .tbl{width:100%;min-width:560px;margin:0;}
+.goal .tblwrap{border:none;border-radius:0;margin:0;background:transparent;}
+
+/* ── 补充说明块 ── */
+.exp{background:#f0fdfa;border:1px solid #99f6e4;border-left:3px solid var(--primary);border-radius:9px;padding:10px 14px;margin:12px 0;font-size:13.3px;line-height:1.75;}
+.exp b{color:#0f766e;}
+
+/* ── 章号块 ── */
+h2 .num{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:8px;background:#eaf0ff;color:var(--blue-d);font-size:13px;font-weight:800;flex:0 0 auto;}
+h2:has(.num)::before{display:none;}
+
+/* ── 上下页导航 ── */
+.nav{display:flex;gap:12px;margin-top:16px;}
+.nav a{flex:1;display:block;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 15px;text-decoration:none;color:var(--text);transition:.15s;}
+.nav a:hover{border-color:#b9cde6;box-shadow:0 2px 8px rgba(15,23,42,.07);}
+.nav .dir{font-size:11.4px;color:var(--muted);font-weight:700;letter-spacing:.4px;}
+.nav .tt{font-size:13.4px;font-weight:700;color:#12406b;margin-top:2px;}
+.nav .nx{text-align:right;}
+.nav .ph{flex:1;border:1px dashed var(--line);border-radius:11px;padding:11px 15px;color:#b6c2d2;font-size:12.4px;}
+
+.footnote{text-align:center;font-size:12px;color:#94a3b8;margin-top:22px;}
+
+@media (max-width:900px){
+  .chead{padding:22px 20px 18px;}
+  .chead h1{font-size:22.5px;}
+  main{padding:20px 17px;}
+  .dec .row{grid-template-columns:1fr;gap:2px;}
+  .nav{flex-direction:column;}
+  .two{grid-template-columns:1fr;}
+  figure{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#c3cfdd transparent;}
+  figure svg{min-width:520px;}
+  main table{display:block;overflow-x:auto;}
+  main table.tbl th,main table.tbl td{min-width:104px;}
+  main table.tbl.stack,main table.tbl.stack tbody,main table.tbl.stack tr,main table.tbl.stack td,main table.tbl.stack th{display:block;min-width:0;width:auto;}
+  main table.tbl.stack tr:first-child{display:none;}
+  main table.tbl.stack tr{border-bottom:1px solid var(--line);padding:9px 14px;}
+  main table.tbl.stack tr:last-child{border-bottom:none;}
+  main table.tbl.stack td{border:none;padding:2px 0;}
+  main table.tbl.stack td:first-child{margin-bottom:3px;}
+  pre.code{font-size:11.4px;}
+}
+@media print{
+  body{background:#fff;padding:0;font-size:11.5px;}
+  .chead{border-radius:0;}
+  main{box-shadow:none;border:none;padding:0;margin-top:8px;}
+  .nav,.footnote,.modnav{display:none;}
+  .dec,.drill,.chk,.recap,.takeaway,.exp,.lede,figure,h2,h3,.two,.goal,pre.code{break-inside:avoid;page-break-inside:avoid;}
+  figure{overflow:visible;}
+  figure svg{min-width:0;}
+  h2,h3{break-after:avoid;page-break-after:avoid;}
+  pre.code{background:#f5f7fa;color:#1e293b;border:1px solid #dbe3ec;}
+  pre.code .c{color:#7a8699;} pre.code .k{color:#0b5cbf;} pre.code .s{color:#0f766e;}
+  .takeaway{background:#163a5f !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  @page{size:A4;margin:12mm;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="chead">
+  <div class="kicker"><span class="lid">L02</span><span class="lname">环境 · 三种方式</span><span class="ltotal">15 课 · 第 3 课</span></div>
+  <h1>把机器开起来，三个框架挨个认一遍</h1>
+  <p class="sub">上一课五选已经定了：Qwen3-1.7B + QLoRA + 手写 transformers/peft + AutoDL 4090 + DISC-Law Triplet。这一课不讲为什么，只把这套选型开起来——配好依赖、验过显卡，再把 LLaMA-Factory、魔搭 ms-swift、手写三十行各跑一遍，做到「给哪个框架我都能上手」。</p>
+</header>
+
+<nav class="modnav"><div class="in">
+  <a href="#s-env" class="on"><span class="n">1</span>定机器</a>
+  <a href="#s-layer"><span class="n">2</span>三个层次</a>
+  <a href="#s-factory"><span class="n">3</span>Factory</a>
+  <a href="#s-swift"><span class="n">4</span>ms-swift</a>
+  <a href="#s-code"><span class="n">5</span>代码驱动</a>
+</div></nav>
+
+<main>
+
+<div class="goal" id="goal">
+  <div class="gh">这一课要拿到的东西<em>三档都过，才敢自己开训</em></div>
+  <table class="tbl">
+    <tr><th style="width:74px">档位</th><th>你能做到</th><th style="width:296px">怎么算达成</th></tr>
+    <tr><td><span class="tier a">跑通</span></td><td>在自己的机器或云上把环境配好，跑通一次最小训练</td><td><code>torch.cuda.is_available()</code> 为 True，三个核心包 import 不报错，产出一个 adapter 目录</td></tr>
+    <tr><td><span class="tier b">分清</span></td><td>说清三种方式各在哪一层，谁替代谁、谁能叠在谁上面</td><td>白纸画出「底座 → 框架 / 加速 → 你的配置」三层，把三个名字放对位置</td></tr>
+    <tr><td><span class="tier c">手写</span></td><td>不靠框架，用 transformers + peft 写出三十行训练脚本</td><td>三十行能跑通，<code>print_trainable_parameters()</code> 打出的是挂载的 LoRA 参数，不是全量</td></tr>
+  </table>
+  <div class="bound"><b>不处理：</b>多卡并行、DeepSpeed / FSDP 配置、推理服务化（vLLM、TGI）、量化推理格式转换——这些不在主线里，遇到再说。</div>
+</div>
+
+<h2 id="s-env"><span class="num">1</span>先把机器定下来</h2>
+<div class="lede"><b>结论</b>平台上一课已经定了：AutoDL 4090 当主力、魔搭 A10 免费试跑。这一课不讲「为什么选它」，只讲「在它上面怎么把环境配起来」——依赖四层对上、验证三行过了，才算能开训。</div>
+
+<h3>AutoDL 上三个必须知道的点</h3>
+<div class="dec">
+  <div class="hd">踩过的人才知道</div>
+  <div class="row"><div class="k">无卡模式</div><div class="v">按 CPU 计费，很便宜。配环境、传数据、下模型都在无卡模式做，别开着 GPU 装包——光配环境就能烧掉几十块</div></div>
+  <div class="row"><div class="k">盘的分工</div><div class="v">系统盘 <code>/root</code> 小，数据盘 <code>/root/autodl-tmp</code> 大。几个 G 的模型放系统盘，会装到一半磁盘满</div></div>
+  <div class="row"><div class="k">关机 ≠ 释放</div><div class="v">关机保留磁盘（还收一点存储费），「释放」才清空。要复用环境，必须存成自定义镜像，否则下次重来</div></div>
+</div>
+
+<h3>依赖是配套的，不是随便装</h3>
+<p>这四层版本必须对得上，从下往上装，不要跳：</p>
+
+<table class="tbl">
+  <tr><th style="width:130px">层</th><th style="width:220px">看什么</th><th>对不上会怎样</th></tr>
+  <tr><td>显卡驱动</td><td><code>nvidia-smi</code> 右上角的 CUDA Version</td><td>驱动太老，装再新的 torch 也调不动卡，只会退回 CPU</td></tr>
+  <tr><td>CUDA / torch</td><td>torch 版本要和驱动支持的上限匹配</td><td><code>torch.cuda.is_available()</code> 返回 False，或者一跑就 <code>no kernel image</code></td></tr>
+  <tr><td>训练栈</td><td><code>transformers</code> + <code>peft</code> + <code>trl</code> + <code>bitsandbytes</code></td><td>新模型（比如 Qwen3 系列）需要足够新的 transformers，版本低了会报「不认识的模型类型」</td></tr>
+  <tr><td>框架</td><td>LLaMA-Factory / ms-swift / Unsloth 各自锁自己的依赖范围</td><td>三个装在一个环境里互相打架。见下面的坑</td></tr>
+</table>
+
+<pre class="code"><span class="c"># 装完先验这三行，全过再往下走</span>
+python -c <span class="s">"import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name(0))"</span>
+python -c <span class="s">"import transformers, peft, trl, bitsandbytes as bnb; print(transformers.__version__, peft.__version__)"</span>
+nvidia-smi</pre>
+
+<div class="pit"><b>最常见的两个死法。</b>① <code>pip install torch</code> 装成了 CPU 版——一定要用官方给的 CUDA 版安装命令，别直接 pip。② 把 LLaMA-Factory、ms-swift、Unsloth 装进同一个环境，它们对 <code>transformers</code> 和 <code>trl</code> 的版本要求经常互相冲突。<b>一个框架一个 conda 环境</b>，这是纪律。</div>
+
+<div class="chk"><b>环境配超过一小时就换方案。</b>这不是能力问题，是投入产出比问题——你花两小时修 CUDA，和你花两块钱开机跑一轮，后者才是在学微调。修环境修到怀疑人生的人，最后都没训出模型。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：依赖四层（驱动 → CUDA/torch → 训练栈 → 框架）从下往上装，验证三行全过才算能开训</li>
+  <li>不这么做会：pip 装成 CPU 版 torch，或者三个框架塞进一个环境，互相打架、进度全停</li>
+  <li>下次遇到同类问题，先看：驱动认不认、torch 是不是 CUDA 版、三个框架是不是各在各的环境</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>环境是门槛不是本事；过不去就绕，绕过去才算开始。</div>
+
+<h2 id="s-layer"><span class="num">2</span>三个名字，三个层次</h2>
+<div class="lede"><b>结论</b>LLaMA-Factory 和 ms-swift 是「框架」，帮你把数据加载、训练循环、导出、界面都包好；Unsloth 是「加速内核」，替掉底层的算子实现。前者管流程，后者管速度，不冲突。</div>
+
+<figure>
+  <svg viewBox="0 0 680 272" role="img" aria-label="三层结构：底层 transformers 训练栈，中层框架与加速，顶层你的配置">
+    <defs>
+      <marker id="bh1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+    </defs>
+
+    <text class="sm" x="8" y="16">你的东西，最少的一层</text>
+    <rect class="bxW" x="8" y="24" width="664" height="52" rx="9"/>
+    <text class="lb" x="340" y="46" text-anchor="middle">一份 YAML / 一条命令 / 三十行脚本</text>
+    <text class="lb2" x="340" y="66" text-anchor="middle">要改的只有模型、数据、r、学习率这几个值</text>
+
+    <line class="ar" x1="340" y1="76" x2="340" y2="94" marker-end="url(#bh1)"/>
+
+    <text class="sm" x="8" y="112">中间层，三选一或叠着用</text>
+    <rect class="bxA" x="8" y="118" width="210" height="72" rx="9"/>
+    <text class="lb" x="113" y="142" text-anchor="middle">LLaMA-Factory</text>
+    <text class="lb2" x="113" y="162" text-anchor="middle">框架 · 有 WebUI · 零代码</text>
+    <text class="sm" x="113" y="180" text-anchor="middle" fill="#1d4ed8">管流程：数据 → 训练 → 导出</text>
+
+    <rect class="bxA" x="234" y="118" width="210" height="72" rx="9"/>
+    <text class="lb" x="339" y="142" text-anchor="middle">魔搭 ms-swift</text>
+    <text class="lb2" x="339" y="162" text-anchor="middle">框架 · 命令行 · 配套社区</text>
+    <text class="sm" x="339" y="180" text-anchor="middle" fill="#1d4ed8">管流程：同上，另一套写法</text>
+
+    <rect class="bxG" x="460" y="118" width="212" height="72" rx="9"/>
+    <text class="lb" x="566" y="142" text-anchor="middle">Unsloth</text>
+    <text class="lb2" x="566" y="162" text-anchor="middle">加速内核 · 手写脚本</text>
+    <text class="sm" x="566" y="180" text-anchor="middle" fill="#0f766e">管速度：同显存跑更快</text>
+
+    <line class="ar" x1="340" y1="190" x2="340" y2="208" marker-end="url(#bh1)"/>
+
+    <text class="sm" x="8" y="224">底座，谁都要用</text>
+    <rect class="bx" x="8" y="228" width="664" height="36" rx="7" stroke-width="1.6"/>
+    <text class="lb2" x="340" y="251" text-anchor="middle">transformers　·　peft　·　trl　·　bitsandbytes　·　你的显卡</text>
+  </svg>
+  <figcaption>框架和内核都坐在同一套栈上。所以学会看懂底层脚本，换哪个框架都只是换写法。</figcaption>
+</figure>
+
+<div class="why"><span class="tag">关键一句</span>三个一起学是浪费。正确顺序是：<b>先看懂底层那三十行</b>（第 5 章），框架就变成了「替你写这三十行」的快捷键。反过来先学框架，你会一直不知道 YAML 里的 <code>lora_rank</code> 到底改了什么。</div>
+
+<table class="tbl stack">
+  <tr><th style="width:150px">名字</th><th style="width:130px">是什么</th><th>它替你做掉的事</th></tr>
+  <tr><td>LLaMA-Factory</td><td>框架</td><td>读数据、拼 prompt、挂 LoRA、跑训练循环、存 adapter、合并权重、开网页界面——全都包了</td></tr>
+  <tr><td>魔搭 ms-swift</td><td>框架</td><td>同上，另外多了和 ModelScope 模型库、免费算力 Notebook 的直连</td></tr>
+  <tr><td>Unsloth</td><td>加速内核</td><td>把 attention 和前向的那几个算子换成手写的更省显存版本；训练流程还得你自己写</td></tr>
+</table>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：框架管流程，内核管速度，两者不在一个维度，可以叠着用</li>
+  <li>不这么做会：把三个名字当成三选一的竞品，花一周各学一遍，底层还是没懂</li>
+  <li>下次遇到同类问题，先问：这个东西是替我「省事」，还是替我「提速」</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>先看懂底层三十行，框架才是快捷键，不是黑箱。</div>
+
+<h2 id="s-factory"><span class="num">3</span>配置驱动一：LLaMA-Factory</h2>
+<div class="lede"><b>结论</b>它的价值就一条：不写 Python 也能训。代价是所有东西都藏进 YAML，你得知道那几个字段对应什么。</div>
+
+<h3>装与启动</h3>
+<pre class="code">git clone --depth 1 https://github.com/hiyouga/LLaMA-Factory.git
+<span class="k">cd</span> LLaMA-Factory
+pip install -e <span class="s">".[torch,metrics]"</span>
+
+<span class="c"># 两种入口，先用界面把流程走一遍</span>
+llamafactory-cli webui          <span class="c"># 打开网页，点着配</span>
+llamafactory-cli train sft_config.yaml <span class="c"># 用配置文件跑，可复现</span></pre>
+
+<h3>数据：先注册，才能选</h3>
+<p>它不从命令行直接读文件，而是要求你在 <code>data/dataset_info.json</code> 里登记一个数据集名，之后 YAML 里用这个名字。这是新手第一个卡点。</p>
+
+<pre class="code"><span class="c">// data/dataset_info.json 里加一条</span>
+<span class="s">"hyde_law"</span>: {
+  <span class="s">"file_name"</span>: <span class="s">"hyde_law.json"</span>,
+  <span class="s">"columns"</span>: { <span class="s">"prompt"</span>: <span class="s">"input"</span>, <span class="s">"response"</span>: <span class="s">"output"</span> }
+}</pre>
+
+<p>这个 <code>columns</code> 是把它自己的字段名，映射到你数据的字段名。你的数据长这样就不用改文件：</p>
+
+<pre class="code">{<span class="s">"input"</span>: <span class="s">"老板让我天天加班不给钱"</span>, <span class="s">"output"</span>: <span class="s">"用人单位安排劳动者延长工作时间的，应当支付不低于百分之一百五十的报酬。"</span>}</pre>
+
+<h3>训练配置：真正要改的就这九行</h3>
+<pre class="code">model_name_or_path: Qwen/Qwen3-1.7B
+stage: sft
+do_train: <span class="k">true</span>
+finetuning_type: lora
+lora_rank: 16
+lora_target: all
+dataset: hyde_law
+cutoff_len: 1024
+output_dir: saves/qwen3-1.7b-hyde
+
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8      <span class="c"># 等效 batch = 16</span>
+learning_rate: 1.0e-4
+num_train_epochs: 3.0</pre>
+
+<div class="why"><span class="tag">对照</span>这九行就是上一课那张概念图里的「参数层」：<code>lora_rank</code> 是 r、<code>lora_target</code> 是挂载层、<code>cutoff_len</code> 是 max_length、batch 与梯度累积是两个字段。<b>YAML 不是新知识，是那六个旋钮的另一种写法。</b></div>
+
+<h3>它替你做的事，值得知道</h3>
+<ul>
+  <li>把 <code>input</code> + <code>output</code> 拼成带 chat 模板的完整序列，并自动把 prompt 段标成不算 loss</li>
+  <li>按 <code>cutoff_len</code> 截断、能开 packing</li>
+  <li>训完把 adapter 存到 <code>output_dir</code>，几十 MB，不是整个模型</li>
+  <li><code>llamafactory-cli export</code> 能把 adapter 合回基座，产出一个完整模型目录</li>
+</ul>
+
+<div class="pit"><b>它的黑箱在这里：数据拼装。</b>不同模型有不同的 chat 模板（Qwen 有自己的格式），模板选错不会报错，但效果会莫名很差——因为模型看到的不是你想要的对话结构。跑完先拿一条样本 <code>decode</code> 出来看一眼，确认「问题 + 答案」的拼接是你以为的样子。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：Factory 的用法就是「注册数据集 → 写九行 YAML → 一条命令」，界面是给你试参数用的</li>
+  <li>不这么做会：数据没注册就去填 YAML，报「dataset not found」，然后开始怀疑人生</li>
+  <li>下次遇到同类问题，先看：模板对不对、cutoff_len 够不够、batch 与累积乘出来是多少</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>YAML 里的每个字段，都是你在上一课学过的那个旋钮。</div>
+
+<h2 id="s-swift"><span class="num">4</span>配置驱动二：魔搭 ms-swift</h2>
+<div class="lede"><b>结论</b>和 Factory 是同类，能力对得上。它真正的优势不在功能，在网络和算力：国内直连下模型，配套免费 Notebook。</div>
+
+<pre class="code">pip install ms-swift -U
+
+<span class="c"># 一条命令开训，参数直接写在命令行</span>
+swift sft \
+  --model Qwen/Qwen3-1.7B \
+  --train_type lora \
+  --dataset data/hyde_law.jsonl \
+  --num_train_epochs 3 \
+  --per_device_train_batch_size 2 \
+  --gradient_accumulation_steps 8 \
+  --learning_rate 1e-4 \
+  --lora_rank 16 \
+  --output_dir output/qwen3-hyde</pre>
+
+<h3>和 Factory 的四个实际差别</h3>
+<table class="tbl stack">
+  <tr><th style="width:150px">方面</th><th style="width:250px">LLaMA-Factory</th><th>ms-swift</th></tr>
+  <tr><td>怎么配</td><td>YAML 文件 + 网页界面</td><td>命令行参数为主，也支持 yaml</td></tr>
+  <tr><td>数据怎么给</td><td>先在 <code>dataset_info.json</code> 注册名字</td><td>直接给文件路径，或注册数据集名</td></tr>
+  <tr><td>数据格式</td><td>alpaca（instruction/input/output）或 sharegpt（messages）</td><td>messages 或 query/response，字段名不同，要改映射</td></tr>
+  <tr><td>模型从哪来</td><td>HuggingFace 为主，也支持魔搭</td><td class="ok">默认走 ModelScope，国内不用配镜像也不卡</td></tr>
+</table>
+
+<div class="why"><span class="tag">选它的理由</span>如果你的痛点是「下模型老断」「没有卡但想试」，ms-swift + 魔搭的组合比 Factory 顺——它和社区是同一家，模型、Notebook、训练命令在同一个地方。如果你的痛点是「要给不写代码的人演示」，Factory 的网页更直观。</div>
+
+<div class="pit"><b>两个框架别混着记命令。</b>它们参数名很像但不完全一样（<code>--lora_rank</code> 都有，数据参数一个叫 <code>--dataset</code> 一个是注册名）。真正要记住的只有一件事：<b>数据字段怎么映射</b>。换框架时 80% 的报错都出在这。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：ms-swift 和 Factory 能力同级，差别在配置方式、数据字段、模型来源</li>
+  <li>不这么做会：把两套命令混着抄，跑不起来还以为是框架有 bug</li>
+  <li>下次遇到同类问题，先看：这个框架要求的数据字段名是什么，你的 jsonl 对不对得上</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>选 Factory 还是 ms-swift，看你的卡和网，不看功能表。</div>
+
+<h2 id="s-code"><span class="num">5</span>代码驱动：三十行，以及 Unsloth</h2>
+<div class="lede"><b>结论</b>框架替你写的就是这三十行。看懂它，你才知道 YAML 里那些字段在干什么；而 Unsloth 是在这三十行底下换引擎，不改变你写的东西。</div>
+
+<h3>手写版：4bit 加载 + 挂 LoRA</h3>
+<pre class="code"><span class="k">from</span> transformers <span class="k">import</span> AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+<span class="k">from</span> peft <span class="k">import</span> LoraConfig, get_peft_model, prepare_model_for_kbit_training
+<span class="k">import</span> torch
+
+bnb = BitsAndBytesConfig(
+    load_in_4bit=<span class="k">True</span>,
+    bnb_4bit_quant_type=<span class="s">"nf4"</span>,              <span class="c"># 4bit 的量化方式</span>
+    bnb_4bit_use_double_quant=<span class="k">True</span>,         <span class="c"># 量化常数再压一次</span>
+    bnb_4bit_compute_dtype=torch.bfloat16,   <span class="c"># 算的时候用 bf16</span>
+)
+
+model = AutoModelForCausalLM.from_pretrained(
+    <span class="s">"Qwen/Qwen3-1.7B"</span>, quantization_config=bnb, device_map=<span class="s">"auto"</span>)
+model = prepare_model_for_kbit_training(model)
+
+lora = LoraConfig(
+    r=16, lora_alpha=32, lora_dropout=0.05,
+    target_modules=[<span class="s">"q_proj"</span>, <span class="s">"k_proj"</span>, <span class="s">"v_proj"</span>, <span class="s">"o_proj"</span>],
+    task_type=<span class="s">"CAUSAL_LM"</span>,
+)
+model = get_peft_model(model, lora)
+model.print_trainable_parameters()   <span class="c"># 会打印「可训参数占 1% 左右」</span></pre>
+
+<p>这四步对应的就是上一课那张 LoRA 图：<b>基座压成 4bit（QLoRA）、冻结原权重、旁挂 A×B、只训那一小块。</b>剩下的是把数据拼成序列、交给 <code>Trainer</code> 跑——那部分每个框架各写一遍，长得都差不多。</p>
+
+<h3>Unsloth 版：换掉这几行</h3>
+<pre class="code"><span class="k">from</span> unsloth <span class="k">import</span> FastLanguageModel
+
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name=<span class="s">"unsloth/Qwen3-1.7B-unsloth-bnb-4bit"</span>,
+    max_seq_length=1024, load_in_4bit=<span class="k">True</span>)
+
+model = FastLanguageModel.get_peft_model(
+    model, r=16, lora_alpha=32, lora_dropout=0.0,
+    target_modules=[<span class="s">"q_proj"</span>, <span class="s">"k_proj"</span>, <span class="s">"v_proj"</span>, <span class="s">"o_proj"</span>])</pre>
+
+<p>注意区别：<b>参数名几乎一样，但入口换成了 <code>FastLanguageModel</code>。</b>它内部把 attention 和前向的算子换成了手写实现，所以同样的显存能开更大的 batch，或者同样的 batch 跑得更快。你的训练循环、数据、评估代码一行都不用改。</p>
+
+<div class="two">
+  <div class="col good">
+    <div class="hd">Unsloth 值得用的场景</div>
+    <div class="bd plain">单卡、显存吃紧<br>要反复试很多配置<br>模型在它支持列表里<br>能接受 Linux / WSL</div>
+    <div class="ft">省下来的时间是真的——试错轮次越多，收益越明显。</div>
+  </div>
+  <div class="col bad">
+    <div class="hd">不建议硬上的场景</div>
+    <div class="bd plain">模型不在支持列表<br>只有 Windows 原生环境<br>要改模型结构<br>需要最新架构特性</div>
+    <div class="ft">它靠预置的算子实现换速度，模型太新或太偏，就得等适配。</div>
+  </div>
+</div>
+
+<div class="pit"><b>别在 Windows 原生环境跟它较劲。</b>它的加速依赖自定义 kernel 和 <code>triton</code>，官方支持的是 Linux；Windows 下要么走 WSL，要么直接用云。这和前面那条「环境配超过一小时就换方案」是同一条纪律。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：框架替你写的就是这段代码；Unsloth 换的是引擎，不是流程</li>
+  <li>不这么做会：只会点界面，换框架或报错时完全不知道从哪查</li>
+  <li>下次遇到同类问题，先看：<code>print_trainable_parameters()</code> 打出来是多少，对不上就是挂载层错了</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>先手写一遍三十行，之后用框架才叫「省事」，不叫「不懂」。</div>
+
+</main>
+
+<nav class="nav">
+  <a href="L01_微调选型_课时页.html"><div class="dir">← 上一课 · L01</div><div class="tt">微调选型</div></a>
+  <div class="ph nx">下一课 · 尺子与数据（重写中）</div>
+</nav>
+
+<div class="footnote">L02 · 环境与三种微调方式</div>
+</div>
+
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.modnav a'));
+  if(!links.length) return;
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+
+  function spy(){
+    var line=window.scrollY+90, idx=0;
+    for(var i=0;i<secs.length;i++){
+      var el=secs[i];
+      if(el && el.getBoundingClientRect().top+window.scrollY<=line) idx=i;
+    }
+    links.forEach(function(a,i){a.classList.toggle('on',i===idx);});
+  }
+
+  window.addEventListener('scroll',spy,{passive:true});
+  window.addEventListener('resize',spy);
+
+  links.forEach(function(a){
+    a.addEventListener('click',function(e){
+      var t=document.querySelector(a.getAttribute('href'));
+      if(!t) return;
+      e.preventDefault();
+      var far=Math.abs(t.getBoundingClientRect().top)>2400;
+      t.scrollIntoView({behavior:far?'instant':'smooth',block:'start'});
+      if(history.replaceState) history.replaceState(null,'',a.getAttribute('href'));
+    });
+  });
+
+  spy();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L00 · 微调认知与原理</title>
+<style>
+:root{
+  --primary:#0d9488; --primary-d:#0f766e; --blue:#2563eb; --blue-d:#1d4ed8;
+  --bg:#eef2f7; --card:#ffffff; --text:#1e293b; --muted:#64748b;
+  --line:#e2e8f0; --soft:#f8fafc; --warn:#b45309; --warn-bg:#fffbeb;
+  --deep:#163a5f; --code-bg:#0e1a2b; --code-fg:#dbe6ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.78;padding:24px 16px 40px;
+  font-size:15px;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;}
+
+/* ── 页头 ── */
+.chead{background:linear-gradient(135deg,#0f766e 0%,#155e93 52%,#1d4ed8 100%);color:#fff;border-radius:16px;padding:26px 30px 20px;position:relative;overflow:hidden;}
+.chead::after{content:"";position:absolute;right:-46px;top:-58px;width:180px;height:180px;background:rgba(255,255,255,.10);border-radius:28px;transform:rotate(18deg);}
+.chead::before{content:"";position:absolute;right:86px;bottom:-58px;width:110px;height:110px;background:rgba(255,255,255,.07);border-radius:50%;}
+.kicker{display:flex;align-items:center;gap:9px;flex-wrap:wrap;position:relative;z-index:1;margin-bottom:9px;}
+.lid{background:rgba(255,255,255,.95);color:#0f766e;font-weight:800;font-size:12.4px;padding:2px 10px;border-radius:6px;letter-spacing:.6px;}
+.lname{font-size:12.2px;color:#d6ecff;letter-spacing:.4px;}
+.ltotal{margin-left:auto;font-size:11.8px;color:#a8cdf0;}
+.chead h1{font-size:27px;line-height:1.36;letter-spacing:-.4px;font-weight:800;position:relative;z-index:1;}
+.chead .sub{font-size:13.4px;color:#d5e8fb;margin-top:7px;max-width:770px;position:relative;z-index:1;}
+
+/* ── 正文容器 ── */
+main{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 28px 20px;margin-top:14px;box-shadow:0 1px 3px rgba(15,23,42,.05);}
+h2{font-size:19px;font-weight:800;margin:30px 0 10px;color:#0f2f4d;line-height:1.45;display:flex;align-items:center;gap:9px;}
+h2:first-child{margin-top:0;}
+h2[id]{scroll-margin-top:64px;}
+h2::before{content:"";width:4px;height:17px;background:linear-gradient(180deg,var(--primary),var(--blue));border-radius:2px;flex:0 0 auto;}
+h3{font-size:15.2px;font-weight:800;margin:20px 0 8px;color:#173a5c;line-height:1.5;}
+h4{font-size:13.6px;font-weight:700;margin:13px 0 5px;color:#1e3448;}
+p{margin:9px 0;font-size:14.3px;}
+strong,b{color:#0b2a45;}
+.en{font-size:11px;color:#94a3b8;font-weight:400;letter-spacing:.2px;white-space:nowrap;}
+.hl{background:linear-gradient(transparent 62%,#d7f2ee 62%);font-weight:700;padding:0 1px;}
+ul,ol{margin:8px 0 8px 20px;font-size:14.2px;}
+li{margin:4px 0;line-height:1.75;}
+
+/* ── 决策卡 ── */
+.dec{border:1px solid #d9e6f6;border-radius:11px;overflow:hidden;margin:14px 0 6px;background:#fff;}
+.dec .hd{background:#eff5ff;padding:8px 14px;font-size:12.4px;font-weight:800;color:#1d4ed8;letter-spacing:.3px;}
+.dec .row{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:9px 14px;border-top:1px solid #eef2f8;font-size:13.4px;}
+.dec .row .k{color:var(--muted);font-weight:700;font-size:12.3px;padding-top:1px;}
+.dec .row .v{line-height:1.72;}
+.dec .row.no .v{color:#b91c1c;}
+.dec .row.yes .v{color:#0f766e;}
+.dec.wide .row{grid-template-columns:118px 1fr;}
+.dec.wide .row .k{color:#0b2a45;font-size:12.8px;} .dec .kk{display:block;margin-top:3px;font-weight:400;color:#7c8ba0;font-size:11.4px;line-height:1.45;}
+.dec .v .mix{display:block;margin-top:5px;font-size:12.3px;color:#93a3b8;line-height:1.66;}
+.dec .v .mix::before{content:"容易混 · ";color:#c0884a;font-weight:700;}
+.dec .v .note{display:block;margin-top:5px;font-size:12.3px;color:#93a3b8;line-height:1.66;}
+
+/* ── 提示块 ── */
+.why{background:#f0fbf9;border-left:3px solid var(--primary);border-radius:0 9px 9px 0;padding:11px 15px;margin:13px 0;font-size:13.8px;line-height:1.75;}
+.why .tag{display:inline-block;background:var(--primary);color:#fff;font-size:11.4px;font-weight:700;padding:1px 8px;border-radius:5px;margin-right:8px;}
+.pit{background:var(--warn-bg);border:1px solid #fde68a;border-radius:9px;padding:10px 14px;margin:12px 0;font-size:13.5px;color:#78350f;line-height:1.75;}
+.pit b{color:var(--warn);}
+.chk{background:#f0fdfa;border:1px solid #99f6e4;border-radius:9px;padding:11px 14px;margin:14px 0 4px;font-size:13.5px;line-height:1.75;}
+.chk b{color:#0f766e;}
+
+/* ── 双栏对比 ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0;}
+.two .col{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column;}
+.two .col .hd{padding:7px 12px;font-size:12.2px;font-weight:800;letter-spacing:.2px;}
+.two .bad{border-color:#fecaca;}
+.two .bad .hd{background:#fef2f2;color:#b91c1c;border-bottom:1px solid #fecaca;}
+.two .good{border-color:#99f6e4;}
+.two .good .hd{background:#f0fdfa;color:#0f766e;border-bottom:1px solid #99f6e4;}
+.two .col .bd{padding:10px 12px;font-family:Consolas,"Courier New",monospace;font-size:12.1px;line-height:1.75;white-space:pre-wrap;word-break:break-word;flex:1;}
+.two .col .ft{padding:7px 12px;font-size:12.3px;line-height:1.68;border-top:1px dashed #eef2f8;font-family:-apple-system,"PingFang SC",sans-serif;}
+.two .bad .ft{color:#b91c1c;background:#fffafa;}
+.two .good .ft{color:#0f766e;background:#fafffe;}
+
+/* ── 顶部章节导航 ── */
+.modnav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:12px;margin-top:14px;box-shadow:0 2px 10px rgba(15,23,42,.06);}
+.modnav .in{display:flex;gap:2px;overflow-x:auto;padding:0 8px;scrollbar-width:none;}
+.modnav .in::-webkit-scrollbar{display:none;}
+.modnav a{flex:0 0 auto;padding:10px 11px 9px;font-size:12.7px;font-weight:700;color:#64748b;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;letter-spacing:.2px;}
+.modnav a .n{display:inline-block;min-width:14px;margin-right:4px;font-size:10.6px;font-weight:800;color:#a8b6c8;font-variant-numeric:tabular-nums;letter-spacing:0;}
+.modnav a:hover{color:#0f766e;}
+.modnav a.on{color:#0f766e;border-bottom-color:#0d9488;}
+.modnav a.on .n{color:#0d9488;}
+.modnav + main{margin-top:10px;}
+
+/* ── 课程目标表 ── */
+.goal{border:1px solid #d9e6f6;border-radius:11px;overflow:hidden;background:#fff;margin:0 0 4px;}
+.goal .gh{background:#eff5ff;padding:8px 14px;font-size:12.4px;font-weight:800;color:#1d4ed8;letter-spacing:.3px;}
+.goal .gh em{font-style:normal;font-weight:600;color:#64748b;font-size:12px;margin-left:8px;letter-spacing:0;}
+.goal .tbl{margin:0;}
+.goal .tbl th{padding:8px 14px;background:#f7fafd;}
+.goal .tbl td{padding:10px 14px;}
+.goal .tbl td:first-child{white-space:nowrap;}
+.goal .tier{display:inline-block;font-size:11.6px;font-weight:800;color:#fff;padding:2px 9px;border-radius:5px;letter-spacing:.4px;}
+.goal .tier.a{background:#0d9488;}
+.goal .tier.b{background:#2563eb;}
+.goal .tier.c{background:#b45309;}
+.goal .tbl b{color:#0b2a45;}
+.bound{font-size:12.3px;color:#64748b;border-top:1px dashed var(--line);padding:8px 14px;line-height:1.7;}
+.bound b{color:var(--warn);}
+
+/* ── 代码 ── */
+pre.code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:12px 15px;font-family:"JetBrains Mono",Consolas,"Courier New",monospace;font-size:12.4px;line-height:1.82;overflow-x:auto;margin:11px 0;white-space:pre;}
+pre.code .c{color:#7c8fa8;}
+pre.code .k{color:#7dd3fc;}
+pre.code .s{color:#a5e8b0;}
+code{font-family:Consolas,monospace;}
+p code,li code,td code{background:#eef2f7;padding:1px 5px;border-radius:4px;font-size:12.2px;color:#0f766e;}
+
+/* ── 表格 ── */
+.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+.tbl th{text-align:left;padding:8px 10px;background:#f4f7fb;color:#334155;font-weight:700;font-size:12.4px;border-bottom:1px solid var(--line);}
+.tbl td{padding:8px 10px;border-bottom:1px solid #eef2f7;vertical-align:top;line-height:1.7;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl .ok{color:#0f766e;font-weight:700;}
+.tbl .no2{color:#b91c1c;font-weight:700;}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap;}
+
+/* ── 图 ── */
+figure{margin:16px 0 6px;background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:14px 14px 8px;}
+figure svg{display:block;width:100%;height:auto;}
+figcaption{font-size:12.2px;color:var(--muted);text-align:center;margin-top:6px;padding-bottom:2px;}
+.bx{fill:#fff;stroke:#94a3b8;stroke-width:1.4;}
+.bxA{fill:#eef5ff;stroke:#2563eb;stroke-width:1.6;}
+.bxG{fill:#eefbf7;stroke:#0d9488;stroke-width:1.6;}
+.bxW{fill:#fff8e8;stroke:#d97706;stroke-width:1.5;}
+.bxR{fill:#fef1f1;stroke:#dc2626;stroke-width:1.4;}
+.bxD{fill:#163a5f;stroke:#163a5f;}
+.lb{font-size:12.4px;fill:#0f2f4d;font-weight:700;}
+.lb2{font-size:11.4px;fill:#475569;}
+.lbw{font-size:12.2px;fill:#fff;font-weight:700;}
+.sm{font-size:10.8px;fill:#64748b;}
+.mono{font-family:Consolas,"Courier New",monospace;}
+.ar{stroke:#64748b;stroke-width:1.5;fill:none;}
+.arB{stroke:#2563eb;stroke-width:1.7;fill:none;}
+.arG{stroke:#0d9488;stroke-width:1.6;fill:none;}
+.arR{stroke:#dc2626;stroke-width:1.5;fill:none;}
+
+/* ── 练习 ── */
+.drill{border:1px dashed #a5b4fc;background:#f5f7ff;border-radius:11px;padding:13px 16px;margin:14px 0 4px;}
+.drill .dh{font-size:12.9px;font-weight:800;color:#4338ca;margin-bottom:6px;}
+.drill ol{margin:6px 0 0 18px;font-size:13.4px;}
+.drill li{margin:5px 0;line-height:1.72;}
+
+/* ── 一句话带走 ── */
+.takeaway{background:var(--deep);color:#eaf3ff;border-radius:10px;padding:11px 16px;margin-top:18px;display:flex;align-items:center;gap:11px;font-size:13.6px;line-height:1.6;}
+.takeaway span.t{flex:0 0 auto;background:var(--primary);color:#fff;font-size:11.2px;font-weight:800;padding:2px 9px;border-radius:999px;letter-spacing:.4px;}
+
+/* ── 章末小结 ── */
+.recap{background:var(--soft);border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:10px;padding:11px 15px;margin:16px 0 0;font-size:13.2px;line-height:1.72;}
+.recap b{display:block;font-size:12.8px;color:#0f766e;margin-bottom:4px;}
+.recap ul{margin:0 0 0 17px;}
+.recap li{margin:3px 0;}
+
+/* ── 结论条 ── */
+.lede{background:#eef4ff;border-left:3px solid var(--blue);border-radius:0 9px 9px 0;padding:10px 15px;margin:0 0 12px;font-size:14px;line-height:1.7;color:#12305c;font-weight:600;}
+.lede b{display:inline-block;margin-right:8px;background:var(--blue);color:#fff;font-size:11.2px;font-weight:800;padding:1px 8px;border-radius:999px;letter-spacing:.4px;vertical-align:1px;}
+.lede code{background:#dde9ff;color:#0b3d91;border-color:#c9dbfb;}
+
+/* ── 表格外壳 ── */
+.tblwrap{overflow-x:auto;margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#fff;}
+.tblwrap .tbl{width:100%;min-width:560px;margin:0;}
+.goal .tblwrap{border:none;border-radius:0;margin:0;background:transparent;}
+
+/* ── 补充说明块 ── */
+.exp{background:#f0fdfa;border:1px solid #99f6e4;border-left:3px solid var(--primary);border-radius:9px;padding:10px 14px;margin:12px 0;font-size:13.3px;line-height:1.75;}
+.exp b{color:#0f766e;}
+
+/* ── 面试高频标注 ── */
+.fq{display:inline-block;background:#b45309;color:#fff;font-size:10.4px;font-weight:800;padding:1px 6px;border-radius:4px;letter-spacing:.3px;vertical-align:1.5px;margin-right:5px;white-space:nowrap;}
+.tbl tr.hot td{background:#fffdf5;}
+.tbl tr.hot td:first-child{box-shadow:inset 3px 0 0 #d97706;}
+.hotq{border:1px solid #fcd34d;border-left:3px solid #d97706;background:#fffdf5;border-radius:0 9px 9px 0;padding:10px 15px;margin:13px 0;font-size:13.4px;line-height:1.78;}
+.hotq .qh{font-size:12.3px;font-weight:800;color:#b45309;margin-bottom:5px;letter-spacing:.2px;}
+.hotq ul{margin:4px 0 0 17px;}
+.hotq li{margin:5px 0;}
+.hotq .a{color:#0f766e;font-weight:700;}
+
+/* ── 章号块 ── */
+h2 .num{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:8px;background:#eaf0ff;color:var(--blue-d);font-size:13px;font-weight:800;flex:0 0 auto;}
+h2:has(.num)::before{display:none;}
+
+/* ── 上下页导航 ── */
+.nav{display:flex;gap:12px;margin-top:16px;}
+.nav a{flex:1;display:block;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 15px;text-decoration:none;color:var(--text);transition:.15s;}
+.nav a:hover{border-color:#b9cde6;box-shadow:0 2px 8px rgba(15,23,42,.07);}
+.nav .dir{font-size:11.4px;color:var(--muted);font-weight:700;letter-spacing:.4px;}
+.nav .tt{font-size:13.4px;font-weight:700;color:#12406b;margin-top:2px;}
+.nav .nx{text-align:right;}
+.nav .ph{flex:1;border:1px dashed var(--line);border-radius:11px;padding:11px 15px;color:#b6c2d2;font-size:12.4px;}
+
+.footnote{text-align:center;font-size:12px;color:#94a3b8;margin-top:22px;}
+
+@media (max-width:900px){
+  .chead{padding:22px 20px 18px;}
+  .chead h1{font-size:22.5px;}
+  main{padding:20px 17px;}
+  .dec .row{grid-template-columns:1fr;gap:2px;}
+  .nav{flex-direction:column;}
+  .two{grid-template-columns:1fr;}
+  figure{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#c3cfdd transparent;}
+  figure svg{min-width:520px;}
+  main table{display:block;overflow-x:auto;}
+  main table.tbl th,main table.tbl td{min-width:104px;}
+  main table.tbl.stack,main table.tbl.stack tbody,main table.tbl.stack tr,main table.tbl.stack td,main table.tbl.stack th{display:block;min-width:0;width:auto;}
+  main table.tbl.stack tr:first-child{display:none;}
+  main table.tbl.stack tr{border-bottom:1px solid var(--line);padding:9px 14px;}
+  main table.tbl.stack tr:last-child{border-bottom:none;}
+  main table.tbl.stack td{border:none;padding:2px 0;}
+  main table.tbl.stack td:first-child{margin-bottom:3px;}
+  pre.code{font-size:11.4px;}
+}
+@media print{
+  body{background:#fff;padding:0;font-size:11.5px;}
+  .chead{border-radius:0;}
+  main{box-shadow:none;border:none;padding:0;margin-top:8px;}
+  .nav,.footnote,.modnav{display:none;}
+  .dec,.drill,.chk,.recap,.takeaway,.exp,.lede,figure,h2,h3,.two,.goal,.hotq{break-inside:avoid;page-break-inside:avoid;}
+  .fq,.tbl tr.hot td{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  figure{overflow:visible;}
+  figure svg{min-width:0;}
+  h2,h3{break-after:avoid;page-break-after:avoid;}
+  pre.code{background:#f5f7fa;color:#1e293b;border:1px solid #dbe3ec;}
+  pre.code .c{color:#7a8699;} pre.code .k{color:#0b5cbf;} pre.code .s{color:#0f766e;}
+  .takeaway{background:#163a5f !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  @page{size:A4;margin:12mm;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="chead">
+  <div class="kicker"><span class="lid">L00</span><span class="lname">微调认知与原理</span><span class="ltotal">16 课 · 第 1 课</span></div>
+  <h1>微调改的是说法，不是知识</h1>
+  <p class="sub">一个法律检索系统，用户问「老板让我天天加班不给钱」，它把讲合同终止的条款顶上来。会上有人说「微调一下就好了」——这句话对不对，取决于你分不分得清「缺知识」和「不会说」。这一课先讲微调是什么、它和哪几条路最容易混，再单开一章讲适用场景（先摆六个真实需求，再看五类场景与两处最值钱的位置，最后过五道闸判该不该动手），然后讲微调原理、二十个术语怎么归位，接着拆 LoRA / QLoRA 到底省在哪，最后走一遍从数据到上线的全流程。</p>
+</header>
+
+<nav class="modnav"><div class="in">
+  <a href="#s-what" class="on"><span class="n">1</span>什么是微调</a>
+  <a href="#s-scene"><span class="n">2</span>适用场景</a>
+  <a href="#s-principle"><span class="n">3</span>微调原理</a>
+  <a href="#s-terms"><span class="n">4</span>常见术语</a>
+  <a href="#s-lora"><span class="n">5</span>参数高效</a>
+  <a href="#s-flow"><span class="n">6</span>全流程</a>
+</div></nav>
+
+<main>
+
+<div class="goal" id="goal">
+  <div class="gh">这一课要拿到的东西<em>三档都过，后面的课才接得上</em></div>
+  <table class="tbl">
+    <tr><th style="width:74px">档位</th><th>你能做到</th><th style="width:300px">怎么算达成</th></tr>
+    <tr><td><span class="tier a">看懂</span></td><td>说清微调改什么、不改什么，和 prompt（提示词）、RAG（检索增强生成）、继续预训练（CPT）各管哪一段</td><td>白纸上画出「预训练 → 后训练（微调 → 对齐）→ 部署」，指出这门课动手的是哪一格</td></tr>
+    <tr><td><span class="tier b">判断</span></td><td>拿到一个需求，30 秒判出该微调还是该检索，并说出理由</td><td>从现象表任抽三行，答出「缺的是知识还是行为 + 该动哪个」</td></tr>
+    <tr><td><span class="tier c">说清</span></td><td>把二十个词按「阶段 / 方法 / 超参数（hyperparameter） / 现象」归位，并说得出每个词在这个项目的哪个环节出现</td><td>任抽十个词各给一句白话解释；指着七步流程图，说得出每步会用上哪几个词</td></tr>
+  </table>
+  <div class="bound"><b>不处理：</b>attention（注意力机制）内部怎么算、位置编码、优化器数学推导、三种训练框架怎么装——这些在后面的课里各自展开，这一课只负责把判断力和词汇表立住。<br><b>怎么用标注：</b>页面里带 <span class="fq">高频</span> 的地方，是面试必问、课上会停下来讲透的；其余是背景。</div>
+</div>
+
+<h2 id="s-what"><span class="num">1</span>什么是微调</h2>
+<div class="dec wide">
+  <div class="hd">先给三句话：定义 · 作用 · 常用方法</div>
+  <div class="row"><div class="k">定义</div><div class="v"><b>微调（Fine-Tuning，简称 FT）</b>：在<b>已经预训练好的大模型</b>基础上，用<b>自己任务的数据</b>接着训，让它适应你这个领域、这个场合——<b>不是从零训一个新模型</b>。它是总称，按喂什么数据还能再分几类，第 4 章逐层拆开。</div></div>
+  <div class="row"><div class="k">作用</div><div class="v">在本场景里答得更准、更像行内人（医疗问诊、金融研报、法条口径都靠这一步）；成本上比从头训便宜得多，几百到几千条样本、一张 24G 卡就能开工。但它只改表达与口径，<b>不装新知识，也提不高能力上限</b>。</div></div>
+  <div class="row"><div class="k">常用方法</div><div class="v">全参（<b>Full FT</b>）、冻结部分层（<b>freeze</b>）、Adapter（适配器）、LoRA（<b>Low-Rank Adaptation</b>，低秩适配）、<span style="white-space:nowrap">Prefix（前缀）/ Prompt Tuning</span>——<b>差别只在「动多少参数」</b>。其中 LoRA 是旁挂两个小矩阵，叠上 4bit 基座就是 QLoRA（<b>Quantized LoRA</b>，量化 LoRA）。第 4 章有一棵完整的树。</div></div>
+</div>
+<h3>区分 SFT、RAG、蒸馏</h3>
+<p>这几个词常被并列着说，其实不在同一层：<b>微调（Fine-Tuning，FT）</b>是动作、是总称；<b>SFT（Supervised Fine-Tuning，监督微调）</b>是它最常用的一种喂法；<b>RAG（Retrieval-Augmented Generation，检索增强生成）</b>绕开权重去改上下文（context）；<b>蒸馏（Knowledge Distillation，KD）</b>换的是模型本身的规模。下面这张表先记住，后面每一章都会回来用它。</p>
+<table class="tbl">
+  <tr><th style="width:70px">词</th><th style="width:266px">一句话</th><th style="width:130px">改的是什么</th><th>什么时候用它</th></tr>
+  <tr><td><b>微调</b> <span class="en">FT</span></td><td>拿预训练模型，用自己的数据接着训</td><td>模型里的权重</td><td>格式、语体、口径要稳定，手头有几百到几千条数据</td></tr>
+  <tr><td><b>SFT</b></td><td>微调的一种：喂「问 → 答」成对数据</td><td>同上，形态定死</td><td>有成对标注（annotation），要它「被这么问，就这么答」</td></tr>
+  <tr><td><b>RAG</b></td><td>把资料检索出来塞进上下文，模型不动</td><td>输入里带什么</td><td>知识要新、要能给出处、要能随时换文档</td></tr>
+  <tr><td><b>蒸馏</b></td><td>训个小模型去模仿大模型的输出</td><td>换成更小的模型</td><td>要大模型的效果、小模型的成本，且已有可用的教师</td></tr>
+</table>
+<p><b>蒸馏最容易误会的一点：</b>它搬的是「怎么答」——教师怎么组织答案、怎么权衡说法；教师不知道的事，学生不会因为蒸馏而知道。所以蒸馏出来的小模型照样要接检索。</p>
+<div class="hotq">
+  <div class="qh"><span class="fq">高频</span>「微调和 RAG 有什么区别」，照这三句答</div>
+  <ul>
+    <li>先给分工：<span class="a">「微调改权重，管怎么说；RAG 改上下文，管知道什么。」</span></li>
+    <li>再给取舍：<span class="a">「知识要新、要溯源就上 RAG；格式和口径要稳，才值得微调。两者不冲突，我们是微调 ＋ 检索。」</span></li>
+    <li>被追问 SFT 和蒸馏：<span class="a">「SFT 是微调里最常用的一种喂法；蒸馏是另一个动作——让小模型学大模型的输出，图的是成本和速度。」</span></li>
+  </ul>
+</div>
+
+<p>在动微调之前，先看清它在整条流水线上的位置：<b>预训练</b>（pre-training）→ <b>微调</b>（fine-tuning）→ <b>偏好对齐</b>（preference alignment）→ <b>部署</b>（deployment）。中间两格合起来叫<b>后训练</b>（post-training）——把只会接龙的基座，调成会听指令、会挑好答案的助手。</p>
+
+<figure>
+  <svg viewBox="0 0 680 168" role="img" aria-label="模型能力的四个阶段：预训练、微调、偏好对齐、部署，其中微调与对齐合称后训练">
+    <defs>
+      <marker id="ah1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+    </defs>
+    <rect class="bx" x="6" y="26" width="146" height="56" rx="9"/>
+    <text class="lb" x="79" y="49" text-anchor="middle">预训练</text>
+    <text class="lb2" x="79" y="69" text-anchor="middle">读万卷书，学会接下一个字</text>
+
+    <line class="ar" x1="152" y1="54" x2="182" y2="54" marker-end="url(#ah1)"/>
+
+    <rect class="bxG" x="186" y="26" width="152" height="56" rx="9" stroke-width="2.2"/>
+    <text class="lb" x="262" y="49" text-anchor="middle">微调</text>
+    <text class="lb2" x="262" y="69" text-anchor="middle">学这个场合怎么说</text>
+
+    <line class="ar" x1="338" y1="54" x2="368" y2="54" marker-end="url(#ah1)"/>
+
+    <rect class="bx" x="372" y="26" width="140" height="56" rx="9"/>
+    <text class="lb" x="442" y="49" text-anchor="middle">偏好对齐</text>
+    <text class="lb2" x="442" y="69" text-anchor="middle">学哪种回答更受认可</text>
+
+    <line class="ar" x1="512" y1="54" x2="542" y2="54" marker-end="url(#ah1)"/>
+
+    <rect class="bxA" x="546" y="26" width="128" height="56" rx="9"/>
+    <text class="lb" x="610" y="49" text-anchor="middle">部署</text>
+    <text class="lb2" x="610" y="69" text-anchor="middle">接进系统干活</text>
+
+    <line x1="186" y1="94" x2="512" y2="94" stroke="#0d9488" stroke-width="1.2"/>
+    <line x1="186" y1="94" x2="186" y2="100" stroke="#0d9488" stroke-width="1.2"/>
+    <line x1="512" y1="94" x2="512" y2="100" stroke="#0d9488" stroke-width="1.2"/>
+    <text class="sm" x="349" y="116" text-anchor="middle" fill="#0f766e">后训练 post-training：把 base（基座模型）变成会听指令的 assistant（助手模型）</text>
+    <text class="sm" x="340" y="146" text-anchor="middle">本课只动中间这一格：把它从「会说话」掰到「会按你的场合说」</text>
+  </svg>
+  <figcaption>四格是叠上去的，不是四选一：下层不稳，上层白搭。中间那格输入是任务里的问题，输出是你要的答法。</figcaption>
+</figure>
+
+<h3>两个常见的比方，一个对一个错</h3>
+<p>讲微调最顺口的两个比方是「通才进修」和「闭卷考试」。第一个能直接用，第二个会把听众带偏——它俩差的正是这一课的核心。</p>
+
+<div class="two">
+  <div class="col good">
+    <div class="hd">通才进修 · 这个比方成立</div>
+    <div class="bd">预训练 → 读万卷书，什么都懂一点
+微调 → 送去律所实习三个月
+回来后 → 说话像律师，办事按流程</div>
+    <div class="ft">知识面没变宽，但「在这个场合该怎么说」变了。</div>
+  </div>
+  <div class="col bad">
+    <div class="hd">闭卷考试 · 这个比方误导</div>
+    <div class="bd">闭卷 → 把知识点背进脑子
+考完 → 能默写条文
+推论 → 微调能「记住」新法规</div>
+    <div class="ft">要它「查得到」，得靠检索；训练改的是答题习惯。</div>
+  </div>
+</div>
+
+<div class="why"><span class="tag">为什么较真</span>「进修」是把人放到场景里练反应，「闭卷考试」是把纸上的字搬进脑子。前者改语体和习惯，后者改知识库存——<b>微调只做得到前者</b>，这一个分岔决定了后面所有的判断。</div>
+
+<h3>五个最贵的误解</h3>
+<p>这五条记死，面试一半的坑就绕过去了。它们的根源是同一个：把微调当成「往模型里装东西」。</p>
+
+<table class="tbl stack">
+  <tr><th style="width:176px">以为</th><th style="width:190px">实际上</th><th style="width:176px">面试会怎么问</th><th>一句话怎么答</th></tr>
+  <tr class="hot"><td>微调能让模型知道新法规</td><td>几千条样本装不进一条新规</td><td><span class="fq">高频</span>微调能更新知识吗？</td><td class="no2">不能，时效性内容走检索</td></tr>
+  <tr><td>微调能让小模型变强</td><td>只改表达与口径，不改能力上限</td><td>7B 微调能追上 70B 吗？</td><td>窄任务能接近，通用能力追不上</td></tr>
+  <tr class="hot"><td>微调会改模型结构</td><td>结构不动：全参只改数值，LoRA 只是旁挂参数</td><td><span class="fq">高频</span>微调完模型体积变了吗？</td><td>都不变——LoRA 单独存那一小块权重才多几十 MB，合并回去一样大</td></tr>
+  <tr class="hot"><td>微调必须全参</td><td>只训千分之一的参数也能出效果</td><td><span class="fq">高频</span>全参和 LoRA 怎么选？</td><td>看显存（VRAM）和迭代次数，不看效果上限</td></tr>
+  <tr><td>训一次就一劳永逸</td><td>数据变了要重训，还会忘旧本事</td><td>微调后通用能力掉了怎么办？</td><td>混通用样本、降学习率（lr）、少训几轮</td></tr>
+</table>
+
+<div class="pit"><b>有一条最容易踩。</b>「微调能不能把知识训进去」——能训进去一点，但不可靠、不可验、不可控。本项目那 2.3 万条样本里确实全是法条，但模型稳定学到的是「回答要落到条号上」这个习惯，不是「这条法规怎么用」。这条线怎么划，第 2 章会专门讲。</div>
+
+<h3>五条路，各改一处：微调只占其中一条</h3>
+<p>先判「缺知识」还是「缺行为」——知识归检索，行为才归微调，表达小毛病先归 prompt（提示词）。同一个需求，五条路都能碰，但改的东西完全不同。这张表建议背下来。</p>
+
+<table class="tbl">
+  <tr><th style="width:92px">手段</th><th>改哪里</th><th style="width:150px">能更新知识</th><th style="width:166px">能溯源</th><th style="width:140px">成本量级</th></tr>
+  <tr><td>改 prompt</td><td>只改输入里的话，模型一个参数不动</td><td>不能，只是当场引导</td><td>不能</td><td>零成本</td></tr>
+  <tr><td>RAG 检索</td><td>把资料塞进上下文，模型本身不变</td><td class="ok">能，换文档就生效</td><td class="ok">能，答案可指回原文</td><td>要维护文档库</td></tr>
+  <tr><td>继续预训练<br>CPT</td><td>权重，灌大批领域语料</td><td class="ok">能，灌的是语料分布</td><td>不能</td><td>很高，要海量语料</td></tr>
+  <tr><td><b>微调</b><br>FT</td><td>权重，全参或旁挂一小块</td><td>有限，新规塞不进去</td><td class="no2">不能，说不清出处</td><td>几百到几千条样本</td></tr>
+  <tr><td>从头训</td><td>全部，从随机初始化开始</td><td>取决于语料</td><td>不能</td><td>极高，不在讨论范围</td></tr>
+</table>
+
+<div class="why"><span class="tag">别二选一</span>这五条不是互斥的，可以叠。本项目的实际链路就是<b>微调 + 检索</b>：小模型把「老板不给钱」改写成法条语体（微调管怎么问），向量库（vector database）把命中的条文送进上下文（检索管知道什么），大模型照着条文答（提示词管怎么说）。三段各修一处，不抢活。</div>
+
+<div class="exp"><b><span class="fq">高频</span>面试就这么答</b>「微调是在预训练模型上做有监督的继续训练，用任务数据把输出往目标格式和语体上拉。它不解决知识时效，那部分靠检索；能本地部署，比每次调云端便宜。」三句话，不用堆术语。</div>
+
+<div class="recap"><b>这一章留下的判断</b><ul>
+  <li>同一个需求有五种改法：改 prompt、检索、继续预训练、微调、从头训</li>
+  <li>只有继续预训练、微调、从头训动权重；改 prompt 和检索一下都不动——成本差好几个量级</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>微调是给模型做岗前培训，不是发新教材；它和 RAG 不是二选一，是各管一段。</div>
+
+<h2 id="s-scene"><span class="num">2</span>适用场景</h2>
+<div class="lede"><b>结论</b>能微调不等于该微调。先摆六个真实需求——一半该用别的办法；再看哪些场景反复出现——五类划算，其中两处在检索之前；接着看工业界怎么分工——微调只占其中一层；最后过五道闸，判下来才动手。</div>
+
+<h3>一、先摆六个需求，一半不该用微调</h3>
+<p>微调不是「高级功能」，是一件专用工具。先别看概念，看六个真实需求——都是产品会上原封不动能听到的话。</p>
+
+<table class="tbl stack">
+  <tr><th style="width:76px">谁提的</th><th>他说的原话</th><th style="width:66px">该不该</th><th style="width:240px">为什么</th></tr>
+  <tr><td>法务</td><td>「客户打一句『老板拖了仨月工资』，我们搜出来全是解除合同的条款」</td><td class="ok">该</td><td>缺的是「把口语翻成法条语体」这个动作：规则写不完，检索学不会</td></tr>
+  <tr><td>客服主管</td><td>「同一个问题，十次回复十种语气，有的写三行，有的只回一句」</td><td class="ok">该</td><td>要的是稳定口吻：prompt 每次都得重申，训过就成了习惯</td></tr>
+  <tr><td>后端开发</td><td>「要输出 JSON，prompt 写了十条约束，一千次里还是有十几次多一句『好的』」</td><td class="ok">该</td><td>格式要 100% 稳，prompt 做不到「每次都对」</td></tr>
+  <tr><td>产品经理</td><td>「上季度新出的公积金政策，它答的还是旧版」</td><td class="no2">不该</td><td>缺的是知识：换文档就生效，训进去记不牢、也说不清出处</td></tr>
+  <tr><td>合规</td><td>「它引法条经常编，我们要求必须给原文」</td><td class="no2">不该</td><td>要可溯源。出处只能来自检索加引用约束，训不出来</td></tr>
+  <tr><td>运营</td><td>「它回答有点啰嗦，能不能精简点」</td><td class="no2">先别</td><td>表达上的小毛病。改 prompt 两句就够，不值得为它造几千条数据</td></tr>
+</table>
+
+<div class="why"><span class="tag">看出那条线了吗</span>三个答「该」的，要改的都是<b>输出的形式</b>——语体、口吻、结构；三个答「不」的，前两个缺的是<b>内容</b>（新旧、出处）。<b>形式能训进权重，内容训不进去。</b></div>
+
+<div class="pit"><b>第六个需求是个例外，值得单独看一眼。</b>它也是「改说法」，但只是「偶尔啰嗦」这种程度——同样是改说法，量级不够、prompt 又压得住，就不该动微调。判的从来不是「属不属于哪一类」，是<b>这条路划不划算</b>。</div>
+
+<h3>二、五类场景，各有各的账</h3>
+<p>上面三个「该」其实只覆盖了五类里的三类；剩下两类——打标签、省 token——这六个需求没碰上。共同点是改形式，不同的是为什么非改不可。</p>
+
+<table class="tbl stack">
+  <tr><th style="width:146px">场景</th><th>为什么这条路比别的合适</th><th style="width:206px">判据</th></tr>
+  <tr><td><b>分类与抽取</b></td><td><b>意图识别</b>（intent classification）、工单归类、合同要素抽取——输出是「一个标签」或「几个字段」，不是一段话。难在边界：哪些算「劳动报酬」，长 prompt 写得出一半，剩下的得靠几百条例子划清</td><td>输出是有限类别，<br>边界靠举例比描述准</td></tr>
+  <tr><td><b>固定结构输出</b></td><td>下游代码要解析，字段一个都不能少。prompt 里写三行约束，每次都得重申一遍，几百次里总有几次跑偏——训过之后，格式变成默认行为</td><td>输出要被程序消费，<br>且要求 100% 稳定</td></tr>
+  <tr><td><b>固定口吻与人设</b></td><td>客服话术、品牌语气、某个老师的讲课风格。prompt 里写「语气亲切」，每次出来都不一样；训过之后，风格成了它自己的习惯，不必每次叮嘱</td><td>同一句话换十种问法，<br>输出风格要一致</td></tr>
+  <tr><td><b>语体改写</b></td><td>口语变体是开放的：「老板不给钱」「加班白干」「让我无偿奉献」，规则表和同义词表穷举不完。训过之后，「翻成法条语体」成了它的本能</td><td>输入说法千变，<br>却要统一成规范表述</td></tr>
+  <tr><td><b>高频重复任务</b></td><td>提示词很长、调用量很大时，这段提示词每天被重复付费上千次。微调把它「压进权重」，请求里只留一句短指令</td><td>省下的 token 钱<br>超过训练成本</td></tr>
+</table>
+
+<div class="why"><span class="tag">算一笔</span>系统提示词 1,200 token、每天 2 万次调用，光这一段每天就要重复付 <b style="white-space:nowrap">2,400 万 token</b>。微调后压到 200 token，每天省 <b style="white-space:nowrap">2,000 万</b>，<b style="white-space:nowrap">一个月约 6 亿 token</b> 的输入费——这笔账算得过来，微调才值得做；算不过来，老老实实改 prompt。</div>
+
+<div class="pit"><b>反过来，有一类常被误塞进来：把「没写下来的规则」训进模型。</b>「内部审批走几步」「报销口径多少」听着像行为，其实还是知识——只是暂时没文档。这种连规则表都说不清的离散条目，几百条样本训不进去，模型会答得很像、错得很随机；要么先写成文档再检索，要么干脆写成代码。微调不接这活。</div>
+
+<h3>三、最值钱的两处：都在检索之前</h3>
+<p>五类里有两类在对话系统里出现得最频繁——分类与抽取里的<b>意图识别</b>、语体改写里的<b>问题改写</b>（query rewriting），位置都很特别：都在「检索之前」。它们常被混成一个词，其实是两个不同任务：一个判「去哪」，一个改「怎么问」。上面第一个例子（「老板拖了仨月工资」搜不到）用的就是后者。</p>
+
+<figure>
+  <svg viewBox="0 0 680 190" role="img" aria-label="一条对话系统链路：用户口语经意图识别、问题改写、检索、生成四段，前两段靠微调，第三段靠检索">
+    <defs>
+      <marker id="ah9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+    </defs>
+
+    <rect class="bxW" x="8" y="26" width="118" height="64" rx="8"/>
+    <text class="lb2" x="67" y="52" text-anchor="middle" fill="#b45309">用户口语</text>
+    <text class="lb2" x="67" y="74" text-anchor="middle">「老板不给钱」</text>
+    <line class="ar" x1="126" y1="58" x2="146" y2="58" marker-end="url(#ah9)"/>
+
+    <rect class="bxG" x="150" y="26" width="118" height="64" rx="8"/>
+    <text class="lb" x="209" y="48" text-anchor="middle">① 意图识别</text>
+    <text class="sm" x="209" y="66" text-anchor="middle" fill="#0f766e">判出「劳动报酬」</text>
+    <text class="sm" x="209" y="81" text-anchor="middle">决定进哪个库</text>
+    <line class="ar" x1="268" y1="58" x2="288" y2="58" marker-end="url(#ah9)"/>
+
+    <rect class="bxG" x="292" y="26" width="118" height="64" rx="8"/>
+    <text class="lb" x="351" y="48" text-anchor="middle">② 问题改写</text>
+    <text class="sm" x="351" y="66" text-anchor="middle" fill="#0f766e">翻成法条语体</text>
+    <text class="sm" x="351" y="81" text-anchor="middle">方便检索命中</text>
+    <line class="ar" x1="410" y1="58" x2="430" y2="58" marker-end="url(#ah9)"/>
+
+    <rect class="bxA" x="434" y="26" width="118" height="64" rx="8"/>
+    <text class="lb" x="493" y="48" text-anchor="middle">③ 检索 RAG</text>
+    <text class="sm" x="493" y="66" text-anchor="middle" fill="#1d4ed8">命中第四十四条</text>
+    <text class="sm" x="493" y="81" text-anchor="middle">送进上下文</text>
+    <line class="ar" x1="552" y1="58" x2="572" y2="58" marker-end="url(#ah9)"/>
+
+    <rect class="bx" x="576" y="26" width="96" height="64" rx="8"/>
+    <text class="lb" x="624" y="48" text-anchor="middle">④ 生成</text>
+    <text class="sm" x="624" y="66" text-anchor="middle">照条文作答</text>
+
+    <text class="sm" x="280" y="118" text-anchor="middle" fill="#0f766e">微调管这两段</text>
+    <text class="sm" x="493" y="118" text-anchor="middle" fill="#1d4ed8">检索管这一段</text>
+    <line x1="150" y1="128" x2="410" y2="128" stroke="#0d9488" stroke-width="1.6" stroke-dasharray="4 4"/>
+    <line x1="434" y1="128" x2="552" y2="128" stroke="#2563eb" stroke-width="1.6" stroke-dasharray="4 4"/>
+    <text class="sm" x="351" y="156" text-anchor="middle" fill="#64748b">两段微调，两个任务，各训各的，别合成一个</text>
+  </svg>
+  <figcaption>意图识别和问题改写都发生在检索之前：一个决定进哪个库，一个让检索命得中。</figcaption>
+</figure>
+
+<table class="tbl stack">
+  <tr><th style="width:150px"></th><th>意图识别<br>Intent Classification</th><th>问题改写<br>Query Rewriting</th></tr>
+  <tr><td><b>干的事</b></td><td>判断用户想干嘛，吐一个标签</td><td>把口语翻成规范语体，方便检索</td></tr>
+  <tr><td><b>本质</b></td><td>封闭分类 / 归一化</td><td>文本改写 / 翻译</td></tr>
+  <tr><td><b>输出</b></td><td>固定标签，如「劳动报酬」</td><td>一段改写后的标准问句</td></tr>
+  <tr><td><b>为什么微调值</b></td><td>口语变体开放，规则穷举不完；高频、封闭、固定输出三合一</td><td>「翻译」是行为不是知识，RAG 和规则都改不动</td></tr>
+  <tr><td><b>失败长什么样</b></td><td>分错类 → 进错库，后面全链路空转</td><td>改得不像法条 → 检索命不中，白改</td></tr>
+  <tr><td><b>拿什么衡量</b></td><td>分类准确率、混淆矩阵</td><td>命中率 hit_rate、Recall@k</td></tr>
+  <tr><td><b>最该盯的坑</b></td><td>意图集合必须封闭且稳定，加一类就得重训</td><td>别把「改写」和「检索」混成一个任务</td></tr>
+</table>
+
+<p>这两件事为什么都算「最适合微调」？它们同时命中五类判据：<b>输出封闭、调用高频、prompt 压不住、改行为不改知识、好坏能用一个数说清</b>。关键在输出形态——都是短进短出、规整可枚举，只需学会一种转换习惯，不必记住整部法规。这正是「行为能训、知识训不进」的分界。</p>
+
+<div class="dec wide">
+  <div class="hd">意图识别：该做，但有三个前提</div>
+  <div class="row"><div class="k">前提一<span class="kk">标签集封闭</span></div><div class="v">类别一年不新增，如 6 域 + 拒答（refusal）= 7 类。反过来，「用户到底想干嘛」这种开放判断，标签天天加，训一次就作废，别碰。</div></div>
+  <div class="row"><div class="k">前提二<span class="kk">真实分布的标注</span></div><div class="v">用产品日志里的原话，别自己造问法。每类 50～200 条，7 类大约 500～1,000 条——数量不多，难在覆盖长尾。</div></div>
+  <div class="row"><div class="k">前提三<span class="kk">调用量够大</span></div><div class="v">意图是每个请求都要跑一遍的前置环节。拿 7B 跑分类，延迟几百毫秒、并发还吃卡；换成 1B 级微调，延迟压到几十毫秒量级。<b>它比「大模型 + prompt」划算的根本原因是成本与延迟，不是准确率。</b></div></div>
+</div>
+<div class="pit"><b>反过来，这三种情况先别做：</b>① 类别随业务扩张频繁增加，加一类就要重训重标；② 大量多意图、跨域句子——「我离职了公积金还能提吗」同时踩两条线，这时改「多标签 + 阈值」通常比换模型有效；③ 样本只有一两百条且分布极偏，训出来会把长尾全归到多数类，还不如规则加小模型。</div>
+
+<div class="dec wide">
+  <div class="hd">问题改写：五类里最该做的一个</div>
+  <div class="row"><div class="k">理由一<span class="kk">它是转换，不是查询</span></div><div class="v">「老板拖了仨月工资」→「用人单位未及时足额支付劳动报酬」，这是语体转换。检索只能匹配已存在的说法，prompt 只能每次现场改、每次改法还不一样。</div></div>
+  <div class="row"><div class="k">理由二<span class="kk">数据好造</span></div><div class="v">口语问句能用规则扰动、大模型合成、再人工抽检，成批生成，比一条条标意图便宜得多。</div></div>
+  <div class="row"><div class="k">理由三<span class="kk">效果能量化</span></div><div class="v">训完直接比 hit_rate：改写之后命中了、改写之前没命中。本项目就是这样干的——2.3 万条 Triplet（三元组）训一个改写器，用命中率说话。<b>拿不出这个数，微调就只是凭感觉。</b></div></div>
+</div>
+<div class="pit"><b>唯一要小心：目标语体得先定死。</b>同一件事有时写「劳动报酬」、有时写「工资」，改写器学到的就是噪声，hit_rate 反而会掉——先把规范表述统一，再开训。</div>
+
+<div class="why"><span class="tag">本项目</span>你的政务问答正好把两段都占了：6 大业务域 + 1 类拒答，是天然的 7 分类意图；「老板不给钱」要翻成「用人单位未及时足额支付劳动报酬」才能命中文档。两个微调任务分别造数据、分别训——一个判「去哪」，一个改「怎么问」。</div>
+
+<div class="exp"><b>识别和路由要分开</b>「判它是什么」交给微调，「判完往哪派」交给代码。很多团队反过来做——用 if-else 写意图、用微调写路由，两头都不讨好。</div>
+
+<h3>四、工业界实际怎么分工</h3>
+<p>「该不该微调」是一件事，「别人实际怎么做」是另一件。按「谁在训、训多大」分四层看，比笼统问「微调多不多」有用。</p>
+<table class="tbl">
+  <tr><th style="width:196px">做法</th><th style="width:196px">拿来干什么</th><th style="width:132px">常见程度</th><th>通常出现在哪</th></tr>
+  <tr class="hot"><td><b>小模型微调</b><br>0.6B～4B，或 BERT 类</td><td>意图识别、分类、抽取、问题改写、路由</td><td>很常见，接近标配</td><td>智能客服、政务问答、工单分流、搜索的 query 理解</td></tr>
+  <tr><td><b>大模型 SFT</b><br>7B 以上</td><td>风格、格式、口径对齐</td><td>中等，B 端交付里常见</td><td>私有化项目、行业模型、数据不出内网</td></tr>
+  <tr><td><b>prompt ＋ RAG</b></td><td>知识、出处、时效</td><td>最常见，是起点</td><td>几乎所有知识型问答的第一步</td></tr>
+  <tr><td><b>继续预训练 CPT</b></td><td>灌领域语料分布</td><td>少见</td><td>语料到亿级、要改模型底子时才做</td></tr>
+</table>
+<div class="why"><span class="tag">行业共识</span>近两年的默认顺序是<b>先 RAG、后微调</b>：先用 prompt ＋ 检索把它跑起来，攒下错例和评测，再针对「RAG 补不了的那个行为缺口」做微调——缺口说得清才值得训，说不清就回去改 prompt。<br><b>反过来也有个趋势：微调正从「效果手段」变成成本手段。</b>PEFT（Parameter-Efficient Fine-Tuning，参数高效微调）让 1.7B 级模型一张 24G 卡就能训，于是「把每天重复付费的长提示词压进权重」「用小模型替掉大模型做前置分类」这两笔账都算得过来，而且比「效果更好」更常出现在立项会上。</div>
+
+<h3>五、五道闸：一张图判完该不该</h3>
+<p>前面给的是分类和例子，真到自己手上还是得一步步判。顺序有讲究：<b>越便宜的闸越靠前</b>——先花几分钟归因，别一上来先标两周数据。</p>
+
+<figure>
+  <svg viewBox="0 0 680 534" role="img" aria-label="判定流程图：五道闸依次是归因、试 prompt、算账、造尺子、备数据，每道闸过不了就往右转成别的办法，全过才开训">
+    <defs>
+      <marker id="ah12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+    </defs>
+
+    <!-- 闸 1 -->
+    <text class="sm" x="70" y="46" text-anchor="end" fill="#b45309">几分钟</text>
+    <rect class="bxA" x="80" y="8" width="286" height="68" rx="9"/>
+    <text class="lb" x="94" y="32">① 缺的是内容，还是形式？</text>
+    <text class="sm" x="94" y="52">新政策、要能给出处 → 内容</text>
+    <text class="sm" x="94" y="68">语体、结构、标签要稳 → 形式</text>
+    <line class="ar" x1="370" y1="42" x2="436" y2="42" marker-end="url(#ah12)"/>
+    <text class="sm" x="403" y="36" text-anchor="middle" fill="#b45309">是内容</text>
+    <rect class="bxW" x="444" y="8" width="198" height="68" rx="9"/>
+    <text class="lb" x="543" y="38" text-anchor="middle">去检索</text>
+    <text class="sm" x="543" y="58" text-anchor="middle">换一份文档就生效</text>
+    <line class="ar" x1="223" y1="79" x2="223" y2="94" marker-end="url(#ah12)"/>
+
+    <!-- 闸 2 -->
+    <text class="sm" x="70" y="136" text-anchor="end" fill="#b45309">半小时</text>
+    <rect class="bxA" x="80" y="98" width="286" height="68" rx="9"/>
+    <text class="lb" x="94" y="122">② 改 prompt 真试过了吗？</text>
+    <text class="sm" x="94" y="142">拿 20 条真实输入跑一遍，数错几条</text>
+    <text class="sm" x="94" y="158">偶发几次 → 说明 prompt 还压得住</text>
+    <line class="ar" x1="370" y1="132" x2="436" y2="132" marker-end="url(#ah12)"/>
+    <text class="sm" x="403" y="126" text-anchor="middle" fill="#b45309">还能压住</text>
+    <rect class="bxW" x="444" y="98" width="198" height="68" rx="9"/>
+    <text class="lb" x="543" y="128" text-anchor="middle">去改 prompt</text>
+    <text class="sm" x="543" y="148" text-anchor="middle">两句就够，别为它标数据</text>
+    <line class="ar" x1="223" y1="169" x2="223" y2="184" marker-end="url(#ah12)"/>
+
+    <!-- 闸 3 -->
+    <text class="sm" x="70" y="226" text-anchor="end" fill="#b45309">一小时</text>
+    <rect class="bxA" x="80" y="188" width="286" height="68" rx="9"/>
+    <text class="lb" x="94" y="212">③ 这笔账算得平吗？</text>
+    <text class="sm" x="94" y="232">省下的调用费、返工 ≥ 标注 + 重训</text>
+    <text class="sm" x="94" y="248">还要算上多维护一套权重的代价</text>
+    <line class="ar" x1="370" y1="222" x2="436" y2="222" marker-end="url(#ah12)"/>
+    <text class="sm" x="403" y="216" text-anchor="middle" fill="#b45309">算不平</text>
+    <rect class="bxW" x="444" y="188" width="198" height="68" rx="9"/>
+    <text class="lb" x="543" y="218" text-anchor="middle">先别做</text>
+    <text class="sm" x="543" y="238" text-anchor="middle">prompt 顶着，别急着投人</text>
+    <line class="ar" x1="223" y1="259" x2="223" y2="274" marker-end="url(#ah12)"/>
+
+    <!-- 闸 4 -->
+    <text class="sm" x="70" y="316" text-anchor="end" fill="#b45309">几天</text>
+    <rect class="bxA" x="80" y="278" width="286" height="68" rx="9"/>
+    <text class="lb" x="94" y="302">④ 训完拿什么证明它变好了？</text>
+    <text class="sm" x="94" y="322">一个能算的数：命中率、格式合规率</text>
+    <text class="sm" x="94" y="338">说不出来 → 训完只能靠感觉</text>
+    <line class="ar" x1="370" y1="312" x2="436" y2="312" marker-end="url(#ah12)"/>
+    <text class="sm" x="403" y="306" text-anchor="middle" fill="#b45309">说不出来</text>
+    <rect class="bxW" x="444" y="278" width="198" height="68" rx="9"/>
+    <text class="lb" x="543" y="308" text-anchor="middle">先造尺子</text>
+    <text class="sm" x="543" y="328" text-anchor="middle">没有考卷，训了也不知道好在哪</text>
+    <line class="ar" x1="223" y1="349" x2="223" y2="364" marker-end="url(#ah12)"/>
+
+    <!-- 闸 5 -->
+    <text class="sm" x="70" y="406" text-anchor="end" fill="#b45309">几周</text>
+    <rect class="bxA" x="80" y="368" width="286" height="68" rx="9"/>
+    <text class="lb" x="94" y="392">⑤ 有几百条「输入→期望输出」吗？</text>
+    <text class="sm" x="94" y="412">不是有文档就行，得成对标注</text>
+    <text class="sm" x="94" y="428">分类几百条够；改写上千条（本项目 2.3 万）</text>
+    <line class="ar" x1="370" y1="402" x2="436" y2="402" marker-end="url(#ah12)"/>
+    <text class="sm" x="403" y="396" text-anchor="middle" fill="#b45309">不够</text>
+    <rect class="bxW" x="444" y="368" width="198" height="68" rx="9"/>
+    <text class="lb" x="543" y="398" text-anchor="middle">先标数据</text>
+    <text class="sm" x="543" y="418" text-anchor="middle">标够再回来，从头过一遍</text>
+    <line class="ar" x1="223" y1="439" x2="223" y2="454" marker-end="url(#ah12)"/>
+
+    <!-- 终点 -->
+    <rect class="bxG" x="80" y="458" width="562" height="64" rx="9"/>
+    <text class="lb" x="361" y="485" text-anchor="middle" fill="#0f766e">五道闸全过：可以开训</text>
+    <text class="lb2" x="361" y="505" text-anchor="middle">剩下的只是选基座、选方法、选平台——那是下一课的事</text>
+  </svg>
+  <figcaption>向下＝这道闸过了；向右＝就停在这一步，换成那个办法。左侧是对应的代价：越往上越便宜。</figcaption>
+</figure>
+
+<div class="why"><span class="tag">顺序的代价</span>不是按重要性排，是按<b>代价</b>——图上左边那列就是价目，前三道加起来不到一天，挡的是后面几周。<b>跳过哪一道，后面都得加倍还回来</b>：最常见的两个坑，是先标完两万条才发现该用检索，和没有考卷就开训。</div>
+
+<div class="drill">
+  <div class="dh">动手：拿手上一个真实需求，过一遍五道闸</div>
+  <ol>
+    <li>现象——用户抱怨的原话，别翻译成术语</li>
+    <li>缺的是知识还是行为——换一份资料能修好吗？能就是知识</li>
+    <li>该动哪个——prompt / 检索 / 微调 / 不动，一句话说给旁边的人听</li>
+    <li>卡在哪一闸——五道闸里第一个说「不」的是哪道</li>
+  </ol>
+</div>
+
+<div class="recap"><b>这一章钉住了四件事</b><ul>
+  <li>钉住了：改形式的归微调，改内容的归检索，prompt 压得住的先改 prompt</li>
+  <li>钉住了：五类场景都划算，最值钱的两处在检索之前——一个判「去哪」，一个管「怎么问」</li>
+  <li>钉住了：工业界微调只占一层——前置的分类与改写用它，知识靠 prompt ＋ 检索；把这两段写清楚，比写「我们用了微调」有用</li>
+  <li>不这么做会：跳过归因和算账就开训，标完两万条才发现这事该用检索</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>五道闸不是流程表，是价目表：先花一天，省后面几周。</div>
+
+
+<h2 id="s-principle"><span class="num">3</span>微调原理：它在接龙，训练在罚分</h2>
+<div class="lede"><b>结论</b>模型没在「想」，它在给下一个字打分；训练就是把它打错的分罚下去，然后把参数往少罚一点的方向挪。</div>
+
+<p>一次训练就是一个四步循环，每一步都有正式名字：<b>前向传播</b>（forward pass）→ <b>算 loss</b>（loss）→ <b>反向传播</b>（backpropagation）→ <b>更新参数</b>（optimizer step）。整批样本从头到尾走完一遍，叫 1 个 <b>epoch</b>（轮）。</p>
+
+<figure>
+  <svg viewBox="0 0 680 158" role="img" aria-label="一次训练的四步循环：前向传播、算loss、反向传播、更新参数，再回到前向处理下一条样本">
+    <defs>
+      <marker id="ah10" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+      <marker id="ah11" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#0d9488"/>
+      </marker>
+    </defs>
+
+    <rect class="bxA" x="6" y="26" width="148" height="60" rx="9"/>
+    <text class="lb" x="80" y="50" text-anchor="middle">① 前向传播</text>
+    <text class="lb2" x="80" y="70" text-anchor="middle">喂进去，给下一个字打分</text>
+    <line class="ar" x1="154" y1="56" x2="176" y2="56" marker-end="url(#ah10)"/>
+
+    <rect class="bxG" x="180" y="26" width="148" height="60" rx="9"/>
+    <text class="lb" x="254" y="50" text-anchor="middle">② 算 loss</text>
+    <text class="lb2" x="254" y="70" text-anchor="middle">和答案比，算出一个罚分</text>
+    <line class="ar" x1="328" y1="56" x2="350" y2="56" marker-end="url(#ah10)"/>
+
+    <rect class="bxW" x="354" y="26" width="148" height="60" rx="9"/>
+    <text class="lb" x="428" y="50" text-anchor="middle">③ 反向传播</text>
+    <text class="lb2" x="428" y="70" text-anchor="middle">算梯度，每个参数怎么挪</text>
+    <line class="ar" x1="502" y1="56" x2="524" y2="56" marker-end="url(#ah10)"/>
+
+    <rect class="bx" x="528" y="26" width="146" height="60" rx="9"/>
+    <text class="lb" x="601" y="50" text-anchor="middle">④ 更新参数</text>
+    <text class="lb2" x="601" y="70" text-anchor="middle">按梯度挪，学习率定步长</text>
+
+    <path d="M 601 86 L 601 116 L 80 116 L 80 92" fill="none" stroke="#0d9488" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#ah11)"/>
+    <text class="sm" x="340" y="112" text-anchor="middle" fill="#0f766e">换下一条样本，再来一圈——整批转完，就是一个 epoch</text>
+    <text class="sm" x="340" y="134" text-anchor="middle" fill="#64748b">前两步看得见（loss 曲线），后两步藏在水下（梯度、学习率），但四步一起才叫训练</text>
+  </svg>
+  <figcaption>先看全景，再拆细节：下面四个小节，就是把这四步一个个讲透。</figcaption>
+</figure>
+
+<div class="dec wide">
+  <div class="hd">四个词认下来：图里那四步 ＋ 一个 epoch</div>
+  <div class="row"><div class="k">前向传播<span class="kk">forward</span></div><div class="v"><b>让它把这道题做一遍，交卷。</b>输入「中华人民共和国劳动」，模型吐出来的是一张<b>打分表</b>——词表里每个候选字各一个分：「合」0.92、「同」0.05、「法」0.02。<b>只看不改</b>：17 亿个数字一个都没动。<span class="note">英文也叫 forward pass；代码就是 <code>model(input_ids)</code> 这一行，出来的就是这张打分表。</span></div></div>
+  <div class="row"><div class="k">loss<span class="kk">损失 · 罚分</span></div><div class="v"><b>拿这张打分表和标准答案对一下，扣分。</b>答案该是「合」：模型给到 0.02，罚 3.9；给到 0.9，只罚 0.1。就<b>一个数</b>，越大说明它越没往正确答案上想。<span class="note">中文叫「损失」，公式本身叫「损失函数」，代码里是 <code>CrossEntropyLoss</code>（交叉熵）；口语我说的「罚分」就是它。</span></div></div>
+  <div class="row"><div class="k">反向传播<span class="kk">backward</span></div><div class="v"><b>查账，不是改账。</b>刚罚了 3.9 分，得追到 17 亿个数字头上逐个问一句：<b>你往上调一点，这笔罚款会涨还是会跌，涨跌多少</b>。把每个数字的答案排成一列，这一列数就叫<b>梯度</b>。<b>查完账，账面还是原样</b>——参数一个没动。<span class="note">严格说，它用<b>链式法则</b>（chain rule）逐层求出<b>偏导</b>（partial derivative）；英文 backpropagation，代码 <code>loss.backward()</code>。</span><span class="mix">把「反向传播」和「梯度下降」当同义词。前者只查账（算梯度），后者才真改账（拿梯度更新参数）——代码里 <code>loss.backward()</code> 和 <code>optimizer.step()</code> 是两行，就是这两件事。</span></div></div>
+  <div class="row"><div class="k">更新参数<span class="kk">optimizer step</span></div><div class="v"><b>照着账单真改账。</b>每个数字按查出的方向<b>反过来</b>挪一小步，挪多大由<b>学习率</b>定。到这一步，17 亿个数字才第一次真的变了——<b>前面几步全在算，只有这一步在动模型</b>。<span class="note">代码是 <code>optimizer.step()</code>；前面通常配一句 <code>optimizer.zero_grad()</code>，把上一轮的梯度清零——不清会累加。</span></div></div>
+  <div class="row"><div class="k">epoch<span class="kk">轮</span></div><div class="v"><b>整本习题册过一遍。</b>本项目的 2.3 万条样本全走完，算 1 个 epoch；一次只喂 8 条（叫一个 step），所以一轮大约 2,900 个 step。训 3 轮，就是这批题反复做三遍。<span class="note">epoch 只是个计数器，本身不改任何东西；该停在第几轮，看验证集那条线（第四节）。</span></div></div>
+</div>
+
+<p>这四个词在训练日志里各留一个痕迹：<b>loss 会打出来</b>（你唯一看得见的数），<b>梯度和学习率都打不出来</b>——一个藏在框架里，一个是你自己在配置文件里填的。所以新手只盯着 loss 一个数，剩下三个出了问题也不知道。</p>
+
+<h3>一、它在接龙，不是在理解</h3>
+<p>先看一个反直觉的现象：把一条法条整条抄给模型，再问它这条什么意思，它答得很好。于是很容易以为它「读懂了」。但拆开看，里面只有一个动作在重复：<strong>看前面若干字，给下一个字打分，挑一个接上去。</strong></p>
+
+<figure>
+  <svg viewBox="0 0 680 126" role="img" aria-label="模型接龙循环：前文打分、挑最高、接上去、成为新前文">
+    <defs>
+      <marker id="ah4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+      <marker id="ah5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#0d9488"/>
+      </marker>
+    </defs>
+    <rect class="bx" x="6" y="24" width="152" height="60" rx="9"/>
+    <text class="lb" x="82" y="48" text-anchor="middle">已有的前文</text>
+    <text class="lb2" x="82" y="68" text-anchor="middle">中华人民共和国劳动</text>
+    <line class="ar" x1="158" y1="54" x2="186" y2="54" marker-end="url(#ah4)"/>
+
+    <rect class="bxA" x="190" y="24" width="152" height="60" rx="9"/>
+    <text class="lb" x="266" y="48" text-anchor="middle">每个字一个概率</text>
+    <text class="lb2" x="266" y="68" text-anchor="middle">「合」0.92　「法」0.06</text>
+    <line class="ar" x1="342" y1="54" x2="370" y2="54" marker-end="url(#ah4)"/>
+
+    <rect class="bxG" x="374" y="24" width="140" height="60" rx="9"/>
+    <text class="lb" x="444" y="48" text-anchor="middle">挑最高的接上</text>
+    <text class="lb2" x="444" y="68" text-anchor="middle">变成新前文，重来</text>
+    <line class="ar" x1="514" y1="54" x2="542" y2="54" marker-end="url(#ah4)"/>
+
+    <rect class="bxW" x="546" y="24" width="128" height="60" rx="9"/>
+    <text class="lb" x="610" y="48" text-anchor="middle">重复 220 次</text>
+    <text class="lb2" x="610" y="68" text-anchor="middle">就是一段完整输出</text>
+
+    <path d="M 610 84 L 610 104 L 82 104 L 82 90" fill="none" stroke="#0d9488" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#ah5)"/>
+  </svg>
+  <figcaption>接得住「劳动」后面跟「合同」或「法」，不是因为懂，是因为预训练时见过几十亿句，哪两个字常挨着它记住了。</figcaption>
+</figure>
+
+<div class="why"><span class="tag">顺手认个词</span><b>token</b> 不是字。常见的组合会被合成一个整体，「劳动合同」「用人单位」往往各算一个 token。中文里一个 token 大约 1 到 1.5 个字——所以「220 token」差不多是两三百个字。</div>
+
+<p>这个动作有正式名字：<b>next-token prediction</b>（预测下一个 token）。这类模型叫<b>自回归</b>（autoregressive）——自己吐出来的字，回头当成输入继续接。论文、文档、面试里会换着说「next-token」「自回归」「接龙」，指的都是这一件事；下面几节也一律叫接龙。</p>
+
+<h3>二、loss 是什么：不是错了几个字，是每个字猜得多没底</h3>
+<p>这一节只讲一个数：<b>模型每猜一个字，都会得到一个「这次猜得多没底」的分数</b>。中文叫<b>损失</b>，英文叫 <b>loss</b>，我口语里写作<b>罚分</b>——三个名字，指的是同一个数。算它的公式另有名字，叫<b>损失函数</b>（loss function），<b>公式是公式，数是数</b>。</p>
+<p>代码里用的几乎都是 <code>CrossEntropyLoss</code>，中文叫<b>交叉熵</b>。名字唬人，规则只有一条：<b>越没底，罚得越重</b>。公式不用背，看这组对照就够了：正确答案是「合」，模型给它下面这些概率时，分别要罚多少分。</p>
+
+<table class="tbl">
+  <tr><th style="width:190px">模型给正确答案的概率</th><th style="width:110px">罚分（loss）</th><th>读起来像什么</th></tr>
+  <tr><td>90%</td><td class="num">0.1</td><td>基本确信，轻轻放过去</td></tr>
+  <tr><td>50%</td><td class="num">0.69</td><td>一半一半，罚一点</td></tr>
+  <tr><td>10%</td><td class="num">2.3</td><td>几乎没往这儿想，罚得重</td></tr>
+  <tr><td>1%</td><td class="num">4.6</td><td>完全没想到，重罚</td></tr>
+</table>
+
+<p>表里的数不是拍出来的，就一条换算：<b>罚分 ＝ <code>−ln p</code></b>，p 是模型给正确答案的概率（0.9 → 0.1，0.5 → 0.69，0.1 → 2.3，1% → 4.6）。两个特点直接看出来：<b>p 越接近 0 罚得越狠、没有上限</b>；<b>p 给到 100% 就是 0 分、不会再往下</b>。所以它比「猜错几个字」这种数法好用——差一点和差很远，罚出来不是一个量级。</p>
+
+<figure>
+  <svg viewBox="0 0 680 244" role="img" aria-label="loss 曲线：模型给正确答案的概率越高，罚分越低；曲线左端陡、右端平">
+    <line x1="70" y1="200" x2="652" y2="200" stroke="#94a3b8" stroke-width="1.2"/>
+    <line x1="70" y1="200" x2="70" y2="34" stroke="#94a3b8" stroke-width="1.2"/>
+
+    <text class="sm" x="62" y="204" text-anchor="end">0</text>
+    <text class="sm" x="62" y="172" text-anchor="end">1</text>
+    <text class="sm" x="62" y="140" text-anchor="end">2</text>
+    <text class="sm" x="62" y="108" text-anchor="end">3</text>
+    <text class="sm" x="62" y="76" text-anchor="end">4</text>
+    <text class="sm" x="62" y="44" text-anchor="end">5</text>
+    <text class="sm" x="70" y="26" text-anchor="middle" fill="#0f2f4d">罚分 loss</text>
+
+    <text class="sm" x="78" y="218" text-anchor="middle">0%</text>
+    <text class="sm" x="212" y="218" text-anchor="middle">25%</text>
+    <text class="sm" x="355" y="218" text-anchor="middle">50%</text>
+    <text class="sm" x="498" y="218" text-anchor="middle">75%</text>
+    <text class="sm" x="640" y="218" text-anchor="middle">100%</text>
+    <text class="sm" x="360" y="238" text-anchor="middle" fill="#0f2f4d">模型给正确答案的概率</text>
+
+    <polyline points="75.7,52.6 81.4,74.8 98.5,104.1 127,126.3 184,148.5 241,161.5 298,170.7 355,177.8 412,183.6 469,188.6 526,192.9 583,196.6 640,200" fill="none" stroke="#0d9488" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <circle cx="75.7" cy="52.6" r="3.4" fill="#dc2626"/>
+    <text class="sm" x="88" y="50" fill="#b91c1c">1% → 罚 4.6</text>
+
+    <circle cx="127" cy="126.3" r="3.4" fill="#dc2626"/>
+    <text class="sm" x="136" y="121" fill="#b91c1c">10% → 罚 2.3</text>
+
+    <circle cx="355" cy="177.8" r="3.4" fill="#0d9488"/>
+    <text class="sm" x="355" y="158" text-anchor="middle" fill="#0f766e">50% → 罚 0.69</text>
+
+    <circle cx="583" cy="196.6" r="3.4" fill="#0d9488"/>
+    <text class="sm" x="583" y="184" text-anchor="middle" fill="#0f766e">90% → 罚 0.1</text>
+  </svg>
+  <figcaption>左端陡、右端平：从 1% 挪到 10%，罚分砍掉一半；从 50% 挪到 90%，只再省 0.59。所以它不需要 100% 确信——「差不多对」就已经罚得很轻了。</figcaption>
+</figure>
+
+<div class="why"><span class="tag">关键</span>正确答案的概率只给了 30%，比只给 0.1% 罚得轻得多。这是好事——它让模型知道「差一点」和「差很远」不是一回事。</div>
+
+<h3>三、往哪调、一步迈多大</h3>
+<p>第四步「更新参数」拆开就两句：<b>先问路，再迈步</b>。问路的是反向传播，指路的答案叫梯度，迈多大由学习率定，这么一问一迈重复几千遍，才叫梯度下降。四个词是一条流水线上的四站，不是四个孤立的词。</p>
+
+<figure>
+  <svg viewBox="0 0 680 374" role="img" aria-label="更新参数这一格内部的四站流水线：反向传播问路、梯度指路指向loss上升最快、取负乘学习率迈步、梯度下降循环">
+    <defs>
+      <marker id="ah13" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+      <marker id="ah14" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#d97706"/>
+      </marker>
+      <marker id="ah15" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#0d9488"/>
+      </marker>
+    </defs>
+
+    <rect class="bxA" x="100" y="14" width="480" height="64" rx="9"/>
+    <text class="lb" x="340" y="40" text-anchor="middle">① 反向传播 · 问路（算）</text>
+    <text class="lb2" x="340" y="60" text-anchor="middle">用链式法则倒查：每个参数「往上拨，loss 涨多少」</text>
+    <line class="ar" x1="340" y1="78" x2="340" y2="96" marker-end="url(#ah13)"/>
+
+    <rect class="bxG" x="100" y="98" width="480" height="64" rx="9"/>
+    <text class="lb" x="340" y="124" text-anchor="middle">② 梯度 · 指路的答案（结果）</text>
+    <text class="lb2" x="340" y="144" text-anchor="middle">「+0.8」这类数排成一列，指向 loss 涨得最快的方向</text>
+    <line x1="340" y1="162" x2="340" y2="190" stroke="#d97706" stroke-width="2" marker-end="url(#ah14)"/>
+    <text class="sm" x="356" y="180" fill="#b45309">取负：梯度指上山，降 loss 要反着走</text>
+
+    <rect class="bxW" x="100" y="192" width="480" height="64" rx="9"/>
+    <text class="lb" x="340" y="218" text-anchor="middle">③ 学习率 · 定步长（动）</text>
+    <text class="lb2" x="340" y="238" text-anchor="middle">0.31 − 0.0002 × 0.8 = 0.30984，往反方向迈一小步</text>
+    <line class="ar" x1="340" y1="256" x2="340" y2="274" marker-end="url(#ah13)"/>
+
+    <rect class="bx" x="100" y="276" width="480" height="64" rx="9"/>
+    <text class="lb" x="340" y="302" text-anchor="middle">④ 梯度下降 · 循环（动作）</text>
+    <text class="lb2" x="340" y="322" text-anchor="middle">问一遍、迈一步，重复几千遍，loss 一路降</text>
+
+    <path d="M 340 340 L 340 362 L 116 362 L 116 82" fill="none" stroke="#0d9488" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#ah15)"/>
+    <text class="sm" x="228" y="358" text-anchor="middle" fill="#0f766e">换下一条样本，再来一遍——重复几千遍，才叫「梯度下降」</text>
+  </svg>
+  <figcaption>站①、②只算不改，站③、④才真动参数。最容易被跳过去的是②到③之间那个「取负」——梯度给的是上山方向，训练要下山。</figcaption>
+</figure>
+
+<p><b>先问路。</b>从 17 亿个参数里随便挑一个，它现在等于 <code>0.31</code>。反向传播要回答的不是「该调多少」，而是更窄的一句：<b>「往上拨一点点，loss 会涨多少」</b>。对这一个参数，答案是 <code>+0.8</code>——<b>正号很关键</b>：它的意思是「往上拨，罚分要涨 0.8」。</p>
+
+<p><b>再指路。</b>17 亿个参数都问一遍，答案排成一列，这一列数就是<b>梯度</b>（gradient）。它的方向不是随便指的：梯度永远指向 <b>loss 涨得最快</b>的那个方向。所以这张「指路图」其实是张<b>上山图</b>——而训练要的是下山（让 loss 变小）。</p>
+
+<p><b>于是反着走。</b>要下山，就得往梯度的<b>反方向</b>迈，也就是拿参数<b>减去</b>它。迈多大？由<b>学习率</b>（learning rate）乘出来：<code>0.31 − 0.0002 × 0.8 = 0.30984</code>。看清这个式子：<b>方向由梯度的正负决定，距离由学习率决定</b>——学习率不关心往哪走，只管这一步迈多远。</p>
+
+<p><b>最后是循环。</b>「问一遍、反着迈一小步」这个动作，下一批样本进来再来一遍，重复几千遍，loss 才一步步滑到谷底。这个完整流程才叫<b>梯度下降</b>（gradient descent）。名字里的「下降」说的是 <b>loss 在降</b>，不是参数在降。</p>
+
+<table class="tbl">
+  <tr><th style="width:150px">四个词</th><th>人话</th><th style="width:244px">它不是什么</th></tr>
+  <tr><td><b>反向传播</b><br><span class="en">backpropagation</span></td><td>算账的算法：用链式法则倒着查，逐个问「往上拨，loss 涨多少」。上面那个 +0.8 就是它问出来的</td><td>不碰参数；也不等于梯度</td></tr>
+  <tr><td><b>梯度</b><br><span class="en">gradient</span></td><td>问出来的答案排成的一列数，永远指向 loss 涨得最快的方向</td><td>不是「一个数」；是方向，不是距离</td></tr>
+  <tr><td><b>学习率</b><br><span class="en">learning rate · lr</span></td><td>你手填的小数字，乘在梯度上，决定这一步迈多远</td><td>不管方向，方向是梯度正负定的</td></tr>
+  <tr><td><b>梯度下降</b><br><span class="en">gradient descent</span></td><td>「问一遍、反着迈一小步」重复几千遍的完整流程</td><td>不是一次到位；降的是 loss，不是参数</td></tr>
+</table>
+
+<div class="why"><span class="tag">面试怎么答</span><span class="fq">高频</span>「反向传播和梯度下降什么关系」——<b>一个负责算，一个负责用，中间隔着梯度；梯度指「涨」，所以要取负反着走。</b></div>
+
+<figure>
+  <svg viewBox="0 0 680 250" role="img" aria-label="在山谷形 loss 地形上，同一个下坡方向配三种步长：太小停在半坡、合适落在谷底、太大冲到对面同高的坡上">
+    <defs>
+      <marker id="ah12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+      </marker>
+    </defs>
+
+    <line x1="56" y1="210" x2="660" y2="210" stroke="#94a3b8" stroke-width="1.2"/>
+    <line x1="56" y1="210" x2="56" y2="30" stroke="#94a3b8" stroke-width="1.2"/>
+    <text class="sm" x="56" y="24" text-anchor="middle" fill="#0f2f4d">loss</text>
+    <text class="sm" x="360" y="238" text-anchor="middle" fill="#0f2f4d">参数取值</text>
+
+    <path d="M 70 44 Q 250 204 350 204" fill="none" stroke="#0d9488" stroke-width="2.4"/>
+    <path d="M 350 204 Q 450 204 640 44" fill="none" stroke="#0d9488" stroke-width="2.4"/>
+
+    <line x1="171" y1="126" x2="534" y2="126" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="4 4"/>
+
+    <circle cx="262" cy="181" r="5" fill="#f59e0b" opacity="0.9"/>
+    <text class="sm" x="262" y="166" text-anchor="middle" fill="#b45309">小步</text>
+
+    <circle cx="350" cy="204" r="6.5" fill="#0d9488" stroke="#fff" stroke-width="2"/>
+    <text class="sm" x="350" y="190" text-anchor="middle" fill="#0f766e">到谷底</text>
+
+    <circle cx="534" cy="126" r="6.5" fill="#dc2626" stroke="#fff" stroke-width="2"/>
+    <text class="sm" x="534" y="110" text-anchor="middle" fill="#b91c1c">冲过头</text>
+
+    <circle cx="171" cy="126" r="6.5" fill="#d97706" stroke="#fff" stroke-width="2"/>
+    <text class="sm" x="171" y="110" text-anchor="middle" fill="#b45309">起点</text>
+
+    <line x1="171" y1="126" x2="205" y2="149" stroke="#334155" stroke-width="2" marker-end="url(#ah12)"/>
+    <text class="sm" x="212" y="146" fill="#334155">往反方向挪</text>
+  </svg>
+  <figcaption>方向每次都只有一个（顺着坡往下），步长才是学习率说了算：走小了还在半坡，走对了落进谷底，走大了冲到对面同高的坡上——loss 一点没降，白跑一趟。</figcaption>
+</figure>
+
+<div class="two">
+  <div class="col bad">
+    <div class="hd">学习率太大</div>
+    <div class="bd">loss 跳着走
+0.9 → 2.4 → 1.1 → NaN</div>
+    <div class="ft">步子太大，一步跨过谷底，越走越远；严重时数值溢出直接 NaN（不是数字），训练当场死掉。</div>
+  </div>
+  <div class="col bad">
+    <div class="hd">学习率太小</div>
+    <div class="bd">loss 平着走
+1.82 → 1.81 → 1.80 → 1.79</div>
+    <div class="ft">方向没错，但走得太慢，钱烧完了还没降下来。看着像「模型学不会」，其实是没走几步。</div>
+  </div>
+</div>
+
+<div class="why"><span class="tag">先留一个问题</span>这一节默认 <b>17 亿个数字全都在更新</b>。能不能只更新其中一小块？那一小块又挂在哪、怎么训？第 5 章回答——LoRA 能省下显存的全部秘密也在这里。</div>
+
+<h3>四、三条曲线，三种病</h3>
+<p>训练的时候你只会看到两条线在动：<b>训练集</b>（training set）上的 loss、<b>验证集</b>（validation set，简称 val）上的 loss。先把这两个词分清，否则后面全看不懂——<b>训练集</b>是喂进去学的那批样本；<b>验证集</b>是从同一批数据里<b>先切出 5% 到 10% 藏起来、一次都不让它学</b>的样本，只在训练途中拿出来考它。区别就一句话：<b>一条是它做过的题，一条是它没做过的题。</b></p>
+<p>这两条线的形状就是诊断书，一共三种病：最常见的叫<b>过拟合</b>（overfitting），验证线降到底又翘头；反过来叫<b>欠拟合</b>（underfitting），两条线都趴着不动；还有一种是<b>数值炸了</b>——loss 突然变成 <b>NaN</b>（Not a Number，不是数字），训练当场死掉。</p>
+
+<figure>
+  <svg viewBox="0 0 680 200" role="img" aria-label="三种 loss 曲线形态：过拟合时验证线先降后升，学不进去时两条都平，数值炸掉时曲线冲出顶部">
+    <text class="sm" x="122" y="22" text-anchor="middle" fill="#0f2f4d" font-weight="700">① 过拟合</text>
+    <line x1="32" y1="132" x2="212" y2="132" stroke="#94a3b8" stroke-width="1.1"/>
+    <line x1="32" y1="132" x2="32" y2="36" stroke="#94a3b8" stroke-width="1.1"/>
+    <path d="M 36 50 C 68 82 112 114 208 126" fill="none" stroke="#2563eb" stroke-width="2.2"/>
+    <path d="M 36 54 C 62 84 94 104 124 104 C 154 104 178 88 208 58" fill="none" stroke="#d97706" stroke-width="2.2"/>
+    <circle cx="124" cy="104" r="3.4" fill="#dc2626"/>
+    <line x1="124" y1="104" x2="124" y2="132" stroke="#dc2626" stroke-width="1" stroke-dasharray="3 3"/>
+    <text class="sm" x="124" y="146" text-anchor="middle" fill="#b91c1c">该在这停</text>
+
+    <text class="sm" x="352" y="22" text-anchor="middle" fill="#0f2f4d" font-weight="700">② 学不进去</text>
+    <line x1="262" y1="132" x2="442" y2="132" stroke="#94a3b8" stroke-width="1.1"/>
+    <line x1="262" y1="132" x2="262" y2="36" stroke="#94a3b8" stroke-width="1.1"/>
+    <path d="M 266 64 C 302 66 402 67 438 68" fill="none" stroke="#2563eb" stroke-width="2.2"/>
+    <path d="M 266 56 C 302 58 402 59 438 60" fill="none" stroke="#d97706" stroke-width="2.2"/>
+    <text class="sm" x="352" y="112" text-anchor="middle" fill="#64748b">两条都平</text>
+
+    <text class="sm" x="582" y="22" text-anchor="middle" fill="#0f2f4d" font-weight="700">③ 数值炸了</text>
+    <line x1="492" y1="132" x2="672" y2="132" stroke="#94a3b8" stroke-width="1.1"/>
+    <line x1="492" y1="132" x2="492" y2="36" stroke="#94a3b8" stroke-width="1.1"/>
+    <path d="M 496 62 C 526 86 556 100 578 104 L 586 52" fill="none" stroke="#2563eb" stroke-width="2.2"/>
+    <line x1="581" y1="41" x2="591" y2="51" stroke="#dc2626" stroke-width="1.8"/>
+    <line x1="591" y1="41" x2="581" y2="51" stroke="#dc2626" stroke-width="1.8"/>
+    <text class="sm" x="598" y="48" fill="#b91c1c">NaN</text>
+
+    <line x1="278" y1="170" x2="302" y2="170" stroke="#2563eb" stroke-width="2.2"/>
+    <text class="sm" x="308" y="174">训练 loss</text>
+    <line x1="398" y1="170" x2="422" y2="170" stroke="#d97706" stroke-width="2.2"/>
+    <text class="sm" x="428" y="174">验证 loss</text>
+  </svg>
+  <figcaption>形状就是诊断书：验证线翘头＝过拟合，两条都平＝没学进去，突然冲顶＝数值炸了。下面这张表是同一件事的清单版。</figcaption>
+</figure>
+
+<table class="tbl stack">
+  <tr><th style="width:212px">你看到的形态</th><th style="width:130px">说明什么</th><th>怎么办</th></tr>
+  <tr><td>训练 loss 一路降，验证 loss 降到底后又往上翘</td><td class="no2">过拟合</td><td>早停、减少轮数、加数据、加 dropout（随机丢弃）。这是最常见的一种</td></tr>
+  <tr><td>两条都不降，或者降得很慢</td><td>没学进去</td><td>学习率太小、数据格式写错了、或者样本本身太少</td></tr>
+  <tr><td>loss 突然变成 NaN（不是数字）</td><td class="no2">数值炸了</td><td>学习率太大、fp16（半精度浮点）溢出。降学习率，或把归一化层算成 fp32（单精度浮点）</td></tr>
+  <tr><td>训练 loss 降到很低，验证也低，但换新题就崩</td><td class="no2">过拟合·背题</td><td>数据太单一或重复。去重、加多样性，别只看 loss 数字</td></tr>
+</table>
+
+<div class="why"><span class="tag">顺手把三个词认了</span><b>过拟合</b>（overfitting）＝它把训练集背下来了，换成没见过的题就露馅，所以验证线降到底以后又翘头；<b>早停</b>（early stopping）＝盯着验证线，一翘头就停手，不等轮数跑满，这是最便宜的一招；<b>dropout</b>（随机丢弃）＝训练时随机关掉一部分神经元，逼它别只靠某几条固定路径记答案，只在训练时开、推理（inference）时关。<b>三个说法指向同一件事：别让它背题。</b></div>
+
+<div class="pit"><b>最贵的错觉：loss 降了就是训好了。</b>loss 只说明「在这些题上猜得越来越准」。它在训练集上一定降——不降才是出了问题。真正判好坏要看<b>没见过的题</b>，这就是后面要专门造评测集（evaluation set）的原因。</div>
+
+<div class="recap"><b>这一章钉住了四件事</b><ul>
+  <li>钉住了：模型在接龙，训练是四步流水线——前向传播猜、loss 罚、反向传播算梯度、更新参数挪一步；前两步只算不改，只有最后一步动权重</li>
+  <li>钉住了：梯度是「一列数」，一个参数对一条；学习率决定这一列数乘完挪多远——两个里错一个，训练就白跑</li>
+  <li>不这么做会：盯着 loss 曲线当成绩单，降到 0.1 就以为成了，换一批新问题一片崩</li>
+  <li>下次遇到同类问题，先看：loss 的形状对不对，再看新题表现——两个都对才算学会</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>训练不是让它变聪明，是让它在这批题上少罚一点分。</div>
+
+
+<h2 id="s-terms"><span class="num">4</span>常见术语：二十个词，一次性归位</h2>
+<div class="lede"><b>结论</b>前面三章你反复撞见这些词——现在停下来，把二十个词分四层一次归位。每个都按「打个比方 → 它到底指什么 → 容易和谁混」过一遍。但在分组之前，先把四个最容易混的词分清：参数、权重、可训练参数、超参数——这四个一混，后面全歪。</div>
+
+<p>先看一个真实场景：你在会上听到「我们先用 LoRA 跑个 baseline，看 loss 和 hit_rate 再决定要不要上全参」——这句话里有五个词，前面三章你已经撞见过它们。这一章把它们连同其余十五个一起归位，只做一件事：<b>让这二十个词变成你能张口用的词</b>。</p>
+
+<figure>
+  <svg viewBox="0 0 680 232" role="img" aria-label="二十个概念分四层：阶段、方法、超参数、现象">
+    <rect class="bxG" x="8" y="16" width="78" height="34" rx="7"/>
+    <text class="lb" x="47" y="38" text-anchor="middle">阶段</text>
+    <rect class="bx" x="94" y="16" width="150" height="34" rx="7"/>
+    <text class="lb2" x="169" y="38" text-anchor="middle">预训练</text>
+    <rect class="bx" x="254" y="16" width="320" height="34" rx="7"/>
+    <text class="lb2" x="414" y="38" text-anchor="middle">后训练：微调 ＋ 对齐</text>
+    <rect class="bx" x="584" y="16" width="86" height="34" rx="7"/>
+    <text class="lb2" x="627" y="38" text-anchor="middle">推理</text>
+
+    <rect class="bxA" x="8" y="70" width="78" height="34" rx="7"/>
+    <text class="lb" x="47" y="92" text-anchor="middle">方法</text>
+    <rect class="bx" x="94" y="70" width="107" height="34" rx="7"/>
+    <text class="lb2" x="147" y="92" text-anchor="middle">全参</text>
+    <rect class="bx" x="211" y="70" width="107" height="34" rx="7"/>
+    <text class="lb2" x="264" y="92" text-anchor="middle">PEFT</text>
+    <rect class="bx" x="328" y="70" width="107" height="34" rx="7"/>
+    <text class="lb2" x="381" y="92" text-anchor="middle">LoRA</text>
+    <rect class="bx" x="445" y="70" width="107" height="34" rx="7"/>
+    <text class="lb2" x="498" y="92" text-anchor="middle">QLoRA</text>
+    <rect class="bx" x="562" y="70" width="107" height="34" rx="7"/>
+    <text class="lb2" x="615" y="92" text-anchor="middle">量化</text>
+
+    <rect class="bx" x="8" y="124" width="78" height="34" rx="7"/>
+    <text class="lb" x="47" y="146" text-anchor="middle">超参数</text>
+    <rect class="bx" x="94" y="124" width="107" height="34" rx="7"/>
+    <text class="lb2" x="147" y="146" text-anchor="middle">学习率</text>
+    <rect class="bx" x="211" y="124" width="107" height="34" rx="7"/>
+    <text class="lb2" x="264" y="146" text-anchor="middle">epoch</text>
+    <rect class="bx" x="328" y="124" width="107" height="34" rx="7"/>
+    <text class="lb2" x="381" y="146" text-anchor="middle">batch</text>
+    <rect class="bx" x="445" y="124" width="107" height="34" rx="7"/>
+    <text class="lb2" x="498" y="146" text-anchor="middle">r · alpha</text>
+    <rect class="bx" x="562" y="124" width="107" height="34" rx="7"/>
+    <text class="lb2" x="615" y="146" text-anchor="middle">挂载层</text>
+
+    <rect class="bxW" x="8" y="178" width="78" height="34" rx="7"/>
+    <text class="lb" x="47" y="200" text-anchor="middle">现象</text>
+    <rect class="bx" x="94" y="178" width="107" height="34" rx="7"/>
+    <text class="lb2" x="147" y="200" text-anchor="middle">loss</text>
+    <rect class="bx" x="211" y="178" width="107" height="34" rx="7"/>
+    <text class="lb2" x="264" y="200" text-anchor="middle">过拟合</text>
+    <rect class="bx" x="328" y="178" width="107" height="34" rx="7"/>
+    <text class="lb2" x="381" y="200" text-anchor="middle">灾难性遗忘</text>
+    <rect class="bx" x="445" y="178" width="107" height="34" rx="7"/>
+    <text class="lb2" x="498" y="200" text-anchor="middle">幻觉</text>
+    <rect class="bx" x="562" y="178" width="107" height="34" rx="7"/>
+    <text class="lb2" x="615" y="200" text-anchor="middle">泛化</text>
+  </svg>
+  <figcaption>四层各回答一个问题：阶段问「什么时候」，方法问「改多少」，超参数是你要填的旋钮，现象是仪表盘。注意这一层叫<b>超参数</b>——它和「参数」是两族东西，关系见下一节。</figcaption>
+</figure>
+
+<h3>开篇 · 先分清四个词，剩下的才不会混</h3>
+<p>参数、权重、可训练参数、超参数——这四个词长得像、经常混着用，而且<b>它们不在一个层级上</b>。这一节先花两分钟把它们摆成两族，后面二十个词才有位置可放。</p>
+
+<figure>
+  <svg viewBox="0 0 680 176" role="img" aria-label="四个词分两族：左边是参数（权重加偏置），右边是你手填的超参数">
+    <rect class="bxA" x="14" y="20" width="292" height="46" rx="7"/>
+    <text class="lb" x="160" y="40" text-anchor="middle">模型参数 parameter</text>
+    <text class="sm" x="160" y="57" text-anchor="middle">总称：权重 weight ＋ 偏置 bias</text>
+
+    <rect class="bx" x="15" y="78" width="140" height="58" rx="6"/>
+    <text class="lb2" x="85" y="100" text-anchor="middle">训练时不动</text>
+    <text class="sm" x="85" y="118" text-anchor="middle">LoRA 冻结原权重</text>
+
+    <rect class="bxW" x="166" y="78" width="140" height="58" rx="6"/>
+    <text class="lb2" x="236" y="100" text-anchor="middle">训练时被更新</text>
+    <text class="sm" x="236" y="118" text-anchor="middle">＝「可训练参数」</text>
+
+    <text class="sm" x="160" y="160" text-anchor="middle">1.7B ＝ 17 亿个数字，全在这里</text>
+
+    <line x1="340" y1="20" x2="340" y2="170" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="4 4"/>
+
+    <rect class="bxG" x="374" y="20" width="292" height="46" rx="7"/>
+    <text class="lb" x="520" y="40" text-anchor="middle">超参数 hyperparameter</text>
+    <text class="sm" x="520" y="57" text-anchor="middle">你手填的，训练一个都不替你改</text>
+
+    <rect class="bx" x="375" y="78" width="290" height="58" rx="6"/>
+    <text class="lb2" x="520" y="100" text-anchor="middle">学习率 · epoch · batch</text>
+    <text class="lb2" x="520" y="118" text-anchor="middle">r · alpha · 挂载层</text>
+
+    <text class="sm" x="520" y="160" text-anchor="middle">r 填多大，和左边的参数量没有换算关系</text>
+  </svg>
+  <figcaption>左边是模型身上的数，右边是你手上的旋钮。LoRA 干的事只有一件：把左下「会被更新」的那块缩到极小，右边那栏一个都不动。</figcaption>
+</figure>
+
+<table class="tbl stack">
+  <tr><th style="width:126px">词</th><th>到底指什么</th><th style="width:176px">训练时会变吗</th><th style="width:186px">你会听到它怎么用</th></tr>
+  <tr>
+    <td><b>模型参数</b><br><span style="color:#64748b;font-size:11.6px">parameter</span></td>
+    <td><b>总称</b>：模型里所有可学的数 ＝ 权重 ＋ 偏置（bias）。<br><b>1.7B 数的就是它</b>，是预训练从语料里算出来的，不是人写的</td>
+    <td>全参微调：全变<br>LoRA：绝大多数不动</td>
+    <td>「这模型多大」「1.7B 参数」——说的都是它</td>
+  </tr>
+  <tr>
+    <td><b>权重</b><br><span style="color:#64748b;font-size:11.6px">weight</span></td>
+    <td>参数里的<b>主体部分</b>：矩阵格子里那些数（乘性系数）。<br>偏置是另一小撮加性项，两者合起来才叫参数。本项目用的 Qwen3 线性层基本不带偏置，数值上两者几乎相等——但概念仍是包含关系</td>
+    <td>同上</td>
+    <td>「加载权重」「权重文件」，装的就是整个参数集</td>
+  </tr>
+  <tr>
+    <td><b>可训练参数</b><br><span style="color:#64748b;font-size:11.6px">trainable params</span></td>
+    <td>这一次微调里<b>真正会被更新的那部分</b>。<br>全参＝17 亿全动；LoRA＝只训旁挂的两块小矩阵</td>
+    <td>就是它在变<br>其余全部冻结</td>
+    <td>「trainable 占比多少」——LoRA 通常不到 1%</td>
+  </tr>
+  <tr>
+    <td><b>超参数</b><br><span style="color:#64748b;font-size:11.6px">hyperparameter</span></td>
+    <td>你在配置文件里手填的那些数：<br>学习率 · epoch · batch · r · alpha · 挂载层</td>
+    <td>一个都不动</td>
+    <td>「调参」——调的是它</td>
+  </tr>
+</table>
+
+<div class="why"><span class="tag">分清两对</span><b>参数 vs 超参数：</b>会被训练改的，是参数；你自己填、训练全程不动的，是超参数。<br><b>参数 vs 权重：</b>不是同义词，是包含关系——<b>参数 ＝ 权重 ＋ 偏置</b>，权重是其中最主体的那部分。用途也不一样：参数回答「这模型有多大」，超参数回答「这一趟怎么训」。</div>
+
+<div class="pit"><b>「微调参数」不是术语，是个口语词。</b>听到它先在脑子里过一句：说的是「这次训了多少参数」（＝可训练参数），还是「我改了哪些设置」（＝超参数）？两种意思经常出自同一个人、同一个会——这正是要先分开的原因。</div>
+
+<p>记住这条，第 5 章就好懂了：LoRA 之所以省，就是把「可训练参数」从 17 亿缩到不到百分之一——冻结的那部分一个都不动，所以既不用存它的梯度，也不用存它的优化器（optimizer）状态。</p>
+
+<h3>第一组 · 阶段：每个词回答「什么时候发生」</h3>
+<p><b>先看一层关系：</b>这五个词不是并列的。预训练在最前，推理在最后。<b>继续预训练和 SFT 是微调的两种喂法</b>——一个灌语料，一个喂问答对；<b>偏好对齐</b>在微调之后再走一段，改的是「两个都不错时，哪个更好」，严格说已经不算微调。所以这一组读成：两个头尾阶段 ＋ 两种微调 ＋ 一段对齐。</p>
+<p>再把这五个词想成一个人的成长阶段：出生上学、考研进修、岗前培训、品行养成、正式上岗——前四个在练，最后一个上场用。顺序不能乱，量级差得极远。（后面反复出现的 <b>token</b>，是模型读文本的最小单位，一个 token 大约一到一点五个汉字。）</p>
+
+<figure>
+  <svg viewBox="0 0 680 210" role="img" aria-label="四个阶段的数据量级逐级递减，从万亿 token 到几千条偏好对">
+    <line class="ar" x1="40" y1="176" x2="640" y2="176"/>
+
+    <path d="M66,58 Q60,58 60,64 V176 H170 V64 Q170,58 164,58 Z" fill="#0F6E56" stroke="#0F6E56"/>
+    <path d="M216,86 Q210,86 210,92 V176 H320 V92 Q320,86 314,86 Z" fill="#1D9E75" stroke="#1D9E75"/>
+    <path d="M366,118 Q360,118 360,124 V176 H470 V124 Q470,118 464,118 Z" fill="#5DCAA5" stroke="#5DCAA5"/>
+    <path d="M516,136 Q510,136 510,142 V176 H620 V142 Q620,136 614,136 Z" fill="#7DCFB5" stroke="#5DCAA5"/>
+
+    <text class="sm" x="115" y="48" text-anchor="middle">万亿 token</text>
+    <text class="sm" x="265" y="76" text-anchor="middle">十亿字级</text>
+    <text class="sm" x="415" y="108" text-anchor="middle">几万条</text>
+    <text class="sm" x="565" y="126" text-anchor="middle">几千对</text>
+
+    <text class="lb" x="115" y="194" text-anchor="middle">预训练</text>
+    <text class="lb" x="265" y="194" text-anchor="middle">继续预训练</text>
+    <text class="lb" x="415" y="194" text-anchor="middle">SFT 监督微调</text>
+    <text class="lb" x="565" y="194" text-anchor="middle">偏好对齐</text>
+  </svg>
+  <figcaption>从万亿 token 降到几千对——按 token 算，最后一格也就相当于几百万 token，中间差着六个数量级以上。这就是几千条样本改不动模型知识的原因：量级根本不在一个层面上。</figcaption>
+</figure>
+
+<div class="dec wide">
+  <div class="hd">阶段层的五个词</div>
+  <div class="row"><div class="k">预训练<br>Pre-training</div><div class="v"><b>让一个人从小读遍图书馆。</b>从零开始，用海量无标注文本做「接下一个字」的训练，出来的东西叫基座模型（base）。它什么都懂一点，但不会听指令——你问它问题，它可能接着你的话往下编。<span class="mix">以为它「懂知识」。它学的是「下一个字最可能是什么」，不是「这条法规说了什么」。</span></div></div>
+  <div class="row"><div class="k">继续预训练<br>CPT</div><div class="v"><b>本科毕业了，再送去读一个专业的研究生。</b>全称 Continual Pre-Training（继续预训练）：拿领域语料（法条、判决书、病历）在基座上再灌一轮，目标还是接龙。目的是让它熟悉这个领域的用词和语料分布。<span class="mix">和 SFT 混。CPT 灌的是「语料」，SFT 教的是「问答」；CPT 以亿字计，SFT 以千条计。</span></div></div>
+  <div class="row"><div class="k">指令微调<br>SFT</div><div class="v"><b>岗前培训，照着标准问答手册练。</b>全称 Supervised Fine-Tuning（监督微调）：用「问题 → 标准回答」成对数据继续训练，让它学会「被这么问，就该这么答」。本课后面说「微调」，默认都指这一种。<b>SFT 只说了「用什么数据」，没说「改多少参数」</b>——改多少是下一组的事，这两件事第 5 章会用两根轴摆开。<span class="mix">把 SFT 当成微调的全部。微调还有另一种喂法 CPT（灌语料）；偏好对齐在更后面，不算微调。</span></div></div>
+  <div class="row"><div class="k">偏好对齐<br>RLHF / DPO</div><div class="v"><b>不只教标准答案，还教「两个都不错时，哪个更好」。</b>用人类偏好数据调「哪种回答更受欢迎」。RLHF（Reinforcement Learning from Human Feedback，人类反馈强化学习）要先训一个打分模型再强化学习；DPO（Direct Preference Optimization，直接偏好优化）直接拿「好 / 坏」成对样本训，简单得多，现在更常用。<span class="mix">以为对齐能修事实错误。它改的是「讨不讨喜」，不是「对不对」。</span></div></div>
+  <div class="row"><div class="k">推理<br>Inference</div><div class="v"><b>毕业上岗，开始接客。</b>权重全部冻结，只做前向计算，一个 token 一个 token 往外吐。部署、量化、加速都在这一段。<span class="mix">和训练混。分界线只有一条：参数还改不改。推理阶段一个权重都不动。</span></div></div>
+</div>
+
+<div class="hotq">
+  <div class="qh"><span class="fq">高频</span>阶段这一层，一定会被问到这三题</div>
+  <ul>
+    <li>「预训练、继续预训练、SFT 到底差在哪？」<span class="a">看数据：无标注文本 / 领域文本 / 问答对；看目标：都是接龙，只有 SFT 在学「被问就该这么答」。</span></li>
+    <li>「SFT 和微调是一回事吗？」<span class="a">不是一回事，是包含关系：微调是总称（在预训练模型上接着训），按喂什么数据分两类——SFT（问答对）和 CPT（语料）。口语说「我微调了个模型」，十有八九指的就是 SFT。</span></li>
+    <li>「SFT 数据要多少条？」<span class="a">几百条能跑，一两千条才稳。量级决定了它改得动习惯、改不动知识。</span></li>
+  </ul>
+</div>
+
+<h3>第二组 · 方法：每个词回答「改多少参数」</h3>
+<p>上一组的 <b>SFT</b> 回答「喂什么数据」，这一组回答「改多少参数」——两个问题互不冲突。三个词的关系一句话：<b>SFT 管数据，PEFT 管改多少，LoRA 是 PEFT 里最常用的一种具体做法</b>。这一组最容易背成一堆并列名词，其实是<b>两层树</b>：先分「全改」和「只改一小块」，只在后者里才继续分出 LoRA、Adapter、Prefix。</p>
+
+<figure>
+  <svg viewBox="0 0 680 250" role="img" aria-label="微调方法两层树：先分全参与 PEFT，PEFT 下再分 LoRA、Adapter、Prefix，LoRA 叠 4bit 基座即 QLoRA，量化不在树上">
+    <rect class="bxA" x="250" y="10" width="140" height="32" rx="8"/>
+    <text class="lb" x="320" y="31" text-anchor="middle">微调：接着训</text>
+
+    <path class="ar" d="M320,42 V58 H170 V70"/>
+    <path class="ar" d="M320,58 H470 V70"/>
+
+    <rect class="bx" x="80" y="70" width="180" height="46" rx="8"/>
+    <text class="lb2" x="170" y="89" text-anchor="middle">全参微调 Full FT</text>
+    <text class="sm" x="170" y="105" text-anchor="middle">17 亿个数字全改</text>
+
+    <rect class="bxG" x="380" y="70" width="180" height="46" rx="8"/>
+    <text class="lb2" x="470" y="89" text-anchor="middle">PEFT：只改一小块</text>
+    <text class="sm" x="470" y="105" text-anchor="middle">冻结原权重，只训新增的</text>
+
+    <path class="arG" d="M470,116 V140"/>
+    <path class="arG" d="M470,128 H355 V140"/>
+    <path class="arG" d="M470,128 H580 V140"/>
+
+    <rect class="bxG" x="300" y="140" width="110" height="34" rx="8"/>
+    <text class="lb2" x="355" y="161" text-anchor="middle">LoRA</text>
+    <rect class="bxG" x="420" y="140" width="100" height="34" rx="8"/>
+    <text class="lb2" x="470" y="161" text-anchor="middle">Adapter</text>
+    <rect class="bxG" x="530" y="140" width="100" height="34" rx="8"/>
+    <text class="lb2" x="580" y="161" text-anchor="middle">Prefix</text>
+
+    <text class="sm" x="355" y="192" text-anchor="middle" fill="#0f766e">＋4bit＝QLoRA</text>
+    <text class="sm" x="470" y="192" text-anchor="middle" fill="#b45309">推理多一层，慢</text>
+    <text class="sm" x="580" y="192" text-anchor="middle" fill="#b45309">占上下文，容量小</text>
+
+    <line x1="20" y1="208" x2="660" y2="208" stroke="#e2e8f0" stroke-width="1"/>
+    <text class="sm" x="20" y="228">量化不在这棵树上：它管「数字怎么存」，和「改多少」正交，能叠在任何一个方法上。</text>
+  </svg>
+  <figcaption>两层树：第一层只问「改多少」，第二层才问「PEFT 里用谁」。量化是另一回事，所以不能和 LoRA 并排。</figcaption>
+</figure>
+
+<div class="dec wide">
+  <div class="hd">方法层的四个词 ＋ 一个旁注</div>
+  <div class="row"><div class="k">全参微调<br>Full FT</div><div class="v"><b>改多少：100%，17 亿个数字全改。</b>整个公司重新培训，每个人都要改工作习惯：所有参数参与训练和更新，效果上限最高，代价也最高（账在第 5 章算）。<span class="mix">以为全参一定更好。数据不行时，它只是更快地过拟合，还更贵。</span></div></div>
+  <div class="row"><div class="k">PEFT</div><div class="v"><b>改多少：0.1% 到 1%</b>——17 亿里只动一百多万到一千多万个。不动原班人马，只加几个外派顾问：冻结原权重，只训新增的一小部分。全称 Parameter-Efficient Fine-Tuning，参数高效微调的总称，LoRA、Adapter、Prefix 都归它管。<span class="mix">把 PEFT 当成一个具体方法。它是「一个类别」，问「你用的什么 PEFT」要答 LoRA。</span></div></div>
+  <div class="row"><div class="k">LoRA</div><div class="v"><b>改多少：和 PEFT 一个量级，0.1% 到 1%</b>，比全参小两三个数量级。在大书上贴便利贴，不改原文：旁挂两个小矩阵 A（降维）和 B（升维），只训这两个，推理时把 B×A 加回原权重、不增加延迟。全称 Low-Rank Adaptation（低秩适配），怎么算的见第 5 章。<span class="mix">说成「另一种微调」。它是微调的一种省法，不是并列的另一件事。</span></div></div>
+  <div class="row"><div class="k">QLoRA</div><div class="v"><b>改多少：和 LoRA 一样多</b>——省的是显存，不是参数。先把大书缩印成小册子，再往上贴便利贴：基座用 4bit 加载（省显存），LoRA 那一小块仍用高精度 bf16（bfloat16，16 位浮点）训练（保质量）。7B 的训练显存能从 16 GB 压到 6 GB 左右。<span class="mix">以为精度也降到 4bit。训练的仍是 LoRA 那块高精度参数，掉点通常在一两个点内。</span></div></div>
+  <div class="row"><div class="k">量化<br>Quantization<br><span style="color:#b45309;font-size:11px">旁注 · 不是方法</span></div><div class="v"><b>改多少：零</b>——参数一个不少，只是每个数字占的位数少了。把高清照片压成 jpg，肉眼几乎看不出，细节少了：权重从 16 位浮点压到 8 位或 4 位。训练侧用 NF4（4 位正态浮点）加双重量化；推理侧还有 GPTQ、AWQ、GGUF（三种量化与存储格式，部署课展开）。<span class="mix">训练时的 4bit 和推理用的 GPTQ / AWQ 混为一谈。前者为了塞进显卡，后者为了跑得快。</span></div></div>
+</div>
+
+<h3>第三组 · 超参数：配置文件里那几个旋钮</h3>
+<p>前面两组是「什么」，这一组是「填多少」。它们没有一个是需要理解的原理，全是你在配置文件里手填的数——知道调大调小会发生什么就够了。<b>注意这层叫超参数，不叫参数</b>：一个你填、一个训练算，区别见本章开篇那张表。这一组你全定下来，训练全程一个都不变。</p>
+
+<div class="dec wide">
+  <div class="hd">超参数层的五个旋钮</div>
+  <div class="row"><div class="k">学习率<br>learning rate</div><div class="v"><b>下山时每步迈多大。</b>决定每次更新参数走多远。太大直接跨过最低点，loss 上蹿下跳；太小走得慢，训不完。<span class="mix">照抄预训练的配置。预训练常用 1e-4 以上，全参 SFT 要降到 2e-5 量级，LoRA 反而可以放回 1e-4。</span></div></div>
+  <div class="row"><div class="k">epoch<br>轮次</div><div class="v"><b>同一本习题册刷几遍。</b>把训练集完整过一遍算 1 个 epoch。微调通常 1 到 3 轮就停，多了就是在背题。<span class="mix">以为轮数越多学得越透。第 3 轮开始，训练 loss 还在降，验证集已经变差。</span></div></div>
+  <div class="row"><div class="k">batch<br>批大小</div><div class="v"><b>一次批改几份卷子。</b>一次前向加反向用多少条样本。显存不够就调小，再攒几次小批量一起更新，凑出等效的大批量。<span class="mix">看到 loss 抖动就以为训练坏了。batch 小的时候抖动本来就大，看趋势不看单点。</span></div></div>
+  <div class="row"><div class="k">r · alpha</div><div class="v"><b>便利贴能写多少字（r），写完放大几倍贴上去（alpha）。</b>r 是低秩矩阵的秩，决定容量；alpha 是缩放系数。真正起作用的是 alpha 除以 r 的比值，2:1 是常见起点。<span class="mix">以为 r 越大越好。r 过大既容易过拟合，又省不下多少显存。</span></div></div>
+  <div class="row"><div class="k">挂载层<br>target_modules</div><div class="v"><b>便利贴贴在哪几页。</b>决定 LoRA 挂到哪些层。常见做法是挂全部线性层：q、k、v、o 加上 gate、up、down。<span class="mix">以为挂得越少越轻量。挂得少确实省参数，但效果也弱，不是免费的。</span></div></div>
+</div>
+
+<h3>第四组 · 现象：这些是仪表盘</h3>
+<p>训练跑起来之后，你能看到的只有这些信号。它们的共同点是——<b>好看不等于好</b>。这一组是后面调参那一课的地基，先建立「别被数字骗」的直觉。</p>
+
+<figure>
+  <svg viewBox="0 0 680 200" role="img" aria-label="loss 曲线：训练 loss 持续下降，验证 loss 先降后升，交点右侧就是过拟合">
+    <path class="ar" d="M70,28 V162 H622"/>
+    <text class="sm" x="622" y="180" text-anchor="end">训练步数</text>
+    <text class="sm" x="58" y="34" text-anchor="end">loss</text>
+
+    <path d="M70,48 C170,112 340,144 610,154" fill="none" stroke="#2563eb" stroke-width="1.8"/>
+    <path d="M70,48 C170,96 270,116 360,122 C450,128 540,104 610,64" fill="none" stroke="#b45309" stroke-width="1.8"/>
+
+    <line x1="360" y1="122" x2="360" y2="40" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 4"/>
+    <text class="sm" x="366" y="36">该停在这里</text>
+
+    <text class="lb2" x="470" y="139" fill="#2563eb">训练 loss：一路降</text>
+    <text class="lb2" x="452" y="86" fill="#b45309">验证 loss：先降后升</text>
+    <text class="sm" x="120" y="152">这一段：欠拟合，还没学会</text>
+  </svg>
+  <figcaption>只看训练 loss 一路降，说明不了什么。真正该看的是验证集那条线什么时候开始往上翘。</figcaption>
+</figure>
+
+<div class="dec wide">
+  <div class="hd">现象层的五个词</div>
+  <div class="row"><div class="k">loss<br>损失</div><div class="v"><b>考试扣了多少分。</b>模型预测和标准答案之间的差距，越小说明越像训练数据。微调里只给回答算分，你喂的提示不算。<span class="mix">把 loss 低当成效果好。它衡量「像不像训练集」，不衡量「答得对不对」。</span></div></div>
+  <div class="row"><div class="k">过拟合<br>overfitting</div><div class="v"><b>把习题册答案背下来了，换道题就不会。</b>训练集上越来越好，新题上开始变差。判断依据只有一条：验证集的数是先变好、后变坏。<span class="mix">盯着训练 loss 找问题。它一路降是应该的，要盯的是验证那条线。</span></div></div>
+  <div class="row"><div class="k">灾难性遗忘<br>catastrophic<br>forgetting</div><div class="v"><b>学了开挖掘机，忘了怎么骑自行车。</b>微调把模型往新任务上拽，原来会的通用能力跟着掉。法律微调做完，闲聊和算术可能明显变差。<span class="mix">当成 bug。改参数就一定有副作用，不是你的配置写错了。LoRA 比全参轻得多。</span></div></div>
+  <div class="row"><div class="k">幻觉<br>hallucination</div><div class="v"><b>不懂装懂，而且说得比谁都肯定。</b>编造不存在的内容：假法条、假案例、假数字。微调能压住一部分（学会「没依据就说不知道」），但根治不了。<span class="mix">以为幻觉是知识不够。它是生成机制决定的，要治只能靠检索加校验。</span></div></div>
+  <div class="row"><div class="k">泛化<br>generalization</div><div class="v"><b>会不会举一反三。</b>训练时没见过的问法，还能不能答对。这是判断微调有没有真学到东西的唯一标准，也是必须留独立<b>测试集</b>（test set）的原因。<span class="mix">拿训练集准确率当效果。那个数字只证明它背下来了。</span></div></div>
+</div>
+
+<div class="why"><span class="tag">怎么用这一章</span>不用背。往后每遇到一个词，回到这里看它的那一行——「打个比方」帮你记住，「容易和谁混」帮你不出错。等全课读完再回来通读一遍，这二十个词就变成你自己的了。</div>
+
+<div class="chk"><b>合上这页，试着回答：</b>① SFT 和 CPT 差在哪，各用多少数据？② SFT 和 PEFT 是什么关系，为什么「用 SFT 还是 LoRA」是伪问题？③ 训练 loss 一直降，该高兴还是该警惕？三条答得出来，后面的课就不会掉队。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：会被训练改的是参数、你自己填的是超参数；二十个词再分四层归位——阶段问「什么时候」，方法问「改多少」，超参数是旋钮，现象是仪表盘</li>
+  <li>不这么做会：把 LoRA、PEFT、QLoRA 当成三个并列的东西，一被问「什么关系」就卡住</li>
+  <li>下次遇到生词，先判断：它回答的是「哪一步」还是「怎么改」，再去理解细节</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>二十个词各自归了位，再去看方法和流程，才不会被孤立的名词绊住。</div>
+
+
+<h2 id="s-lora"><span class="num">5</span>参数高效微调：LoRA 与 QLoRA</h2>
+<div class="lede"><b>结论</b>同一个模型、同一张 24G 卡：全参 20.65 GB，几乎顶满；LoRA 3.62 GB；QLoRA 约 2 GB。差的只是「要改多少数字」。本章一条主线：为什么贵 → 怎么少花 → 省到极致。</div>
+
+<figure>
+  <svg viewBox="0 0 680 208" role="img" aria-label="三种改法的显存对比：1.7B 全参 20.65 GB 占掉 24G 卡的 86%，LoRA 3.62 GB，QLoRA 约 2 GB">
+    <text class="lb2" x="14" y="22">同样训 1.7B，三种改法要多少显存（本项目用的是 24G 卡）</text>
+
+    <text class="lb2" x="14" y="62">全参 Full FT</text>
+    <rect x="126" y="46" width="258" height="24" rx="4" fill="#fbbf6a" stroke="#d97706" stroke-width=".9"/>
+    <text class="sm" x="376" y="63" text-anchor="end" fill="#7c2d12" font-weight="700">20.65 GB</text>
+
+    <text class="lb2" x="14" y="100">LoRA</text>
+    <rect x="126" y="84" width="45" height="24" rx="4" fill="#5eead4" stroke="#0d9488" stroke-width=".9"/>
+    <text class="sm" x="179" y="101" fill="#0f766e" font-weight="700">3.62 GB</text>
+
+    <text class="lb2" x="14" y="138">QLoRA</text>
+    <rect x="126" y="122" width="25" height="24" rx="4" fill="#0f766e"/>
+    <text class="sm" x="159" y="139" fill="#0f766e" font-weight="700">约 2 GB</text>
+
+    <line x1="426" y1="34" x2="426" y2="156" stroke="#b45309" stroke-width="1.4" stroke-dasharray="5 4"/>
+    <text class="sm" x="426" y="176" text-anchor="middle" fill="#b45309">24 GB 卡的上限</text>
+    <text class="sm" x="14" y="196">全参占掉 86%；LoRA 只用 15%，剩下 20 GB 留给长文本和 batch。</text>
+  </svg>
+  <figcaption>同一张卡、同一个模型，差别全在「要改多少数字」和「用什么精度存」。7B 全参要 91.4 GB，这张图直接画不下。</figcaption>
+</figure>
+
+<h3>一、参数：17 亿个数字，到底是什么</h3>
+<p>「1.7B 参数」的 B 是 billion，十亿——所以是 <b>17 亿个数</b>，不是 17 亿条规则。模型内部就是一层层数字表格（矩阵），每格一个数，比如 0.0372、−1.284、0.0051。这些数不是人写进去的，是预训练时从海量文本里一点点算出来的，合起来决定：看到「劳动」，下一个字更可能是「合同」还是「纠纷」。</p>
+
+<figure>
+  <svg viewBox="0 0 680 204" role="img" aria-label="参数示意图：一句话输入经过多层数字矩阵，每个格子里是一个数字参数">
+    <text class="sm" x="224" y="30" text-anchor="middle">几十层叠起来，每层一张几千乘几千的表，加起来就是 17 亿个数</text>
+
+    <rect class="bx" x="14" y="58" width="86" height="36" rx="7"/>
+    <text class="sm" x="57" y="81" text-anchor="middle">老板不给钱</text>
+
+    <path class="ar" d="M100,76 H112"/>
+
+    <rect class="bxA" x="114" y="44" width="64" height="64" rx="5"/>
+    <line x1="130" y1="44" x2="130" y2="108" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="146" y1="44" x2="146" y2="108" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="162" y1="44" x2="162" y2="108" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="114" y1="60" x2="178" y2="60" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="114" y1="76" x2="178" y2="76" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="114" y1="92" x2="178" y2="92" stroke="#93b4e0" stroke-width=".8"/>
+
+    <path class="ar" d="M178,76 H190"/>
+
+    <rect class="bxA" x="192" y="44" width="64" height="64" rx="5"/>
+    <line x1="208" y1="44" x2="208" y2="108" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="224" y1="44" x2="224" y2="108" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="240" y1="44" x2="240" y2="108" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="192" y1="60" x2="256" y2="60" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="192" y1="76" x2="256" y2="76" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="192" y1="92" x2="256" y2="92" stroke="#93b4e0" stroke-width=".8"/>
+
+    <path class="ar" d="M256,76 H268"/>
+
+    <rect class="bxA" x="270" y="44" width="64" height="64" rx="5"/>
+    <line x1="286" y1="44" x2="286" y2="108" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="302" y1="44" x2="302" y2="108" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="318" y1="44" x2="318" y2="108" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="270" y1="60" x2="334" y2="60" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="270" y1="76" x2="334" y2="76" stroke="#93b4e0" stroke-width=".8"/>
+    <line x1="270" y1="92" x2="334" y2="92" stroke="#93b4e0" stroke-width=".8"/>
+
+    <path class="ar" d="M334,76 H346"/>
+
+    <rect class="bx" x="348" y="58" width="82" height="36" rx="7"/>
+    <text class="sm" x="389" y="81" text-anchor="middle">劳动</text>
+
+    <line x1="224" y1="108" x2="224" y2="138" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+    <rect class="bxW" x="196" y="140" width="56" height="56" rx="5"/>
+    <text class="sm" x="224" y="173" text-anchor="middle" fill="#b45309">0.0372</text>
+
+    <text class="lb2" x="272" y="158">一个格 = 一个参数 = 一个数字</text>
+    <text class="sm" x="272" y="178">这 17 亿个数字，就是模型「学到」的全部东西</text>
+  </svg>
+  <figcaption>参数既不是代码，也不是规则，更不是一条条知识——它就是这些格子里的数字。所谓「训练」，就是把它们各拨一点点。</figcaption>
+</figure>
+
+<p>训练做的事只有一句：<b>拿数据算出「该往哪边拨」，把这 17 亿个数字各拨一点点</b>。第 3 章那个循环的最后一步，更新的就是这些数字——不是改代码，也不是往里塞法条。这里说的「参数」主要指权重（严格说参数 ＝ 权重 ＋ 偏置），不是你配置文件里填的超参数（区别见第 4 章开篇）——后面几节只关心它：有多少、占多少显存、要不要全动。</p>
+
+<h3>二、全参为什么贵：三份账</h3>
+<p>17 亿个都要拨，代价就来了：训练时每个参数不是占一份内存，是<b>三份</b>。</p>
+
+<table class="tbl">
+  <tr><th style="width:150px">存什么</th><th>怎么算</th><th style="width:110px">1.7B</th><th style="width:110px">7B</th></tr>
+  <tr><td>权重</td><td>参数个数 × 2 字节（bf16）</td><td class="num">3.44 GB</td><td class="num">15.2 GB</td></tr>
+  <tr><td>梯度</td><td>参数个数 × 2 字节</td><td class="num">3.44 GB</td><td class="num">15.2 GB</td></tr>
+  <tr><td>优化器状态</td><td>参数个数 × 8 字节（AdamW 优化器存动量和方差，各 4 字节 fp32）</td><td class="num">13.76 GB</td><td class="num">61.0 GB</td></tr>
+  <tr><td><b>合计</b></td><td>参数个数 × 12 字节</td><td class="num"><b>20.65 GB</b></td><td class="num"><b>91.4 GB</b></td></tr>
+</table>
+
+<div class="why"><span class="tag">反直觉</span>第三行最容易被低估。<b>参数本来只占 2 字节，记账本占 8 字节——记账本比正本厚四倍。</b>所以显存的大头不是模型，是你为了改它而额外准备的那些东西。</div>
+
+<p>对照自己的卡：7B 全参要 91.4 GB，两张 A100 80G 才装得下；1.7B 是 20.65 GB，24G 卡勉强挤得进，但 batch 只能开很小。卡就这么大，模型又非改不可——唯一的出路是<b>少改点</b>。</p>
+
+<h3>三、PEFT：不全改，只改一小块</h3>
+<p>既然贵在这两份额外的账上，最直接的办法就是：<b>只让一小部分数字参与训练，其余全部冻住</b>——冻住的既不算梯度，也不配记账本。这套做法的正式名字叫 <b>PEFT</b>（Parameter-Efficient Fine-Tuning，参数高效微调），只改 <b>0.1% 到 1%</b>：17 亿个数字里，只动一百多万到一千多万个。</p>
+<p>PEFT 只规定「改多少」，没规定「<b>怎么</b>改」——具体手段有 LoRA、Adapter、Prefix 好几种，本章只讲最常用的 LoRA。它一露面就会撞上一个常见误解：「该用 SFT 还是 PEFT？」——这问题问错了，因为两者不在同一根轴上：<b>SFT 管拿什么数据、算什么 loss，PEFT 管 17 亿个数字里允许动哪些</b>。</p>
+
+<figure>
+  <svg viewBox="0 0 680 268" role="img" aria-label="两根轴四格表：行是学什么（SFT 问答对、CPT 领域语料），列是改多少（全参、PEFT），四格组合都成立；本项目落在 SFT 加 PEFT 这一格，具体用 LoRA 再叠 4bit 量化，才叫 QLoRA">
+    <text class="sm" x="20" y="36">改多少 →</text>
+    <rect class="bx" x="210" y="14" width="200" height="34" rx="7"/>
+    <text class="lb2" x="310" y="36" text-anchor="middle">全参 Full FT</text>
+    <rect class="bxG" x="430" y="14" width="200" height="34" rx="7"/>
+    <text class="lb2" x="530" y="36" text-anchor="middle">PEFT：只动不到 1%</text>
+
+    <rect class="bxA" x="14" y="56" width="186" height="78" rx="8"/>
+    <text class="lb2" x="107" y="90" text-anchor="middle">SFT 指令微调</text>
+    <text class="sm" x="107" y="112" text-anchor="middle">问题 → 答案 成对</text>
+
+    <rect class="bx" x="210" y="56" width="200" height="78" rx="8"/>
+    <text class="lb2" x="310" y="90" text-anchor="middle">全参 SFT</text>
+    <text class="sm" x="310" y="112" text-anchor="middle">17 亿个数字全改</text>
+
+    <rect class="bxG" x="430" y="56" width="200" height="78" rx="8" stroke-width="2.2"/>
+    <text class="lb" x="530" y="78" text-anchor="middle" fill="#0f766e">SFT ＋ PEFT</text>
+    <text class="sm" x="530" y="99" text-anchor="middle" fill="#0f766e">具体用 LoRA ＋ 4bit 量化</text>
+    <text class="sm" x="530" y="118" text-anchor="middle">＝ QLoRA · 本项目这一格</text>
+
+    <rect class="bxA" x="14" y="142" width="186" height="78" rx="8"/>
+    <text class="lb2" x="107" y="176" text-anchor="middle">CPT 继续预训练</text>
+    <text class="sm" x="107" y="198" text-anchor="middle">领域语料</text>
+
+    <rect class="bx" x="210" y="142" width="200" height="78" rx="8"/>
+    <text class="lb2" x="310" y="176" text-anchor="middle">领域继续预训练</text>
+    <text class="sm" x="310" y="198" text-anchor="middle">灌语料，全部参数</text>
+
+    <rect class="bx" x="430" y="142" width="200" height="78" rx="8"/>
+    <text class="lb2" x="530" y="176" text-anchor="middle">合法，但少见</text>
+    <text class="sm" x="530" y="198" text-anchor="middle">省卡，学进去的也少</text>
+
+    <text class="sm" x="20" y="246">同一行＝同样的数据和 loss；同一列＝同样的参数范围。四格都成立，所以「用 SFT 还是 PEFT」是伪问题。</text>
+  </svg>
+  <figcaption>行是「学什么」，列是「改多少」。换行不换列＝数据换了，仍走 PEFT（本课用 LoRA）；换列不换行＝同一批问答对改用全参。</figcaption>
+</figure>
+
+<p>所以说清一次微调，要报到具体方法为止：<b>SFT 的数据 ＋ PEFT 的范围 ＋ LoRA 这个做法 ＋ 4bit 基座 ＝ QLoRA</b>。只答「用 PEFT」等于什么都没说。</p>
+<div class="hotq">
+  <div class="qh"><span class="fq">高频</span>「SFT 和 PEFT 什么关系」，照这两句答</div>
+  <ul>
+    <li>先答关系：<span class="a">「SFT 是训练阶段和数据类型，PEFT 是参数更新范围。我用 SFT 的数据、走 PEFT 路线，具体用 LoRA，基座 4bit 加载——合起来就是 QLoRA。」</span></li>
+    <li>再追问「你用的什么 PEFT」：<span class="a">答具体方法名——LoRA（叠 4bit 就是 QLoRA），别只答「PEFT」。PEFT 是类别，不是方法。</span></li>
+  </ul>
+</div>
+
+<h3>四、LoRA：原件锁死，旁边贴一块</h3>
+<p><b>PEFT 里最常用的一种，就是 LoRA</b>：原矩阵一个不动，只在旁边挂两个很小的矩阵，训完再加回去。这里只认符号，不用会算：</p>
+
+<figure>
+  <svg viewBox="0 0 680 178" role="img" aria-label="LoRA 结构：冻结原权重 W0，旁挂 A 乘 B 两个低秩矩阵">
+    <rect class="bx" x="18" y="30" width="150" height="86" rx="9"/>
+    <text class="lb" x="93" y="58" text-anchor="middle">W₀</text>
+    <text class="lb2" x="93" y="78" text-anchor="middle">2048 × 2048</text>
+    <text class="sm" x="93" y="100" text-anchor="middle" fill="#64748b">冻结，一个都不改</text>
+
+    <text class="lb" x="182" y="78" text-anchor="middle">+</text>
+
+    <rect class="bxG" x="206" y="24" width="22" height="98" rx="6"/>
+    <text class="sm" x="217" y="78" text-anchor="middle" fill="#0f766e" transform="rotate(-90 217 78)">B 2048 × 16</text>
+    <text class="lb" x="246" y="53" text-anchor="middle">×</text>
+    <rect class="bxG" x="262" y="36" width="112" height="22" rx="6"/>
+    <text class="sm" x="318" y="51" text-anchor="middle" fill="#0f766e">A　16 × 2048</text>
+
+    <text class="lb" x="398" y="78" text-anchor="middle">=</text>
+
+    <rect class="bxW" x="420" y="30" width="150" height="86" rx="9"/>
+    <text class="lb" x="495" y="58" text-anchor="middle">ΔW</text>
+    <text class="lb2" x="495" y="78" text-anchor="middle">2048 × 2048</text>
+    <text class="sm" x="495" y="100" text-anchor="middle" fill="#b45309">只训 A 和 B</text>
+
+    <text class="sm" x="20" y="146" fill="#0f766e">A 和 B 加起来约 6.6 万个数；原权重 419 万个，一个都不动。</text>
+    <text class="sm" x="20" y="166" fill="#64748b">训完可以把 ΔW 加回 W₀，推理时和原模型一样快——这就是「能合并」的意思。</text>
+  </svg>
+  <figcaption>两个小矩阵 B×A 拼回一个 2048×2048 的 ΔW。省的不是「少改几个参数」，是把基座的梯度和优化器状态整份省掉了——5 倍是这么来的。</figcaption>
+</figure>
+
+<p>要训的数少 60 多倍，那两份账（梯度 ＋ 优化器）就从 17.2 GB 缩到 0.18 GB——20.65 掉到 3.62，省的全在这里。具体到 1.7B（r=16）：基座 3.44 GB 照旧，梯度只剩 35 MB、优化器 140 MB，几乎可以不计。同一张 24G 卡，全参只剩 3.35 GB 留给激活值和 batch，长序列直接 OOM（显存溢出）；LoRA 还剩 20 GB。</p>
+
+<div class="why"><span class="tag">本项目</span>为什么是 1.7B 不是 7B——不是跑不动，是<b>跑得完很多轮</b>：1.7B 一轮一两小时，一天能试三四个配置；7B 一轮两小时起，试错成本翻几倍。</div>
+
+<h3>五、三个旋钮</h3>
+<p>LoRA 要你填的只有三个数，名字不友好，意思都很朴素——<b>先记住第一个</b>，另外两个有默认值。</p>
+
+<table class="tbl">
+  <tr><th style="width:170px">旋钮</th><th>是什么</th><th style="width:210px">怎么定</th></tr>
+  <tr class="hot"><td><span class="fq">高频</span>r（秩）</td><td>旁边那块矩阵条的<b>窄边留多宽</b>。留宽了能学更复杂的东西，参数也跟着变多</td><td>常用 8 / 16 / 32；任务越窄越小，16 是安全默认</td></tr>
+  <tr><td>alpha（缩放）</td><td>给 ΔW 乘的倍数——决定贴上去这一块影响多大</td><td>起作用的是 alpha/r 的比值，常见 alpha = 2r</td></tr>
+  <tr><td>target_modules</td><td>挂在哪些层上</td><td>只挂 q、v 最省；全挂（q/k/v/o + gate/up/down）效果最好</td></tr>
+</table>
+
+<h3>六、QLoRA：连基座也压成 4bit</h3>
+<p>LoRA 省的是梯度和优化器状态，基座那 3.44 GB 还在。QLoRA 再往下一步：<strong>基座用 4bit 加载，LoRA 部分仍然用 bf16 训</strong>。</p>
+
+<table class="tbl stack">
+  <tr><th style="width:120px">方案</th><th style="width:150px">1.7B 训练显存</th><th style="width:150px">7B 训练显存</th><th>什么时候用</th></tr>
+  <tr><td>全参</td><td class="num">20.65 GB</td><td class="num">91.4 GB</td><td>数据量大、要改模型底子、有多卡。个人项目基本不用</td></tr>
+  <tr><td>LoRA</td><td class="num">3.62 GB</td><td class="num">16.2 GB</td><td>卡够、追求速度，不想在量化上折腾</td></tr>
+  <tr><td>QLoRA</td><td class="num">约 2 GB</td><td class="num">约 6 GB</td><td class="ok">卡不够时的默认选择；本项目的方案</td></tr>
+</table>
+
+<div class="pit"><b>4bit 不是白拿的。</b>省的是显存，花的是时间——每次前向都要反量化，速度会慢一截。掉点通常很小（一两个点以内），但任务越难、数据越少，掉得越明显。所以先用 LoRA 跑一版当参照，再决定要不要上 4bit。</div>
+
+<p>收个口：<b>QLoRA 不是第四种方案，是 LoRA 多加一步</b>——同样只训那两个小矩阵，只是基座改用 4bit 加载。缺一样都不算：只量化不加 LoRA，训的是冻住的基座；只加 LoRA 不量化，省不到这个程度。本项目就是这一套。</p>
+
+<div class="recap"><b>这一章钉住了四件事</b><ul>
+  <li>钉住了（主线）：20.65 GB → 3.62 GB → 约 2 GB。省的不是「模型变小了」，是那两份账——梯度账 LoRA 压根不配，基座那份 QLoRA 再压成 4bit</li>
+  <li>钉住了（定位）：SFT 管数据，PEFT 管改多少，LoRA 是 PEFT 里的一个做法，叠 4bit 才叫 QLoRA</li>
+  <li>不这么做会：把 SFT、全参、LoRA 当成三选一，或者以为「调参」调的是模型里那 17 亿个数字</li>
+  <li>下次遇到同类问题，先算：参数 × 12 字节 = 全参显存，对一下自己的卡</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>参数是模型里那 17 亿个数字；LoRA 不是另一种微调，是改这些数字的一种省法——省下来的是梯度与优化器那份账。</div>
+
+
+<h2 id="s-flow"><span class="num">6</span>微调全流程与准备清单</h2>
+<div class="lede"><b>结论</b>七步里只有「定任务」和「评测」决定成败，训练反而是最标准的一步。</div>
+
+<figure>
+  <svg viewBox="0 0 680 176" role="img" aria-label="微调四段：备料四步、训练、评测、部署，评测不过回到备料">
+    <defs>
+      <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+      <marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#b45309"/>
+      </marker>
+    </defs>
+    <rect class="bxW" x="8" y="26" width="196" height="88" rx="9"/>
+    <text class="lb" x="106" y="50" text-anchor="middle">① 备料 · 四步</text>
+    <text class="lb2" x="106" y="72" text-anchor="middle" fill="#b45309" font-weight="700">定任务（最关键）</text>
+    <text class="lb2" x="106" y="92" text-anchor="middle">备数据 · 选基座 · 选方法</text>
+    <line class="ar" x1="204" y1="70" x2="222" y2="70" marker-end="url(#ah2)"/>
+
+    <rect class="bxG" x="226" y="26" width="104" height="88" rx="9"/>
+    <text class="lb" x="278" y="50" text-anchor="middle">② 训练</text>
+    <text class="lb2" x="278" y="72" text-anchor="middle">脚本一跑</text>
+    <text class="lb2" x="278" y="92" text-anchor="middle">剩下交给时间</text>
+    <line class="ar" x1="330" y1="70" x2="348" y2="70" marker-end="url(#ah2)"/>
+
+    <rect class="bxW" x="352" y="26" width="126" height="88" rx="9"/>
+    <text class="lb" x="415" y="50" text-anchor="middle">③ 评测</text>
+    <text class="lb2" x="415" y="72" text-anchor="middle">固定考卷 + 基线</text>
+    <text class="lb2" x="415" y="92" text-anchor="middle">没有它全靠感觉</text>
+    <line class="ar" x1="478" y1="70" x2="496" y2="70" marker-end="url(#ah2)"/>
+
+    <rect class="bxA" x="500" y="26" width="172" height="88" rx="9"/>
+    <text class="lb" x="586" y="50" text-anchor="middle">④ 部署</text>
+    <text class="lb2" x="586" y="72" text-anchor="middle">接进系统</text>
+    <text class="lb2" x="586" y="92" text-anchor="middle">延迟与显存要记账</text>
+
+    <path d="M 415 114 L 415 138 L 106 138 L 106 118" fill="none" stroke="#b45309" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ah3)"/>
+    <text class="sm" x="340" y="160" text-anchor="middle" fill="#b45309">不过就回备料补数据，这个回流是常态，不是失败</text>
+  </svg>
+  <figcaption>琥珀两格决定成败：定任务和评测。中间两格照标准动作做，评测不过就回第一步。</figcaption>
+</figure>
+
+<table class="tbl stack">
+  <tr><th style="width:112px">步</th><th style="width:236px">产出物</th><th style="width:210px">最常翻车</th><th>怎么算过</th></tr>
+  <tr><td>① 定任务</td><td>一句「输入 → 输出」契约 + 验收指标</td><td>连「好」都定义不了</td><td>拿给旁人看，他能说出什么算合格</td></tr>
+  <tr><td>② 备数据</td><td>训练 / 验证 / 测试三份 jsonl（JSON Lines，一行一条样本）+ 一页数据卡</td><td>样本重复、超长被截断</td><td>抽 10 条，8 条能说清输入和期望输出</td></tr>
+  <tr><td>③ 选基座</td><td>一个模型 + 一句选择理由</td><td>一上来上 7B，轮次跑不完</td><td>能说出「为什么不是更大 / 更小」</td></tr>
+  <tr><td>④ 选方法</td><td>全参 / LoRA / QLoRA + 一个框架</td><td>只看教程不看显存</td><td>显存账算得出来，选型有理由</td></tr>
+  <tr><td>⑤ 训练</td><td>loss 曲线 + LoRA 权重文件</td><td>断连白跑、忘关机</td><td>loss 前降后稳，LoRA 权重能加载</td></tr>
+  <tr><td>⑥ 评测</td><td>基线文件 + 前后对比表</td><td>没有基线，全靠感觉</td><td>同一脚本跑两遍，数字一致</td></tr>
+  <tr><td>⑦ 部署</td><td>接进系统的调用 + 延迟与显存记录</td><td>只报好数字，不报变差的样本</td><td>原来那次云端调用被替换掉，链路跑通</td></tr>
+</table>
+
+<div class="why"><span class="tag">一个量级差</span>超参和预训练完全不是一个数量级，照着预训练的配置抄一定崩。<b>预训练</b>：学习率 <code>1e-4</code> 以上，跑几十万步，论「见过多少 token」；<b>全参 SFT</b>：降到 <code>2e-5</code> 量级，只跑一两轮，论「几个 epoch」；<b>LoRA</b>：只训旁挂的小块，可以放回 <code>1e-4</code> 到 <code>2e-4</code>。微调的训练量小、目标窄，大学习率和大轮数只会更快过拟合。</div>
+
+<h3>开训前，四张清单</h3>
+<table class="tbl stack">
+  <tr><th style="width:104px">清单</th><th>最低要求</th><th style="width:262px">怎么算齐了</th></tr>
+  <tr><td><b>数据</b></td><td>三百条能跑，一两千条才稳；jsonl（每行一条 JSON）字段固定；长度卡在截断上限内</td><td>抽 10 条，8 条能说清输入与期望输出</td></tr>
+  <tr><td><b>算力</b></td><td>1.7B 用 4bit + LoRA，单卡 8G 级就够；7B 要 16G 以上；4090 24G 够用</td><td><code>nvidia-smi</code> 认得出卡，<code>torch.cuda.is_available()</code> 为 True</td></tr>
+  <tr><td><b>环境</b></td><td>驱动、CUDA、torch 版本对齐；transformers 4.51 以上；peft + trl + bitsandbytes 能 import</td><td>三个包 import 不报错，版本号记下来</td></tr>
+  <tr><td><b>评测</b></td><td>一套固定题 + 一个基线文件，训之前先跑出来</td><td>同一脚本跑两遍，数字一致</td></tr>
+</table>
+
+<div class="chk"><b>合上文档，自己判：</b>① 白纸画出「预训练 → 后训练（微调 → 对齐）→ 部署」，指出这一课动手的是哪一格；② 任抽五个概念词，各给一句话定义；③ 60 秒说清：我这个需求为什么该（或不该）微调。三条都过，这一课才算读完。</div>
+
+<div class="recap"><b>这一课留下的四样东西</b><ul>
+  <li>一样判断力：缺知识归检索，缺行为归微调，表达小毛病先归 prompt</li>
+  <li>一套词汇：二十个词分四层；报自己的配置时按「用什么数据 ＋ 动多少 ＋ 具体手段」三段说，不会乱</li>
+  <li>一条流程：七步里只有定任务和评测决定成败，训练反而是最标准的一步</li>
+  <li>一份能直接用的交付：白纸上的四格图、五道闸判定流程、七步清单</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>这一课不教你训模型，教你在动手之前就知道该不该训、钱该花在哪——七步里最不该省的是两头的定任务和评测。</div>
+
+<div class="why"><span class="tag">下一步</span>下一课把六个「选什么」一次定清：训什么、用哪个基座、上哪种方法、选哪个框架、租什么平台、喂哪份数据——选型是一条链，顺序反了全白选。</div>
+
+</main>
+
+<nav class="nav">
+  <div class="ph">这是第一课，前面没有内容了</div>
+  <a href="L01_微调选型_课时页.html" class="nx"><div class="dir">下一课 · L01 →</div><div class="tt">微调选型</div></a>
+</nav>
+
+<div class="footnote">L00 · 微调认知与原理</div>
+</div>
+
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.modnav a'));
+  if(!links.length) return;
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+
+  function spy(){
+    var line=window.scrollY+90, idx=0;
+    for(var i=0;i<secs.length;i++){
+      var el=secs[i];
+      if(el && el.getBoundingClientRect().top+window.scrollY<=line) idx=i;
+    }
+    links.forEach(function(a,i){a.classList.toggle('on',i===idx);});
+  }
+
+  window.addEventListener('scroll',spy,{passive:true});
+  window.addEventListener('resize',spy);
+
+  links.forEach(function(a){
+    a.addEventListener('click',function(e){
+      var t=document.querySelector(a.getAttribute('href'));
+      if(!t) return;
+      e.preventDefault();
+      var far=Math.abs(t.getBoundingClientRect().top)>2400;
+      t.scrollIntoView({behavior:far?'instant':'smooth',block:'start'});
+      if(history.replaceState) history.replaceState(null,'',a.getAttribute('href'));
+    });
+  });
+
+  spy();
+})();
+</script>
+</body>
+</html>

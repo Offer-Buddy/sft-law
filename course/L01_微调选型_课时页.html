@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L01 · 微调选型</title>
+<style>
+:root{
+  --primary:#0d9488; --primary-d:#0f766e; --blue:#2563eb; --blue-d:#1d4ed8;
+  --bg:#eef2f7; --card:#ffffff; --text:#1e293b; --muted:#64748b;
+  --line:#e2e8f0; --soft:#f8fafc; --warn:#b45309; --warn-bg:#fffbeb;
+  --deep:#163a5f; --code-bg:#0e1a2b; --code-fg:#dbe6ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.78;padding:24px 16px 40px;
+  font-size:15px;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;}
+
+/* ── 页头 ── */
+.chead{background:linear-gradient(135deg,#0f766e 0%,#155e93 52%,#1d4ed8 100%);color:#fff;border-radius:16px;padding:26px 30px 20px;position:relative;overflow:hidden;}
+.chead::after{content:"";position:absolute;right:-46px;top:-58px;width:180px;height:180px;background:rgba(255,255,255,.10);border-radius:28px;transform:rotate(18deg);}
+.chead::before{content:"";position:absolute;right:86px;bottom:-58px;width:110px;height:110px;background:rgba(255,255,255,.07);border-radius:50%;}
+.kicker{display:flex;align-items:center;gap:9px;flex-wrap:wrap;position:relative;z-index:1;margin-bottom:9px;}
+.lid{background:rgba(255,255,255,.95);color:#0f766e;font-weight:800;font-size:12.4px;padding:2px 10px;border-radius:6px;letter-spacing:.6px;}
+.lname{font-size:12.2px;color:#d6ecff;letter-spacing:.4px;}
+.ltotal{margin-left:auto;font-size:11.8px;color:#a8cdf0;}
+.chead h1{font-size:27px;line-height:1.36;letter-spacing:-.4px;font-weight:800;position:relative;z-index:1;}
+.chead .sub{font-size:13.4px;color:#d5e8fb;margin-top:7px;max-width:770px;position:relative;z-index:1;}
+
+/* ── 正文容器 ── */
+main{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 28px 20px;margin-top:14px;box-shadow:0 1px 3px rgba(15,23,42,.05);}
+h2{font-size:19px;font-weight:800;margin:30px 0 10px;color:#0f2f4d;line-height:1.45;display:flex;align-items:center;gap:9px;}
+h2:first-child{margin-top:0;}
+h2[id]{scroll-margin-top:64px;}
+h2::before{content:"";width:4px;height:17px;background:linear-gradient(180deg,var(--primary),var(--blue));border-radius:2px;flex:0 0 auto;}
+h3{font-size:15.2px;font-weight:800;margin:20px 0 8px;color:#173a5c;line-height:1.5;}
+p{margin:9px 0;font-size:14.3px;}
+strong,b{color:#0b2a45;}
+.hl{background:linear-gradient(transparent 62%,#d7f2ee 62%);font-weight:700;padding:0 1px;}
+ul,ol{margin:8px 0 8px 20px;font-size:14.2px;}
+li{margin:4px 0;line-height:1.75;}
+small{font-size:11.6px;color:var(--muted);line-height:1.5;}
+p.note{font-size:12.6px;color:var(--muted);line-height:1.7;margin:7px 0 2px;}
+
+/* ── 决策卡 ── */
+.dec{border:1px solid #d9e6f6;border-radius:11px;overflow:hidden;margin:14px 0 6px;background:#fff;}
+.dec .hd{background:#eff5ff;padding:8px 14px;font-size:12.4px;font-weight:800;color:#1d4ed8;letter-spacing:.3px;}
+.dec .row{display:grid;grid-template-columns:92px 1fr;gap:10px;padding:9px 14px;border-top:1px solid #eef2f8;font-size:13.4px;}
+.dec .row .k{color:var(--muted);font-weight:700;font-size:12.3px;padding-top:1px;}
+.dec .row .v{line-height:1.72;}
+.dec .row.no .v{color:#b91c1c;}
+.dec .row.yes .v{color:#0f766e;}
+
+/* ── 提示块 ── */
+.why{background:#f0fbf9;border-left:3px solid var(--primary);border-radius:0 9px 9px 0;padding:11px 15px;margin:13px 0;font-size:13.8px;line-height:1.75;}
+.why .tag{display:inline-block;background:var(--primary);color:#fff;font-size:11.4px;font-weight:700;padding:1px 8px;border-radius:5px;margin-right:8px;}
+.pit{background:var(--warn-bg);border:1px solid #fde68a;border-radius:9px;padding:10px 14px;margin:12px 0;font-size:13.5px;color:#78350f;line-height:1.75;}
+.pit b{color:var(--warn);}
+.chk{background:#f0fdfa;border:1px solid #99f6e4;border-radius:9px;padding:11px 14px;margin:14px 0 4px;font-size:13.5px;line-height:1.75;}
+.chk b{color:#0f766e;}
+
+/* ── 双栏对比 ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0;}
+.two .col{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column;}
+.two .col .hd{padding:7px 12px;font-size:12.2px;font-weight:800;letter-spacing:.2px;}
+.two .bad{border-color:#fecaca;}
+.two .bad .hd{background:#fef2f2;color:#b91c1c;border-bottom:1px solid #fecaca;}
+.two .good{border-color:#99f6e4;}
+.two .good .hd{background:#f0fdfa;color:#0f766e;border-bottom:1px solid #99f6e4;}
+.two .col .bd{padding:10px 12px;font-size:13.1px;line-height:1.8;white-space:pre-wrap;word-break:break-word;flex:1;font-family:-apple-system,"PingFang SC",sans-serif;}
+.two .col .ft{padding:7px 12px;font-size:12.3px;line-height:1.68;border-top:1px dashed #eef2f8;font-family:-apple-system,"PingFang SC",sans-serif;}
+.two .bad .ft{color:#b91c1c;background:#fffafa;}
+.two .good .ft{color:#0f766e;background:#fafffe;}
+
+/* ── 顶部章节导航 ── */
+.modnav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:12px;margin-top:14px;box-shadow:0 2px 10px rgba(15,23,42,.06);}
+.modnav .in{display:flex;gap:2px;overflow-x:auto;padding:0 8px;scrollbar-width:none;}
+.modnav .in::-webkit-scrollbar{display:none;}
+.modnav a{flex:0 0 auto;padding:10px 11px 9px;font-size:12.7px;font-weight:700;color:#64748b;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;letter-spacing:.2px;}
+.modnav a .n{display:inline-block;min-width:14px;margin-right:4px;font-size:10.6px;font-weight:800;color:#a8b6c8;font-variant-numeric:tabular-nums;letter-spacing:0;}
+.modnav a:hover{color:#0f766e;}
+.modnav a.on{color:#0f766e;border-bottom-color:#0d9488;}
+.modnav a.on .n{color:#0d9488;}
+.modnav + main{margin-top:10px;}
+
+/* ── 课程目标表 ── */
+.goal{border:1px solid #d9e6f6;border-radius:11px;overflow:hidden;background:#fff;margin:0 0 4px;}
+.goal .gh{background:#eff5ff;padding:8px 14px;font-size:12.4px;font-weight:800;color:#1d4ed8;letter-spacing:.3px;}
+.goal .gh em{font-style:normal;font-weight:600;color:#64748b;font-size:12px;margin-left:8px;letter-spacing:0;}
+.goal .tbl{margin:0;}
+.goal .tbl th{padding:8px 14px;background:#f7fafd;}
+.goal .tbl td{padding:10px 14px;}
+.goal .tbl td:first-child{white-space:nowrap;}
+.goal .tier{display:inline-block;font-size:11.6px;font-weight:800;color:#fff;padding:2px 9px;border-radius:5px;letter-spacing:.4px;}
+.goal .tier.a{background:#0d9488;}
+.goal .tier.b{background:#2563eb;}
+.goal .tier.c{background:#b45309;}
+.goal .tbl b{color:#0b2a45;}
+.bound{font-size:12.3px;color:#64748b;border-top:1px dashed var(--line);padding:8px 14px;line-height:1.7;}
+.bound b{color:var(--warn);}
+
+/* ── 代码 ── */
+pre.code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:12px 15px;font-family:"JetBrains Mono",Consolas,"Courier New",monospace;font-size:12.4px;line-height:1.82;overflow-x:auto;margin:11px 0;white-space:pre;}
+pre.code .c{color:#7c8fa8;}
+pre.code .k{color:#7dd3fc;}
+pre.code .s{color:#a5e8b0;}
+code{font-family:Consolas,monospace;}
+p code,li code,td code{background:#eef2f7;padding:1px 5px;border-radius:4px;font-size:12.2px;color:#0f766e;}
+.fname{font-family:Consolas,monospace;font-size:12px;color:var(--muted);margin:12px 0 -4px;}
+.fname::before{content:"▤ ";color:var(--primary);}
+
+/* ── 表格 ── */
+.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+.tbl th{text-align:left;padding:8px 10px;background:#f4f7fb;color:#334155;font-weight:700;font-size:12.4px;border-bottom:1px solid var(--line);}
+.tbl td{padding:8px 10px;border-bottom:1px solid #eef2f7;vertical-align:top;line-height:1.7;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl .ok{color:#0f766e;font-weight:700;}
+.tbl .no2{color:#b91c1c;font-weight:700;}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap;}
+
+/* ── 图 ── */
+figure{margin:16px 0 6px;background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:14px 14px 8px;}
+figure svg{display:block;width:100%;height:auto;}
+figcaption{font-size:12.2px;color:var(--muted);text-align:center;margin-top:6px;padding-bottom:2px;}
+.bx{fill:#fff;stroke:#94a3b8;stroke-width:1.4;}
+.bxA{fill:#eef5ff;stroke:#2563eb;stroke-width:1.6;}
+.bxG{fill:#eefbf7;stroke:#0d9488;stroke-width:1.6;}
+.bxW{fill:#fff8e8;stroke:#d97706;stroke-width:1.5;}
+.bxR{fill:#fef1f1;stroke:#dc2626;stroke-width:1.4;}
+.bxD{fill:#163a5f;stroke:#163a5f;}
+.lb{font-size:12.4px;fill:#0f2f4d;font-weight:700;}
+.lb2{font-size:11.4px;fill:#475569;}
+.lbw{font-size:12.2px;fill:#fff;font-weight:700;}
+.sm{font-size:10.8px;fill:#64748b;}
+.mono{font-family:Consolas,"Courier New",monospace;}
+.ar{stroke:#64748b;stroke-width:1.5;fill:none;}
+.arB{stroke:#2563eb;stroke-width:1.7;fill:none;}
+.arG{stroke:#0d9488;stroke-width:1.6;fill:none;}
+.arR{stroke:#dc2626;stroke-width:1.5;fill:none;}
+
+/* ── 练习 ── */
+.drill{border:1px dashed #a5b4fc;background:#f5f7ff;border-radius:11px;padding:13px 16px;margin:14px 0 4px;}
+.drill .dh{font-size:12.9px;font-weight:800;color:#4338ca;margin-bottom:6px;}
+.drill ol{margin:6px 0 0 18px;font-size:13.4px;}
+.drill li{margin:5px 0;line-height:1.72;}
+
+/* ── 一句话带走 ── */
+.takeaway{background:var(--deep);color:#eaf3ff;border-radius:10px;padding:11px 16px;margin-top:18px;display:flex;align-items:center;gap:11px;font-size:13.6px;line-height:1.6;}
+.takeaway span.t{flex:0 0 auto;background:var(--primary);color:#fff;font-size:11.2px;font-weight:800;padding:2px 9px;border-radius:999px;letter-spacing:.4px;}
+.takeaway b{color:#a7f3d0;}
+
+/* ── 章末小结 ── */
+.recap{background:var(--soft);border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:10px;padding:11px 15px;margin:16px 0 0;font-size:13.2px;line-height:1.72;}
+.recap b{display:block;font-size:12.8px;color:#0f766e;margin-bottom:4px;}
+.recap ul{margin:0 0 0 17px;}
+.recap li{margin:3px 0;}
+
+/* ── 结论条 ── */
+.lede{background:#eef4ff;border-left:3px solid var(--blue);border-radius:0 9px 9px 0;padding:10px 15px;margin:0 0 12px;font-size:14px;line-height:1.7;color:#12305c;font-weight:600;}
+.lede b{display:inline-block;margin-right:8px;background:var(--blue);color:#fff;font-size:11.2px;font-weight:800;padding:1px 8px;border-radius:999px;letter-spacing:.4px;vertical-align:1px;}
+.lede code{background:#dde9ff;color:#0b3d91;border-color:#c9dbfb;}
+
+/* ── 表格外壳 ── */
+.tblwrap{overflow-x:auto;margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#fff;}
+.tblwrap .tbl{width:100%;min-width:560px;margin:0;}
+.goal .tblwrap{border:none;border-radius:0;margin:0;background:transparent;}
+
+/* ── 补充说明块 ── */
+.exp{background:#f0fdfa;border:1px solid #99f6e4;border-left:3px solid var(--primary);border-radius:9px;padding:10px 14px;margin:12px 0;font-size:13.3px;line-height:1.75;}
+.exp b{color:#0f766e;}
+.exp pre.code{margin:8px 0 2px;font-size:12px;}
+
+/* ── 终端输出 ── */
+pre.term{background:#f6f8fb;border:1px dashed #cbd5e1;border-radius:9px;padding:10px 14px;font-family:Consolas,"Courier New",monospace;font-size:12.3px;line-height:1.78;color:#334155;overflow-x:auto;white-space:pre;margin:10px 0;}
+pre.term .d{color:#0f766e;}
+
+/* ── 章号块 ── */
+h2 .num{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:8px;background:#eaf0ff;color:var(--blue-d);font-size:13px;font-weight:800;flex:0 0 auto;}
+h2:has(.num)::before{display:none;}
+
+/* ── 上下页导航 ── */
+.nav{display:flex;gap:12px;margin-top:16px;}
+.nav a{flex:1;display:block;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 15px;text-decoration:none;color:var(--text);transition:.15s;}
+.nav a:hover{border-color:#b9cde6;box-shadow:0 2px 8px rgba(15,23,42,.07);}
+.nav .dir{font-size:11.4px;color:var(--muted);font-weight:700;letter-spacing:.4px;}
+.nav .tt{font-size:13.4px;font-weight:700;color:#12406b;margin-top:2px;}
+.nav .nx{text-align:right;}
+.nav .ph{flex:1;border:1px dashed var(--line);border-radius:11px;padding:11px 15px;color:#b6c2d2;font-size:12.4px;}
+
+.footnote{text-align:center;font-size:12px;color:#94a3b8;margin-top:22px;}
+
+@media (max-width:900px){
+  .chead{padding:22px 20px 18px;}
+  .chead h1{font-size:22.5px;}
+  main{padding:20px 17px;}
+  .dec .row{grid-template-columns:1fr;gap:2px;}
+  .nav{flex-direction:column;}
+  .two{grid-template-columns:1fr;}
+  figure{overflow-x:auto;scrollbar-width:thin;scrollbar-color:#c3cfdd transparent;}
+  figure svg{min-width:520px;}
+  main table{display:block;overflow-x:auto;}
+  main table.tbl th,main table.tbl td{min-width:104px;}
+  main table.tbl.stack,main table.tbl.stack tbody,main table.tbl.stack tr,main table.tbl.stack td,main table.tbl.stack th{display:block;min-width:0;width:auto;}
+  main table.tbl.stack tr:first-child{display:none;}
+  main table.tbl.stack tr{border-bottom:1px solid var(--line);padding:9px 14px;}
+  main table.tbl.stack tr:last-child{border-bottom:none;}
+  main table.tbl.stack td{border:none;padding:2px 0;}
+  main table.tbl.stack td:first-child{margin-bottom:3px;}
+  pre.code{font-size:11.4px;}
+}
+@media print{
+  body{background:#fff;padding:0;font-size:11.5px;}
+  .chead{border-radius:0;}
+  main{box-shadow:none;border:none;padding:0;margin-top:8px;}
+  .nav,.footnote,.modnav{display:none;}
+  .dec,.drill,.chk,.recap,.takeaway,.exp,.lede,figure,h2,h3,.two,.goal,pre.code,pre.term{break-inside:avoid;page-break-inside:avoid;}
+  figure{overflow:visible;}
+  figure svg{min-width:0;}
+  h2,h3{break-after:avoid;page-break-after:avoid;}
+  pre.code{background:#f5f7fa;color:#1e293b;border:1px solid #dbe3ec;}
+  pre.code .c{color:#7a8699;} pre.code .k{color:#0b5cbf;} pre.code .s{color:#0f766e;}
+  pre.term{background:#f8fafc;border:1px solid #e2e8f0;color:#334155;}
+  .takeaway{background:#163a5f !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  @page{size:A4;margin:12mm;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="chead">
+  <div class="kicker"><span class="lid">L01</span><span class="lname">微调选型</span><span class="ltotal">15 课 · 第 2 课</span></div>
+  <h1>先定靶子，再定工具——微调选型的八个判断</h1>
+  <p class="sub">这一课不讲某个具体项目该怎么选，只讲判断顺序。前四环定靶子：需求 → 数据 → 验收 → 任务；后四环定工具：基座 → 方法 → 框架 → 平台。每一环给一条判断依据、一条一票否决项。八步走完，换成任何任务都能自己下结论。</p>
+</header>
+
+<nav class="modnav"><div class="in">
+  <a href="#s-chain" class="on"><span class="n">1</span>选型总览</a>
+  <a href="#s-need"><span class="n">2</span>定需求</a>
+  <a href="#s-data"><span class="n">3</span>看数据</a>
+  <a href="#s-accept"><span class="n">4</span>定验收</a>
+  <a href="#s-task"><span class="n">5</span>定任务</a>
+  <a href="#s-base"><span class="n">6</span>选基座</a>
+  <a href="#s-method"><span class="n">7</span>选方法</a>
+  <a href="#s-framework"><span class="n">8</span>选框架</a>
+  <a href="#s-platform"><span class="n">9</span>选平台</a>
+  <a href="#s-wrap"><span class="n">10</span>小结</a>
+</div></nav>
+
+<main>
+
+<div class="goal" id="goal">
+  <div class="gh">课程目标<em>三档都过，这课才算拿到</em></div>
+  <table class="tbl">
+    <tr><th style="width:74px">档位</th><th>学完你能做到</th><th style="width:296px">怎么算达成</th></tr>
+    <tr><td><span class="tier a">写出</span></td><td>画出八环决策链，说清前四环和后四环各在定什么</td><td>白纸画一条链，八个框顺序不错，每段能用一句话说清这段在定什么</td></tr>
+    <tr><td><span class="tier b">跑通</span></td><td>给一个陌生需求，能走完前四环定出任务形态，再给出工具层选型</td><td>任给一个场景，能填出数据 / 验收 / 任务 / 基座 / 方法五格，不许写「差不多都行」</td></tr>
+    <tr><td><span class="tier c">说清</span></td><td>解释为什么「验收」排在「任务」前面——为什么任务不是挑出来的，是被夹出来的</td><td>举例：把验收从「有客观数」换成「人眼看着还行」，能说出任务形态为什么跟着变</td></tr>
+  </table>
+  <div class="bound"><b>不处理：</b>多卡并行的参数调优细节、推理服务化（vLLM / TGI）的部署调参、数据清洗与构造的具体做法；也不针对任何具体项目——这一课只给判断顺序，落地放到后面的课。</div>
+</div>
+
+<h2 id="s-chain"><span class="num">1</span>八个「选」不是并列题，是前后两段</h2>
+<div class="lede"><b>结论</b>前四环定靶子，后四环定工具。靶子没定就挑框架，等于先买钻头再想打哪个孔。第一问不是「用哪个框架」，是「要解决什么、手上有什么、拿什么算解决」。</div>
+
+<figure>
+  <svg viewBox="0 0 680 232" role="img" aria-label="八环决策链：前四环定靶子（需求、数据、验收、任务），后四环定工具（基座、方法、框架、平台）">
+    <defs>
+      <marker id="ch1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+    </defs>
+
+    <rect class="bxW" x="17" y="26" width="148" height="66" rx="9"/>
+    <text class="lb" x="91" y="50" text-anchor="middle">定需求</text>
+    <text class="lb2" x="91" y="71" text-anchor="middle">哪一步在失败</text>
+    <text class="sm" x="91" y="86" text-anchor="middle">先定位，再动手</text>
+
+    <line class="ar" x1="166" y1="59" x2="180" y2="59" marker-end="url(#ch1)"/>
+
+    <rect class="bxW" x="183" y="26" width="148" height="66" rx="9"/>
+    <text class="lb" x="257" y="50" text-anchor="middle">看数据</text>
+    <text class="lb2" x="257" y="71" text-anchor="middle">有什么料</text>
+    <text class="sm" x="257" y="86" text-anchor="middle">标注字段定形态</text>
+
+    <line class="ar" x1="332" y1="59" x2="346" y2="59" marker-end="url(#ch1)"/>
+
+    <rect class="bxW" x="349" y="26" width="148" height="66" rx="9"/>
+    <text class="lb" x="423" y="50" text-anchor="middle">定验收</text>
+    <text class="lb2" x="423" y="71" text-anchor="middle">拿什么量</text>
+    <text class="sm" x="423" y="86" text-anchor="middle">量不出就别训</text>
+
+    <line class="ar" x1="498" y1="59" x2="512" y2="59" marker-end="url(#ch1)"/>
+
+    <rect class="bxW" x="515" y="26" width="148" height="66" rx="9"/>
+    <text class="lb" x="589" y="50" text-anchor="middle">定任务</text>
+    <text class="lb2" x="589" y="71" text-anchor="middle">输入什么、出什么</text>
+    <text class="sm" x="589" y="86" text-anchor="middle">前三环的交集</text>
+
+    <text class="sm" x="340" y="114" text-anchor="middle" fill="#b45309">① 定靶子 —— 做成什么、拿什么算成（错了要推倒重来）</text>
+
+    <rect class="bxA" x="17" y="130" width="148" height="66" rx="9"/>
+    <text class="lb" x="91" y="154" text-anchor="middle">选基座</text>
+    <text class="lb2" x="91" y="175" text-anchor="middle">许可→语言→规模</text>
+    <text class="sm" x="91" y="190" text-anchor="middle">榜单不参与</text>
+
+    <line class="ar" x1="166" y1="163" x2="180" y2="163" marker-end="url(#ch1)"/>
+
+    <rect class="bxA" x="183" y="130" width="148" height="66" rx="9"/>
+    <text class="lb" x="257" y="154" text-anchor="middle">选方法</text>
+    <text class="lb2" x="257" y="175" text-anchor="middle">改多少参数</text>
+    <text class="sm" x="257" y="190" text-anchor="middle">显存账说了算</text>
+
+    <line class="ar" x1="332" y1="163" x2="346" y2="163" marker-end="url(#ch1)"/>
+
+    <rect class="bxA" x="349" y="130" width="148" height="66" rx="9"/>
+    <text class="lb" x="423" y="154" text-anchor="middle">选框架</text>
+    <text class="lb2" x="423" y="175" text-anchor="middle">省事还是透明</text>
+    <text class="sm" x="423" y="190" text-anchor="middle">能不能改 loss</text>
+
+    <line class="ar" x1="498" y1="163" x2="512" y2="163" marker-end="url(#ch1)"/>
+
+    <rect class="bxA" x="515" y="130" width="148" height="66" rx="9"/>
+    <text class="lb" x="589" y="154" text-anchor="middle">选平台</text>
+    <text class="lb2" x="589" y="175" text-anchor="middle">试错速度</text>
+    <text class="sm" x="589" y="190" text-anchor="middle">单价是其次</text>
+
+    <text class="sm" x="340" y="218" text-anchor="middle" fill="#1d4ed8">② 定工具 —— 用什么做（前段一变，这段整段重选）</text>
+  </svg>
+  <figcaption>两段不能倒着来。前段四环互相咬合（没有数据就定不了任务，没有验收就说不清做成了没），后段四环是前段的函数。</figcaption>
+</figure>
+
+<table class="tbl stack">
+  <tr><th style="width:82px">环节</th><th style="width:214px">它决定什么</th><th>一票否决项（什么情况直接否）</th></tr>
+  <tr><td><b>定需求</b></td><td>整条链往哪走</td><td>说不清「现在哪一步在失败」→ 先回去翻日志，别急着选型</td></tr>
+  <tr><td><b>看数据</b></td><td>任务最多能做到多重</td><td>标注字段对不上你要的输出 → 换任务，别硬凑</td></tr>
+  <tr><td><b>定验收</b></td><td>训完算不算成了</td><td>说不出拿什么指标量 → 别开训，训了也没法交差</td></tr>
+  <tr><td><b>定任务</b></td><td>输入输出长什么样</td><td>做完没法验证 → 换形态，别硬训</td></tr>
+  <tr><td><b>选基座</b></td><td>语言底子、参数上限、许可能不能用</td><td>许可有传染性（AGPL / GPL）→ 直接换</td></tr>
+  <tr><td><b>选方法</b></td><td>要不要改全部参数、显存花多少</td><td>全参显存超出你的卡 → 退回 LoRA / QLoRA</td></tr>
+  <tr><td><b>选框架</b></td><td>用界面还是写代码、能不能改 loss</td><td>要改 loss / 自定义评估 → 别用黑盒框架</td></tr>
+  <tr><td><b>选平台</b></td><td>试错速度、预算、环境风险</td><td>配环境超过一小时还跑不通 → 换平台</td></tr>
+</table>
+
+<div class="why"><span class="tag">最常见的翻车</span>一上来比 LLaMA-Factory 和 ms-swift，比完发现数据里根本没有能当标注的字段，任务得整个换，框架白比。工具层的选择成本最低、返工代价最大——正因为它是最后才该动的那一层。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：选型是前后两段，前四环定靶子、后四环定工具；八环有先后，不是八道并列选择题</li>
+  <li>不这么做会：先挑框架再回头看任务，发现框架选得根本不对，推倒重来</li>
+  <li>下次遇到同类问题，先问：我要解决哪一步失败、手上有什么数据、拿什么量——三个答不出，后面的选型全是空转</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>先定需求、数据和尺子，再谈选什么——顺序反了，选得再细也是白选。</div>
+
+<h2 id="s-need"><span class="num">2</span>定需求：先定位失败在哪一段</h2>
+<div class="lede"><b>结论</b>需求不是「让模型聪明一点」，是「现在哪一步在失败」。说不清失败的那一步，就不该往下走——因为不同段落对应完全不同的药，微调只治其中一段。</div>
+
+<p>把任何一个带模型的应用拆开看，都是四段：<b>理解输入 → 取资料 → 组织输出 → 兜底规则</b>。失败可能落在任何一段，而每一段的药不一样。</p>
+
+<table class="tbl stack">
+  <tr><th style="width:198px">业务描述的现象</th><th style="width:110px">大概率在哪一段</th><th>该动什么</th></tr>
+  <tr><td>用户说的话，模型听不懂他想要什么</td><td>理解输入</td><td>意图分类的微调，或补几条路由规则</td></tr>
+  <tr><td>资料库里有，就是检索不出来</td><td>取资料</td><td>换检索方式、优化 query、加语料——不是模型不会说话</td></tr>
+  <tr><td>资料找到了，答得啰嗦、答跑偏、格式不是要的</td><td class="ok">组织输出</td><td class="ok">这才是微调的主场：改的是输出的形式和习惯</td></tr>
+  <tr><td>该拒答的答了，该答的拒了</td><td>兜底规则</td><td>调阈值和规则，跟模型能力关系不大</td></tr>
+</table>
+
+<div class="pit"><b>一个很常见的误判：把「查不到」当成「答不好」。</b>用户说「它答得不对」，你去训模型；实际是检索那一段没取到资料，模型在没有依据的情况下硬答。这一类需求训多少轮都没用——得先看日志，确认资料到底进没进 prompt。</div>
+
+<h3>需求拆成三问，答完才往下走</h3>
+<table class="tbl stack">
+  <tr><th style="width:158px">问什么</th><th>答成什么样才算过关</th></tr>
+  <tr><td><b>谁在什么场景失败</b></td><td>具体到一类用户、一个入口、一个动作。不能是「用户觉得不好用」</td></tr>
+  <tr><td><b>现在是怎么失败的</b></td><td>能指到上面四段里的某一段，最好能从日志里翻出例子</td></tr>
+  <tr><td><b>做成什么样算解决</b></td><td>一句话能说清，且这句话后面能翻译成指标——翻不成的，第 4 章会拦下来</td></tr>
+</table>
+
+<h3>排掉四条不微调的路，剩下的才是微调的地盘</h3>
+<table class="tbl stack">
+  <tr><th style="width:152px">手段</th><th style="width:100px">改的是</th><th>什么时候它就够了</th><th>什么时候不够</th></tr>
+  <tr><td>改 prompt</td><td>指令</td><td>输出偶尔跑偏、格式不稳，加几条约束就收住了</td><td>约束写到几百字还是压不住，每次都在跟自己较劲</td></tr>
+  <tr><td>加检索、换 embedding</td><td>取资料</td><td>要新知识、要溯源、库里没有的东西</td><td>query 侧本身就对不上，检索再强也只能在错的附近找</td></tr>
+  <tr><td>加规则 / 后处理</td><td>输出管道</td><td>错法能枚举完，正则和词典能覆盖</td><td>说法无穷无尽，规则库永远追不上新表达</td></tr>
+  <tr><td>换更大的模型</td><td>能力上限</td><td>任务要推理深度，小模型确实扛不住</td><td>只是要改个说法，大模型是纯浪费，还更慢更贵</td></tr>
+  <tr><td><b>微调</b></td><td class="ok"><b>输出习惯</b></td><td class="ok">形式固定、量大重复、且有办法量化验证</td><td class="ok">要新知识、要可溯源、样本太少——换个手段</td></tr>
+</table>
+
+<div class="why"><span class="tag">关键区别</span>这五条不是竞品，是<b>叠加</b>关系，各有各管的一段。真实项目里通常几条一起上；微调只是其中一条，它被选中的条件是：<b>失败发生在「输出形式」这一段，而且这个形式能被量化</b>。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：需求先定位到四段里的某一段，微调只治「组织输出」这一段</li>
+  <li>不这么做会：把检索问题当模型问题，训了半个月，上线还是查不到</li>
+  <li>下次遇到同类问题，先问：现在到底是哪一步在失败——是听不懂、取不到、说不好，还是规则没卡住？</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>微调不是万能药，它是四段里的一段专用药——先确诊，再开方。</div>
+
+<h2 id="s-data"><span class="num">3</span>看数据：有什么料，决定能训什么形态</h2>
+<div class="lede"><b>结论</b>数据不是越多越好，是<b>标注字段对不对</b>。手上那批数据长什么形状，直接决定了你能训出什么任务——这一步经常比选模型重要十倍。</div>
+
+<p>拿到一份数据，先别看条数，先看它长什么样。几种形态对应的任务，几乎是一一对应的。</p>
+
+<table class="tbl stack">
+  <tr><th style="width:170px">数据形态</th><th style="width:272px">长什么样</th><th>能训什么任务</th></tr>
+  <tr><td><b>输入 + 目标输出</b><small>（配对）</small></td><td>一句话 → 另一句话<br><small>问句→标准答案句、口语→书面、A 语言→B 语言</small></td><td class="ok">改写、翻译、格式转换、风格迁移——本质都是「把一句改写成另一句」</td></tr>
+  <tr><td><b>输入 + 标签</b></td><td>一段文本 → 一个类别或几个字段<br><small>「这句话属于哪类意图」「这段里有哪些要素」</small></td><td>分类、意图识别、信息抽取、打标</td></tr>
+  <tr><td><b>输入 + 偏好</b></td><td>同一个问题 → 两个回答 → 哪个更好</td><td>偏好对齐（DPO 这类方法），不是监督微调</td></tr>
+  <tr><td>只有原始语料</td><td>大量没有标注的文本</td><td class="no2">只能做继续预训练，做不了监督微调——没有「标准答案」可学</td></tr>
+</table>
+
+<div class="why"><span class="tag">核心一句</span>你想训成什么，取决于数据里<b>哪个字段能当「正确答案」</b>。想训问答，但手上只有「问句 + 分类标签」，那就只能训分类器；想训分类，但手上全是长答案，那就得先抽标签。反过来硬凑，训出来的东西一定跑偏。</div>
+
+<h3>第二个问题：够不够</h3>
+<ul>
+  <li><b>量级</b>：窄任务（分类、格式转换、单轮改写）几百到几千条就能见效；要改口径、要多轮对话，往往得上万。判断标准不是绝对条数，而是<b>覆盖够不够</b>——把任务拆成若干子情况，每种情况至少几十条。</li>
+  <li><b>质量</b>：一千条干净、目标一致的数据，胜过一万条目标混乱的。数据里混进 5% 目标不对的样本，模型学到的就是那 5% 的习惯。</li>
+  <li><b>分布</b>：训练集的分布要贴着线上真实输入。线上是口语，你拿书面语训，训完在线上等于没训。</li>
+</ul>
+
+<h3>三个常见缺口，开训前必须知道</h3>
+<table class="tbl stack">
+  <tr><th style="width:104px">缺口</th><th style="width:280px">现象</th><th>怎么补</th></tr>
+  <tr><td>分布不符</td><td>训练数据是书面语、规范表述，线上输入是口语、错别字、缩写</td><td>把训练输入改写成线上那副样子，标注保持不变</td></tr>
+  <tr><td>没有考卷</td><td>数据只能拿来训，没有一份能测「好没好」的独立测试集</td><td>从数据里切一批出来单放，人工过一遍，锁死不再参与训练</td></tr>
+  <tr><td>类别失衡</td><td>某一类占八成，其余均分剩下两成</td><td>按类别配额采样，别让少数类在训练里等于消失</td></tr>
+</table>
+
+<div class="pit"><b>数据这一关的结论只有一句：它决定任务的上限。</b>不是「数据量不够」，很多时候是<b>标注字段决定任务形态</b>——手里那批数据只能学「把 A 变成 B」，那就别指望训出「回答问题」的能力。想换任务，先去换数据，不要在模型上硬拧。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：先看数据形态，再看条数——配对数据训改写，标签数据训分类，只有语料只能继续预训练</li>
+  <li>不这么做会：拿错形态的数据硬训，训出来的模型在目标场景上完全不对，还以为是自己调参不行</li>
+  <li>下次遇到同类问题，先看：这份数据里哪一列能当「标准答案」——找不到，就先去造数据</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>数据形状决定任务形状——先看标注字段，再看条数。</div>
+
+<h2 id="s-accept"><span class="num">4</span>定验收：先有尺子，再开训</h2>
+<div class="lede"><b>结论</b>验收标准必须在开训前写在纸上。写法就一句：同一套题，训前量一次，训后再量一次，差多少一目了然。没有这个数，训完只能说「感觉好一点」。</div>
+
+<h3>第一件事：你的任务到底能不能量化</h3>
+<p>不是所有任务都好量。先给任务对号入座，再看有没有尺子。</p>
+
+<table class="tbl stack">
+  <tr><th style="width:110px">任务类型</th><th style="width:230px">能用的指标</th><th>坑在哪</th></tr>
+  <tr><td>分类 / 意图</td><td class="ok">准确率、F1、混淆矩阵</td><td>要有一份人工标过的测试集；类别失衡时只看准确率会被带偏，要看 F1</td></tr>
+  <tr><td>抽取 / 结构化</td><td class="ok">字段级准确率、整条完全匹配率</td><td>只看整条会掩盖问题——十个字段里错一个，整条也算错</td></tr>
+  <tr><td>改写 / 生成</td><td class="no2">字面重合类指标（BLEU / ROUGE）和人感差得远</td><td>改写没有唯一正确答案，跟参考答案字面不一样不代表错</td></tr>
+  <tr><td>对话 / 问答</td><td>人工评分、两两对比、任务完成率</td><td>人工评分要定评分表，否则两个人打出两套分</td></tr>
+</table>
+
+<div class="why"><span class="tag">最有用的一招</span>生成类任务自己没尺子，就把尺子<b>挂到下游</b>。改写本身没法打分，但「改写后去检索，目标文档能不能进前 k」能打分；问答好不好没法直接量，但「用户有没有追问同一件事、有没有转人工」能统计。<b>指标不一定要长在模型身上，能长在链路上也行。</b></div>
+
+<p>这一招为什么重要：它把「没法验证的任务」变成「可以验证的任务」。很多看起来只能人眼看的活儿，挂到下游都能找出一个客观数。找不出来，才是真的该重新考虑要不要做。</p>
+
+<h3>第二件事：基线</h3>
+<pre class="code"><span class="c"># 一把尺子的全部逻辑，和任务类型无关</span>
+for case in testset:              <span class="c"># 一套固定的题，训前训后都用它</span>
+    out  = model(case.input)      <span class="c"># 训前用原始方案，训后用微调后的方案</span>
+    ok  += check(out, case.gold)  <span class="c"># 对错判断，或下游指标是否达标</span>
+score = ok / len(testset)</pre>
+
+<p>训前跑出来的那个数，就是<b>基线</b>。它是后面所有比较的地基。没有基线，「提升了」这句话没有任何意义——你不知道从哪儿提的，也不知道提了多少。</p>
+
+<div class="pit"><b>比数字时，三样必须一样：同一套题、同一个下游版本、同一个评判标准。</b>中间换了检索库、换了 embedding、换了评分人，两次数字就不能比——那不是提升，是换了一把尺子。要换就整套重测，基线一起重跑。</div>
+
+<h3>第三件事：验收单，三行</h3>
+<div class="dec">
+  <div class="hd">开训前填好，训完对着勾</div>
+  <div class="row"><div class="k">① 主指标</div><div class="v">用哪个数、基线多少、要到多少。这条线自己定，但必须在开训前写下来——不能训完再看着结果定标准</div></div>
+  <div class="row"><div class="k">② 回归</div><div class="v">微调会不会把原来会的东西训坏。要有一组「本来就会」的题，训后重跑，掉太多就是训过头</div></div>
+  <div class="row"><div class="k">③ 成本</div><div class="v">延迟、显存、单次推理开销。模型接在线路上，多出来的每一毫秒都是用户在等</div></div>
+</div>
+
+<div class="why"><span class="tag">为什么要排在这里</span>验收排在任务前面，是因为<b>尺子决定形态</b>。能量化、有客观数，任务就能定成「输出一句话」这种窄形态；只能人眼看、谁也说不清好坏，那选什么任务都不算数——因为你无法证明它变好了。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：验收要在开训前写下来——主指标、回归、成本，三行缺一行不开训</li>
+  <li>不这么做会：训完拿模型去评审，被问「好了多少」只能答「感觉顺畅多了」，等于没答</li>
+  <li>下次遇到同类问题，先问：这个任务有没有客观数——自己身上找不到，就往链路下游找</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>没有基线的提升是感觉，不是结论——尺子先立，模型后训。</div>
+
+<h2 id="s-task"><span class="num">5</span>定任务：三样一夹，形态自己浮出来</h2>
+<div class="lede"><b>结论</b>任务形态不是挑出来的，是需求、数据、验收三样夹出来的交集。四类常见形态，对数据、对验收的要求完全不同。</div>
+
+<table class="tbl stack">
+  <tr><th style="width:76px">形态</th><th style="width:186px">输入 → 输出</th><th style="width:158px">数据要求</th><th>验收怎么量</th></tr>
+  <tr><td><b>分类</b></td><td>一段文本 → 一个类别</td><td>输入 + 标签</td><td class="ok">准确率 / F1，最容易量</td></tr>
+  <tr><td><b>抽取</b></td><td>一段文本 → 若干字段</td><td>输入 + 字段标注</td><td class="ok">字段级准确率，好量</td></tr>
+  <tr><td><b>改写</b></td><td>一句话 → 另一句话</td><td>输入 + 目标句（配对）</td><td>自己没尺子，挂下游量</td></tr>
+  <tr><td><b>生成</b></td><td>一个要求 → 一段长文本</td><td>输入 + 参考答案（配对）</td><td class="no2">最难量，通常要人工</td></tr>
+</table>
+
+<h3>怎么用三样去筛</h3>
+<p>拿三个问题依次过一遍，每过一关砍掉一批选项，剩下的就是能做的：</p>
+<div class="dec">
+  <div class="hd">三道筛子，依次过</div>
+  <div class="row"><div class="k">① 数据有配对吗</div><div class="v">要训改写，就得有「原文 → 目标句」这种配对。只有标签、没有目标句，改写直接出局</div></div>
+  <div class="row"><div class="k">② 验收量得出吗</div><div class="v">能找出一个客观数（自己身上或下游）就能进；只能「看着还行」，出局</div></div>
+  <div class="row"><div class="k">③ 下游接得进吗</div><div class="v">训出来的东西要能插进现有链路。和链路上已有的能力重复，硬接进去就是两个模块抢一个活</div></div>
+</div>
+
+<p>三道过完，通常只剩一个形态。这时候不用纠结「哪个更酷」——剩下的那个就是答案，其余的都被数据或验收否掉了。</p>
+
+<div class="pit"><b>第三条最容易被漏。</b>一个模型训得再好，如果它的输出在链路上没人接、或者和已有模块功能重复，价值就等于零。定任务的时候就要问：这个输出，下一步谁消费、怎么消费。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：任务形态是三道筛子的结果——数据有配对、验收量得出、下游接得进</li>
+  <li>不这么做会：凭感觉挑一个「听起来很酷」的任务，训完发现数据对不上、指标量不出、还接不进链路</li>
+  <li>下次遇到同类问题，先问：这个形态，数据里有对应配对吗、能量吗、下游接得进去吗——三问答完，任务自己就定了</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>任务不是挑出来的，是被需求、数据、验收三样夹出来的。</div>
+
+<h2 id="s-base"><span class="num">6</span>选基座：许可 → 语言 → 规模</h2>
+<div class="lede"><b>结论</b>基座的判断顺序是许可、语言、规模，三步依次过。榜单分数不参与决策——它测的是通用能力，跟你这个窄任务关系不大。</div>
+
+<h3>候选池：主流五个家族</h3>
+<table class="tbl stack">
+  <tr><th style="width:100px">家族</th><th style="width:194px">代表与参数档</th><th style="width:154px">许可</th><th>什么情况选它</th></tr>
+  <tr><td><b>Qwen</b> <small>阿里</small></td><td>Qwen3 系列：0.6B / 1.7B / 4B / 8B / 14B / 32B；MoE 另有 30B-A3B、235B-A22B</td><td class="ok">多数 Apache 2.0</td><td>中文任务优先。一个家族从端侧到旗舰全有，换档不用换生态</td></tr>
+  <tr><td><b>DeepSeek</b></td><td>V3 / R1 是 671B 级 MoE；能上手的是 R1 蒸馏系列 1.5B / 7B / 8B / 14B / 32B</td><td class="ok">MIT（R1 系）</td><td>任务要推理链（分析、判断、多步推导）。大版本单卡训不动，只用蒸馏小模型</td></tr>
+  <tr><td><b>Llama</b> <small>Meta</small></td><td>Llama 3.x 的 8B / 70B、3.2 的 1B / 3B，以及 Llama 4</td><td>社区许可<small>（有月活条款）</small></td><td>英文任务为主、团队已熟这套工具链。中文底子要自己补</td></tr>
+  <tr><td><b>GLM</b> <small>智谱</small></td><td>GLM-4-9B、GLM-4-32B 及更大 MoE</td><td>自定义<small>（逐条核对）</small></td><td>中文 Agent、工具调用、长上下文。许可不是标准协议，商用前要自己读条款</td></tr>
+  <tr><td><b>Gemma</b> <small>谷歌</small></td><td>Gemma 3：1B / 4B / 12B / 27B，全是稠密</td><td>Gemma 许可<small>（有条款）</small></td><td>端侧、显存 8G 以内、做小实验。中文一般，不适合词表密集的中文任务</td></tr>
+</table>
+
+<div class="dec">
+  <div class="hd">三步判断，顺序不能反</div>
+  <div class="row yes"><div class="k">① 许可</div><div class="v">第一眼看 license。Apache 2.0 / MIT 最省心；AGPL / GPL 有传染性，闭源产品用之前要掂量；自定义协议（GLM、Gemma）要逐条读。训完才发现不能商用，前面全白干——所以它排第一</div></div>
+  <div class="row yes"><div class="k">② 语言</div><div class="v">任务是什么语种，就看这个语种语料厚不厚。中文任务优先中文语料充足的家族；跨语种任务要看双语对齐质量，不是看参数大</div></div>
+  <div class="row yes"><div class="k">③ 规模</div><div class="v">最后才看参数档，结合你的卡和试错轮次算。同样两天，小模型能试十个配置，大模型只能试两个，而微调的效果八成来自试</div></div>
+</div>
+
+<table class="tbl stack">
+  <tr><th style="width:126px">许可</th><th style="width:196px">典型</th><th style="width:96px">能商用吗</th><th>一句话</th></tr>
+  <tr><td><b>Apache 2.0</b></td><td>Qwen 多数版本、Mistral</td><td class="ok">能</td><td>最省心，改完可闭源</td></tr>
+  <tr><td><b>MIT</b></td><td>DeepSeek R1 系、Phi</td><td class="ok">能</td><td>保留版权声明即可</td></tr>
+  <tr><td>Llama 社区许可</td><td>Llama 全系</td><td>有条件</td><td>月活超 7 亿要单独谈</td></tr>
+  <tr><td><b>AGPL / GPL</b></td><td>部分开源垂域模型</td><td class="no2">慎</td><td>传染性，闭源产品可能被要求开源</td></tr>
+</table>
+
+<h3>参数档怎么配任务</h3>
+<table class="tbl stack">
+  <tr><th style="width:60px">档</th><th style="width:96px">参数</th><th style="width:92px">QLoRA 显存</th><th style="width:76px">24G 卡</th><th>适合什么任务</th><th style="width:140px">什么时候不够</th></tr>
+  <tr><td>极小</td><td class="num">0.5–1B</td><td class="num">4–6 G</td><td class="ok">很宽松</td><td>分类、抽取、格式转换、先把流程跑通</td><td>稍微要一点推理就崩</td></tr>
+  <tr><td><b>小</b></td><td class="num"><b>1.7–4B</b></td><td class="num"><b>8–12 G</b></td><td class="ok"><b>舒服</b></td><td><b>窄任务改写、语体转换、单轮指令</b></td><td>长文生成、多轮、复杂约束</td></tr>
+  <tr><td>中</td><td class="num">7–9B</td><td class="num">16–20 G</td><td>刚好</td><td>通用助手、多轮、稍复杂的指令</td><td>显存一紧，batch 开不大</td></tr>
+  <tr><td>大</td><td class="num">14B</td><td class="num">24–32 G</td><td class="no2">要 A100</td><td>需要推理、长文输出</td><td>个人和小团队成本不划算</td></tr>
+  <tr><td>超大</td><td class="num">32B+ / MoE</td><td class="num">48 G 起</td><td class="no2">别想</td><td>追平闭源效果</td><td>不在这一课范围</td></tr>
+</table>
+
+<div class="exp"><b>为什么任务窄就该用小模型。</b>改写靠的是语感和词表，不靠推理深度；知识由检索提供，参数里多出来的通用知识在这类任务上一分用不上；模型越小，同样时间里能试的配置越多；它还接在链路上，每次请求都要过一遍，几十毫秒和几百毫秒，用户能感觉到差别。<b>不是「便宜所以选小的」，是「大模型多出来的优势这一档用不上」。</b></div>
+
+<div class="exp"><b>现成的垂域模型为什么不直接拿来用。</b>三个常见的坑：底座旧（架构落后一两代）、任务不对（训的是答题，不是你要的那件事）、许可有传染性（不少开源垂域模型是 AGPL）。真正值钱的是它们的数据构造和评测思路，不是权重。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：选底模的顺序是许可 → 语言 → 规模，榜单分数不参与决策</li>
+  <li>不这么做会：拿一个 GPL 的垂域模型训两周，要商用才发现许可传染，全白干</li>
+  <li>下次遇到同类问题，先看：模型卡里 license 那一行，再看语料厚不厚，最后才算显存账</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>先看许可，再看语言，最后看卡——顺序反了，白干一场。</div>
+
+<h2 id="s-method"><span class="num">7</span>选方法：全参、LoRA、QLoRA，由显存账定</h2>
+<div class="lede"><b>结论</b>方法不是偏好问题，是显存问题。全参≈参数量 × 12 字节，扛不住就退 LoRA，还紧就上 QLoRA——这是一条顺序，不是三个并列选项。</div>
+
+<table class="tbl stack">
+  <tr><th style="width:100px">方法</th><th style="width:140px">改多少参数</th><th style="width:196px">显存大致怎么算</th><th>什么时候选它</th></tr>
+  <tr><td>全参</td><td>100%</td><td>参数量 × 12 字节起（还要加激活值）</td><td>数据量上万、要彻底改口径、手上有大卡</td></tr>
+  <tr><td>LoRA</td><td>约 1%（旁挂低秩）</td><td>基座权重 + 很小的补丁和优化器状态</td><td>默认选项：不动原权重，只训补丁，几百到几千条就能见效</td></tr>
+  <tr><td><b>QLoRA</b></td><td>约 1%</td><td>基座量化到 4bit 后只剩四分之一左右</td><td class="ok"><b>卡不够时的标准解：4bit 量化基座 + LoRA，训练逻辑完全一样</b></td></tr>
+</table>
+
+<div class="why"><span class="tag">算一遍就懂</span>全参的显存大头是三份：权重、梯度、优化器状态，大致按每参数 12 字节估。1.7B 的模型就是 1.72B × 12B ≈ 20.65G，还没算激活值——24G 的卡只剩 3G 给它，基本开不动。这就是为什么个人和中小团队几乎都用 QLoRA：不是它先进，是它装得下。</div>
+
+<div class="pit"><b>别把「量化」理解成省精度。</b>NF4 不是均匀砍 16 档，是按正态分布分档——中间密、两头疏，越常用的值分得越细。所以 4bit 基座压到原来的四分之一，窄任务的效果几乎不掉。结论记牢：<b>QLoRA 是「省显存」不是「省效果」。</b></div>
+
+<div class="pit"><b>反过来也有坑：卡够大不等于该开全参。</b>数据只有几百上千条时，全参更容易把预训练学到的东西冲掉（灾难性遗忘），最后反而比 LoRA 差。方法是跟着「数据量 + 显存」两个条件一起定的，不是越重越好。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：方法由显存账定——全参扛不住就 LoRA，还紧就 QLoRA，这是顺序不是并列</li>
+  <li>不这么做会：拿大模型在 24G 卡上硬开全参，OOM 三次之后开始怀疑自己不适合这行</li>
+  <li>下次遇到同类问题，先算：参数量 × 12 字节，和你的卡比一比，答案自己就出来了</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>显存账先算，方法后选——算一遍，比背十个方法有用。</div>
+
+<h2 id="s-framework"><span class="num">8</span>选框架：技术、框架、加速，分三层看</h2>
+<div class="lede"><b>结论</b>「选个框架」把三件事混成了一件：改哪里（微调技术）、谁跑循环（训练框架）、怎么提速（加速与并行）。三层可以叠、不互斥，顺序是先技术、再框架、最后加速——反了就会变成「先挑工具，再想拿它干什么」。</div>
+
+<h3>一、技术层：先定改哪里</h3>
+<p>上一章只讲了全参、LoRA、QLoRA 三种主干，这一章把谱系补全。主干之外的都是变体，判断依据还是那两条：<b>改多少参数、值不值这个代价</b>。</p>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:124px">技术</th><th style="width:172px">改哪里</th><th style="width:92px">可训参数</th><th style="width:104px">显存代价</th><th>什么时候用 / 代价是什么</th></tr>
+  <tr><td><b>全参</b><small> Full FT</small></td><td>全部权重</td><td class="num">100%</td><td class="num">12–16 字节/参数</td><td>数据上万条、要彻底改口径、手上有 A100 级卡。几百条数据开全参，只会把原有能力冲掉</td></tr>
+  <tr><td><b>LoRA</b></td><td>旁挂低秩矩阵，原权重冻结</td><td class="num">0.1%–1%</td><td class="num">基座 + 极小补丁</td><td class="ok"><b>默认首选</b>：几百到几千条就见效。秩 r 和 target_modules 选错，等于白训一轮</td></tr>
+  <tr><td><b>QLoRA</b></td><td>4bit 量化基座 + LoRA</td><td class="num">同 LoRA</td><td class="num">基座压到约 1/4</td><td class="ok"><b>24G 卡训 7B–14B 的标准解</b>。每步慢两三成，这是反量化的代价，不是配置错了</td></tr>
+  <tr><td>DoRA</td><td>权重拆成幅度和方向，只训方向</td><td class="num">同 LoRA</td><td class="num">稍高于 LoRA</td><td>小秩下比 LoRA 稳、掉点少。较新，部分框架还没接全，先确认文档再上</td></tr>
+  <tr><td>LoRA+</td><td>A、B 两组用不同学习率</td><td class="num">同 LoRA</td><td>不变</td><td>嫌收敛慢时的零成本加速。只改超参，收益看任务，不是必开项</td></tr>
+  <tr><td>AdaLoRA</td><td>按重要性动态分配秩</td><td>自适应</td><td class="num">高于 LoRA</td><td>不知道该给哪层多少秩时用它自动分。实现慢、参数多，能手工调就别上</td></tr>
+  <tr><td>(IA)³</td><td>每层学几个缩放向量</td><td class="num">万级</td><td>极低</td><td>只有几百条数据、先看数据里有没有信号。能力上限低，验证完要换回 LoRA</td></tr>
+  <tr><td>Prefix / P-Tuning</td><td>每层前挂可训练前缀</td><td class="num">0.1% 以下</td><td>低</td><td>生成类任务、复现早期论文。要吃上下文长度，现在新项目少用</td></tr>
+  <tr><td>Adapter</td><td>在层间插瓶颈模块</td><td class="num">1%–5%</td><td>低</td><td>一个底座挂多个任务，按需切换。推理多一层延迟，必须合并才消得掉</td></tr>
+  <tr><td>冻结部分层</td><td>只训最后几层或 embedding</td><td>看冻结范围</td><td>最低</td><td>快速 baseline、判断数据值不值得继续做。别指望它出成品</td></tr>
+</table>
+</div>
+
+<div class="why"><span class="tag">一条判据</span>除了全参，其余九种都在「少改一点、多省一点」这条轴上移动。<b>参数越少，能改的东西越浅</b>——所以判断顺序是：先看数据够不够动全参，不够就往 LoRA 退，再不够就往 (IA)³ 这类极端省参的方向退，而不是反过来「先挑个听起来先进的」。</div>
+
+<h3>二、信号层：教什么，决定要什么数据</h3>
+<p>技术解决「改哪里」，信号解决「拿什么教」。这一步的瓶颈不在算法，在<b>你手上有没有那种形状的数据</b>。</p>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:130px">方法</th><th style="width:200px">数据长什么样</th><th style="width:150px">显存与工程</th><th>什么时候用 / 代价是什么</th></tr>
+  <tr><td><b>SFT</b><small> 指令微调</small></td><td>输入 + 目标输出，一问一答成对</td><td>一个模型，最轻</td><td class="ok"><b>九成任务都从这一步开始</b>。数据质量的影响远大于数量，两千条干净的胜过两万条脏的</td></tr>
+  <tr><td>蒸馏</td><td>大模型生成的输入输出对</td><td>一个模型（离线造数据）</td><td>没有人工标注、但有可用的大模型。教师答错，学生会一字不差地照抄</td></tr>
+  <tr><td>DPO</td><td>同一输入下，好答案 / 坏答案成对</td><td>当前模型 + 参考模型两份权重</td><td>SFT 之后想把「好坏差距」拉开。偏好对难造，且容易把模型训得又硬又短</td></tr>
+  <tr><td>ORPO</td><td>偏好对，把 SFT 并进同一步</td><td>不需要参考模型</td><td>显存紧、想一步到位。方法较新，框架支持参差，先跑通再信</td></tr>
+  <tr><td>KTO</td><td>只要「这条好 / 这条差」，不必成对</td><td>同 DPO</td><td>有大量单条反馈、配不成对时。标签噪声敏感，脏标签会直接教坏</td></tr>
+  <tr><td>GRPO</td><td>问题 + 能自动判对错的答案</td><td>组内多次采样，用显存换效果</td><td>数学、代码这类有判分器的任务。判分器写歪，训出来的就是「会骗判分器」</td></tr>
+  <tr><td>PPO / RLHF</td><td>提示 + 奖励模型打分</td><td>四个模型同存，工程最重</td><td>做通用对齐的大团队。个人和小团队先别碰，调不动的部分远多于能调的</td></tr>
+</table>
+</div>
+
+<p class="note">顺序上有个经验：SFT 没做好就上偏好对齐，等于在歪地基上加层。先把 SFT 的损失降下来、抽几十条样本人工看一遍，再考虑 DPO 这一类。</p>
+
+<h3>三、工程层：谁跑循环</h3>
+<p>技术和信号定了，接下来是「谁来写那几百行训练循环」。这一层不改效果上限，只改你<b>一天能试几个配置</b>。</p>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:120px">框架</th><th style="width:112px">出身</th><th style="width:236px">强项</th><th>什么时候选它 / 代价是什么</th></tr>
+  <tr><td><b>LLaMA-Factory</b></td><td>社区（北航系起）</td><td>一个 YAML 从训练跑到导出，自带网页界面，中文文档全</td><td class="ok">想最快看到第一个 loss，或要给不写代码的人演示。封装深，想改内部逻辑得翻源码</td></tr>
+  <tr><td><b>ms-swift</b></td><td>阿里魔搭</td><td>和模型库、Notebook 是一家，模型覆盖最广，多模态也管</td><td>国内网络环境、用魔搭的模型和算力。版本迭代快，接口常变，锁版本再开工</td></tr>
+  <tr><td><b>Unsloth</b></td><td>独立团队</td><td>手写 Triton kernel，单卡提速并省显存</td><td>只有一张卡、要反复试错。只覆盖主流模型，且只认 Linux</td></tr>
+  <tr><td>Axolotl</td><td>社区</td><td>配置项最全，多机多卡成熟，配置能进版本库</td><td>做正式训练、要复现别人的配方。配置多，第一周基本在读文档</td></tr>
+  <tr><td>TRL + PEFT</td><td>Hugging Face 官方</td><td>积木式，最灵活，各种 Trainer 齐全</td><td class="ok">要自己控数据管线和 loss。代码量比框架多，但每一步都看得见</td></tr>
+  <tr><td>XTuner</td><td>上海 AI Lab</td><td>配置驱动，书生系和多模态支持好</td><td>用 InternLM 系模型，或做多模态微调。生态相对独立，换模型要重读文档</td></tr>
+  <tr><td>torchtune</td><td>Meta 官方</td><td>PyTorch 原生 recipe，代码最干净</td><td>想读一份「标准写法」的源码。支持的模型少，中文资料也少</td></tr>
+  <tr><td>DeepSpeed / FSDP</td><td>微软 / PyTorch</td><td>不是框架，是分布式引擎，被上面这些调用</td><td>单卡放不下、要上多卡。配错比训错更难查，先把单卡跑通</td></tr>
+</table>
+</div>
+
+<h3>能力对照：七个维度过一遍就知道差在哪</h3>
+<table class="tbl">
+  <tr><th style="width:132px">框架</th><th>网页界面</th><th>全参</th><th>QLoRA</th><th>偏好对齐</th><th>多卡</th><th>合并导出</th></tr>
+  <tr><td><b>LLaMA-Factory</b></td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td></tr>
+  <tr><td><b>ms-swift</b></td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td></tr>
+  <tr><td><b>Unsloth</b></td><td>—</td><td class="ok">✓</td><td class="ok">✓</td><td>△</td><td>△</td><td class="ok">✓</td></tr>
+  <tr><td>Axolotl</td><td>—</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td></tr>
+  <tr><td>TRL + PEFT</td><td>—</td><td class="ok">✓</td><td class="ok">✓</td><td class="ok">✓</td><td>△</td><td class="ok">✓</td></tr>
+  <tr><td>XTuner</td><td>△</td><td class="ok">✓</td><td class="ok">✓</td><td>△</td><td class="ok">✓</td><td class="ok">✓</td></tr>
+  <tr><td>torchtune</td><td>—</td><td class="ok">✓</td><td class="ok">✓</td><td>△</td><td class="ok">✓</td><td>—</td></tr>
+</table>
+<p class="note">✓ 完整支持，△ 部分支持或依赖额外组件，— 没有。这张表变化很快，落地前按当期文档再核一遍。</p>
+
+<h3>四、加速层：怎么更快</h3>
+<p>加速不是「开了就赚」——每一项都在拿时间或精度换显存。知道它换的是什么，才不会被某个开关的副作用吓到。</p>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:158px">手段</th><th style="width:186px">换到了什么</th><th style="width:150px">代价</th><th>什么时候开</th></tr>
+  <tr><td><b>梯度检查点</b></td><td>激活显存省一半以上</td><td>慢两成左右</td><td class="ok">默认开。显存不够时第一个动的就是它</td></tr>
+  <tr><td><b>FlashAttention-2</b></td><td>注意力更快、更省显存</td><td>要 Ampere 以上架构</td><td class="ok">默认开。老卡（V100 / T4）用不了，别装</td></tr>
+  <tr><td>4bit 量化</td><td>基座显存压到 1/4</td><td>反量化让每步变慢</td><td>卡装不下 fp16 基座时</td></tr>
+  <tr><td>8bit 优化器</td><td>优化器状态再减半</td><td>少量精度损失</td><td>长序列、显存卡在临界线上时</td></tr>
+  <tr><td>序列打包</td><td>吞吐翻两三倍</td><td>边界没切干净会串样本</td><td>短样本占多数时开，开完抽一条出来验证边界</td></tr>
+  <tr><td>DeepSpeed ZeRO-3</td><td>参数、梯度、优化器切到多卡</td><td>卡间通信变多，调参变复杂</td><td>单卡彻底放不下时</td></tr>
+  <tr><td>Unsloth kernel</td><td>单卡提速并省显存</td><td>只覆盖主流模型、只认 Linux</td><td>单卡、模型在它支持列表里</td></tr>
+</table>
+</div>
+
+<h3>五、三种组合，对应三种人</h3>
+<div class="dec">
+  <div class="hd">先想清楚你现在缺的是透明、速度，还是规模</div>
+  <div class="row yes"><div class="k">要透明</div><div class="v">手写 transformers + peft + accelerate。三十行，loss 怎么算的、梯度有没有走，全在眼前。<b>第一次做微调建议走这条</b>，出问题知道往哪查</div></div>
+  <div class="row yes"><div class="k">要速度</div><div class="v">LLaMA-Factory 或 ms-swift 打底，单卡再叠 Unsloth。要试的配置多、卡只有一张，这一组最划算——省下来的时间直接变成试错轮次</div></div>
+  <div class="row yes"><div class="k">要规模</div><div class="v">Axolotl 或 ms-swift 配 DeepSpeed ZeRO-3，再往上是 Megatron。到这一步调的是通信和分片，不是学习率</div></div>
+</div>
+
+<h3>六、三十行能看清什么</h3>
+<p>不管最后用哪个框架，这三十行都值得亲手写一遍——它把「微调」拆成四个动作：换精度、挂补丁、包数据、开训。框架只是把这四步写成了配置。</p>
+
+<pre class="code"><span class="c"># ① 换精度：基座压到 4bit，显存降到四分之一</span>
+bnb = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type=<span class="s">"nf4"</span>,
+    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_use_double_quant=True,
+)
+model = AutoModelForCausalLM.from_pretrained(
+    MODEL_ID, quantization_config=bnb, device_map=<span class="s">"auto"</span>
+)
+
+<span class="c"># ② 挂补丁：只训旁挂的低秩矩阵，原权重一动不动</span>
+lora = LoraConfig(
+    r=16, lora_alpha=32, lora_dropout=0.05,
+    target_modules=[<span class="s">"q_proj"</span>, <span class="s">"k_proj"</span>, <span class="s">"v_proj"</span>, <span class="s">"o_proj"</span>],
+    task_type=<span class="s">"CAUSAL_LM"</span>,
+)
+model = get_peft_model(model, lora)
+model.print_trainable_parameters()   <span class="c"># 看一眼：通常不到 1%</span>
+
+<span class="c"># ③ 包数据：对话模板必须和基座训练时用的那套一致</span>
+text = tokenizer.apply_chat_template(msgs, tokenize=False)
+batch = tokenizer(text, truncation=True, max_length=2048)
+
+<span class="c"># ④ 开训：真正需要改的其实只有这三处</span>
+args = TrainingArguments(
+    learning_rate=2e-4,            <span class="c"># LoRA 比全参大一个量级</span>
+    per_device_train_batch_size=4,
+    gradient_accumulation_steps=4,
+    gradient_checkpointing=True,
+    bf16=True,
+)</pre>
+
+<p>写完这段再去看框架的配置文件，你会发现那些看不懂的字段，对应的就是这四步里的某一行。<b>先有这三十行，框架才是快捷键；没有它，框架就是黑箱。</b></p>
+
+<h3>七、五个坑</h3>
+<div class="pit"><b>一个框架一个环境。</b>LLaMA-Factory、ms-swift、Unsloth 对 transformers 和 trl 的版本要求经常互相冲突，装在一个环境里就是给自己挖坑。按项目建 venv，别图省事共用。</div>
+<div class="pit"><b>Unsloth 的 kernel 只认 Linux。</b>它靠自定义 Triton 内核提速，官方支持 Linux；Windows 下要么 WSL，要么直接上云，别在原地反复重装。</div>
+<div class="pit"><b>对话模板不一致，训完效果断崖。</b>基座训练时用什么模板（角色标记、特殊 token、结尾符），微调时必须一模一样。框架默认值不一定对，开训前先把一条样本 decode 出来看一眼。</div>
+<div class="pit"><b>4bit 权重不能直接合并。</b>要合并回基座，先把量化权重反量化成 fp16 再 merge；直接在 4bit 上合并，精度掉得比训练本身还多。</div>
+
+<div class="exp"><b>框架的默认超参会悄悄改你的实验。</b>序列打包默认开、<code>cutoff_len</code> 默认 2048、学习率默认 2e-5 量级——这三项在你不知情的时候就已经决定了结果。第一次跑，把配置里的默认值逐条读一遍，比盲目调参有用得多。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：框架是三层不是一层——技术定改哪里、框架定谁跑循环、加速定多快，顺序是先技术后工程</li>
+  <li>不这么做会：把 LLaMA-Factory、Unsloth、DeepSpeed 当竞品各学一遍，最后既说不清它们各管什么，也修不了自己的 loss</li>
+  <li>下次遇到同类问题，先问：要改的东西在权重里还是在数据里、一天能试几个配置、有没有多卡——三个答案直接对应三层</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>先手写三十行，再让框架当快捷键——不然它就是个黑箱。</div>
+
+<h2 id="s-platform"><span class="num">9</span>选平台：五类形态，比的是试错速度</h2>
+<div class="lede"><b>结论</b>平台不比单价，比「从开机到拿到第一个 loss 要多久」。同一张卡，单价能差五倍；但决定成败的通常是<b>环境配不配得起来</b>，而不是每小时贵了几毛钱。</div>
+
+<h3>一、五个常用平台，横向摆开</h3>
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:118px">平台</th><th style="width:132px">形态</th><th style="width:186px">典型卡与额度</th><th style="width:118px">计费</th><th>强项 / 限制</th></tr>
+  <tr><td><b>魔搭</b><small> ModelScope</small></td><td>免费 Notebook，网页 IDE</td><td>A10 24G、8 核 32G，每月约 36 小时；100G 持久化盘</td><td>免费，绑阿里云账号</td><td class="ok">模型库和算力是一家，下载走内网。限制：空闲 1 小时自动停、单次约 8 小时上限，长训必须做断点续训</td></tr>
+  <tr><td><b>AutoDL</b></td><td>按量租卡，带镜像市场</td><td>4090 24G 约 1.5–2.8 元/时，A100 80G 约 6–8 元/时</td><td>按秒计费，充余额</td><td class="ok">卡型最全、开机最快、社区镜像现成。限制：高峰抢不到卡，系统盘关机即清</td></tr>
+  <tr><td><b>阿里云 PAI</b><small> DSW / DLC</small></td><td>企业级平台</td><td>A10 / A100 / H20，按需选配</td><td>按量或包年</td><td>有 SLA、和 OSS / VPC 打通、能提交分布式训练。限制：同规格比租卡平台贵三到五倍</td></tr>
+  <tr><td><b>腾讯云 HAI</b></td><td>一键应用 + 按量 GPU</td><td>4090 / A10 / A100 / H20</td><td>按量</td><td>环境模板开箱可用，适合快速起服务与演示。限制：深度定制不如裸实例灵活，微调框架要自己装</td></tr>
+  <tr><td><b>百度 AI Studio</b></td><td>免费 Notebook + 生态</td><td>每日 8 个算力点，V100 约合十几小时</td><td>免费额度 + 付费</td><td class="ok">零成本试跑最划算。限制：额度偏向飞桨生态，PyTorch 任务可用但受限</td></tr>
+</table>
+</div>
+<p class="note">价格是 2026 年初的量级参考，随时段、余量、活动浮动，下单以各平台实时价为准。GPU 租赁的价格波动比云服务器大，别拿三个月前的截图做预算。</p>
+
+<h3>二、逐个说清：什么时候选它、配什么框架</h3>
+<div class="dec">
+  <div class="hd">五个平台不是替代关系，按阶段配，别站队</div>
+  <div class="row yes"><div class="k">魔搭</div><div class="v"><b>适合：</b>零成本试跑、模型就在站内。免费 A10 24G 跑 7B 的 QLoRA 刚好，跑 14B 会紧。<b>配什么：</b>它自家的 ms-swift 是原生搭配，Notebook 里预装，一行命令起训；也能自己装 LLaMA-Factory。<b>注意：</b>每月额度有限、单次有时长上限，超过半小时的训练一定要开断点续训</div></div>
+  <div class="row yes"><div class="k">AutoDL</div><div class="v"><b>适合：</b>正式训练、要反复试配置。卡型从 4090 到 H100 都有，镜像市场里 LLaMA-Factory、Unsloth、ms-swift 都有现成的，省掉装环境那两小时。<b>配什么：</b>单卡 4090 + Unsloth 或 LLaMA-Factory；多卡再上 DeepSpeed。<b>两个硬规矩：</b>数据放数据盘（<code>/root/autodl-tmp</code>），系统盘关机会清；关机前确认是「关机」还是「释放」，两者计费不同</div></div>
+  <div class="row yes"><div class="k">阿里云 PAI</div><div class="v"><b>适合：</b>企业、要合规、数据不能出 VPC、要打通 OSS。DSW 当交互式 Notebook 用，DLC 当提交式训练用。<b>配什么：</b>Megatron、DeepSpeed 都能接，多机训练是它的主场。<b>注意：</b>贵在 SLA 和网络，不在算力——个人做实验没必要为它买单</div></div>
+  <div class="row yes"><div class="k">腾讯云 HAI</div><div class="v"><b>适合：</b>要把模型快速起成服务或 demo，应用模板点几下就能用。<b>配什么：</b>模板偏推理和可视化，微调要走实例自己装框架。<b>注意：</b>另有 Cloud Studio 提供每月一万分钟的 T4 免费额度，只够跑 7B 以下的轻量验证</div></div>
+  <div class="row yes"><div class="k">AI Studio</div><div class="v"><b>适合：</b>学生、零预算、先把流程跑通。每日算力点天天刷新，够你一天试两三个小配置。<b>配什么：</b>飞桨的 PaddleNLP 有现成微调套件；PyTorch 也能跑，但环境和额度都不如飞桨顺。<b>注意：</b>V100 跑 7B 的 QLoRA 很慢，只适合验证代码通不通，不适合出结果</div></div>
+</div>
+
+<h3>三、第二梯队：需要时再往下看</h3>
+<table class="tbl stack">
+  <tr><th style="width:140px">平台</th><th>特点</th><th style="width:250px">什么情况会用到</th></tr>
+  <tr><td>UCloud 优云智算</td><td>消费级卡按天、按月套餐，大显存卡有独家规格</td><td>要连续跑几天、按量计费反而更贵时</td></tr>
+  <tr><td>恒源云 / 矩池云</td><td>与 AutoDL 同类，价格和卡型各有出入</td><td>AutoDL 抢不到卡时做备选，账号多备一个不亏</td></tr>
+  <tr><td>华为云 ModelArts</td><td>企业级，昇腾国产卡也在里面</td><td>项目要求国产化或已有华为云账号</td></tr>
+  <tr><td>火山引擎</td><td>按量 GPU + 模型服务</td><td>训练完要顺手做在线推理</td></tr>
+</table>
+
+<h3>四、怎么比：算「一天能试几个配置」</h3>
+<div class="why"><span class="tag">换算</span>一天能试的轮数 ≈ 可用小时 ÷ 单轮耗时。单价只影响总花费，<b>不影响轮数</b>——而微调的效果八成来自试。配环境花掉两小时，等于直接砍掉四分之一的产能，这一项的权重比每小时贵五毛高得多。</div>
+
+<p>拿一组中性数字算一遍：五千条数据单卡跑一轮约 40 分钟，一天能用 8 小时，理论上是 12 轮；如果开机配环境、下模型、调依赖花掉 2 小时，只剩 6 小时，就是 9 轮。同样一天，选「镜像现成」的平台比选「便宜两毛」的平台多试三轮。</p>
+
+<div class="dec">
+  <div class="hd">四个成本项，只看第一个最容易超预算</div>
+  <div class="row"><span class="k">算力费</span><span class="v">按秒或按小时，看得见的那部分，通常只占总花费的一半多</span></div>
+  <div class="row"><span class="k">存储费</span><span class="v">数据盘超出免费额度的部分按 GB 计，关机后仍在收</span></div>
+  <div class="row"><span class="k">带宽费</span><span class="v">下载权重、传数据集都走公网，几十 G 的模型来回几次就是一笔钱</span></div>
+  <div class="row no"><span class="k">空转费</span><span class="v">开着 GPU 装环境、读文档、开会——最贵的一项，也是唯一完全能避免的一项</span></div>
+</div>
+
+<h3>五、五个通用坑</h3>
+<div class="pit"><b>配环境别开 GPU。</b>按量计费的机器空转也在烧钱。能开无卡模式或 CPU 实例就先开，依赖装完、数据传完，再切到 GPU 跑训练。这一条省下的钱，比挑平台省的多。</div>
+<div class="pit"><b>关机不等于不计费。</b>多数平台关机后仍收存储费，有的还收公网 IP 保留费。跑完先看账单明细，再决定要不要「释放」。</div>
+<div class="pit"><b>系统盘和数据盘是两回事。</b>重装镜像会清系统盘，数据盘才留得住。训练脚本、数据、输出目录一开始就放在数据盘，别等丢了一次才改习惯。</div>
+<div class="pit"><b>免费额度有硬限制。</b>空闲自动关机、单次时长上限、同一时间只能开一个实例——长训练不断点续训，跑一半被停就白跑。</div>
+<div class="exp"><b>数据合规不是小事。</b>含个人信息、病历、身份证号这类数据不能上公有算力平台，先脱敏，或者只在单位的机器上跑。这一条不构成技术选择，构成红线。</div>
+
+<div class="recap"><b>这一章钉住了三件事</b><ul>
+  <li>钉住了：平台按「一天能试几个配置」比，不按单价比；免费额度试跑、按量租卡训练、本地写代码，三处各干各的</li>
+  <li>不这么做会：开着 GPU 装环境烧掉几十块，或者忘了关机，月底账单比训练本身还贵</li>
+  <li>下次遇到同类问题，先算：单轮多久、一天可用几小时、配环境要多久——三个数一除，平台自己就选出来了</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>配环境别开 GPU，数据别放系统盘——这两条比挑哪个平台省得多。</div>
+
+<h2 id="s-wrap"><span class="num">10</span>小结</h2>
+<div class="lede"><b>结论</b>八环压成一张判断表。前四环定靶子，后四环跟着靶子走；每一环都有一条判断依据，也都有一个「什么情况直接否」。</div>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:66px">环节</th><th style="width:126px">判断依据</th><th>一票否决 / 结论怎么下</th></tr>
+  <tr><td><b>需求</b></td><td>失败落在哪一段</td><td>定位不到「理解 / 取数 / 输出 / 兜底」中的某一段，就别往下走</td></tr>
+  <tr><td><b>数据</b></td><td>哪个字段能当标准答案</td><td>配对训改写、标签训分类、只有语料只能继续预训练；对不上就先去造数据</td></tr>
+  <tr><td><b>验收</b></td><td>有没有客观数</td><td>自己身上找不到，就往链路下游找；还找不到，这个任务不该做</td></tr>
+  <tr><td><b>任务</b></td><td>三道筛子</td><td>数据有配对、验收量得出、下游接得进——三道过完只剩一个形态</td></tr>
+  <tr><td><b>基座</b></td><td>许可 → 语言 → 规模</td><td>许可有传染性直接换；榜单分数不进决策</td></tr>
+  <tr><td><b>方法</b></td><td>参数量 × 12 字节</td><td>全参扛不住退 LoRA，还紧上 QLoRA；卡大但数据少也别开全参</td></tr>
+  <tr><td><b>框架</b></td><td>技术 → 框架 → 加速</td><td>先定改哪里（全参 / LoRA / 变体）、再定谁跑循环、最后开加速；一个框架一个环境，4bit 权重不能直接合并</td></tr>
+  <tr><td><b>平台</b></td><td>一天能试几个配置</td><td>免费额度试跑、按量租卡训练、本地写代码；配环境别开 GPU，数据放数据盘</td></tr>
+</table>
+</div>
+
+<h3>四条边界，越界就要重做</h3>
+<ul>
+  <li><b>靶子先于工具。</b>需求、数据、验收没定，后面任何选型都是空转——先补这三样，别急着挑框架。</li>
+  <li><b>数据决定上限。</b>手上材料的标注字段和目标输出对不上，任务就得换，硬凑只会训出一个跑偏的模型。</li>
+  <li><b>许可一票否决。</b>基座许可有传染性（AGPL / GPL）直接换，别等训完再发现不能商用。</li>
+  <li><b>方法跟显存走。</b>先算「参数量 × 12 字节」，扛不住就退 LoRA、再紧就 QLoRA，别硬开全参。</li>
+</ul>
+
+<h3>三条自检</h3>
+<div class="dec">
+  <div class="hd">从下结论到能开训，每步都能单独验</div>
+  <div class="row"><span class="k">① 画链</span><span class="v">白纸画出八环链，前四环是靶子、后四环是工具；每环下写一句你自己那个场景的结论</span></div>
+  <div class="row"><span class="k">② 量基线</span><span class="v">把测试集切出来、锁住，用现有方案跑一遍，把主指标记下来——没有这个数，后面所有比较都不成立</span></div>
+  <div class="row"><span class="k">③ 验卡</span><span class="v">平台开机后 <code>nvidia-smi</code> 可执行、<code>torch.cuda.is_available()</code> 为 True</span></div>
+</div>
+
+<div class="why"><span class="tag">下一步</span>八环走完只是纸上的结论。下一步是把它变成能跑的东西：从数据里抽训练对、切出能判好坏的测试集、把环境配起来。没有那把尺子，训完你也不知道有没有变好。</div>
+
+<div class="recap"><b>这门课留下的判据</b><ul>
+  <li>判据一：选型是前后两段，靶子定方向，工具跟着走——顺序反了全白选</li>
+  <li>判据二：每选都有一个一票否决项——说不出需求、数据对不上、验收量不出、许可有传染、显存不够，先看否决项再看优点</li>
+  <li>判据三：数据看标注字段对不对，不看条数多不多</li>
+  <li>判据四：验收在任务前面，因为尺子决定形态</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span>遇到「该选哪个」，先问需求清不清、数据够不够、指标量不量得出、许可过吗、显存够吗——五问过了，答案自己浮出来。</div>
+
+</main>
+
+<nav class="nav">
+  <a href="L00_微调全景与前导_课时页.html"><div class="dir">← 上一课 · L00</div><div class="tt">微调认知与原理</div></a>
+  <a href="L02_需求与数据_课时页.html" class="nx"><div class="dir">下一课 · L02 →</div><div class="tt">需求与数据</div></a>
+</nav>
+
+<div class="footnote">L01 · 微调选型</div>
+</div>
+
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.modnav a'));
+  if(!links.length) return;
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+
+  function spy(){
+    var line=window.scrollY+90, idx=0;
+    for(var i=0;i<secs.length;i++){
+      var el=secs[i];
+      if(el && el.getBoundingClientRect().top+window.scrollY<=line) idx=i;
+    }
+    links.forEach(function(a,i){a.classList.toggle('on',i===idx);});
+  }
+
+  window.addEventListener('scroll',spy,{passive:true});
+  window.addEventListener('resize',spy);
+
+  links.forEach(function(a){
+    a.addEventListener('click',function(e){
+      var t=document.querySelector(a.getAttribute('href'));
+      if(!t) return;
+      e.preventDefault();
+      var far=Math.abs(t.getBoundingClientRect().top)>2400;
+      t.scrollIntoView({behavior:far?'instant':'smooth',block:'start'});
+      if(history.replaceState) history.replaceState(null,'',a.getAttribute('href'));
+    });
+  });
+
+  spy();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+datasets>=2.20
+peft>=0.12
+accelerate>=0.34
+trl>=0.10
+
+# Linux + NVIDIA GPU 上如需 4bit QLoRA，再单独安装：
+# bitsandbytes>=0.43
+
+# 跑基线 / 评测需要（L02、L12、L13）：
+sentence-transformers>=3.0
+numpy>=1.26

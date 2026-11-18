@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>法律大模型微调实战 · 15 课时课纲</title>
+<style>
+:root{
+  --accent:#2f6df6;
+  --accent-soft:#eaf0fe;
+  --bg:#f5f7fb;
+  --panel:#ffffff;
+  --text:#1a2233;
+  --muted:#6b7a90;
+  --line:#e6ebf3;
+  --ok:#0f7a5a;
+  --warn:#a8580f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.65;
+  font-size:15px;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px 80px}
+
+/* 顶栏 */
+.topbar{
+  display:flex;align-items:center;gap:14px;
+  padding:26px 0 18px;
+}
+.mark{
+  width:40px;height:40px;border-radius:12px;background:var(--accent);
+  color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:17px;font-weight:500;flex:none;
+}
+.topbar h1{font-size:20px;font-weight:600;letter-spacing:-.2px}
+.topbar p{font-size:13px;color:var(--muted)}
+.print-btn{
+  margin-left:auto;border:1px solid var(--line);background:#fff;color:var(--text);
+  padding:8px 16px;border-radius:9px;font-size:13.5px;cursor:pointer;
+  font-family:inherit;transition:.15s;flex:none;
+}
+.print-btn:hover{border-color:var(--accent);color:var(--accent)}
+.print-btn:active{transform:translateY(1px)}
+
+/* 导航 */
+.modnav{
+  position:sticky;top:0;z-index:20;background:rgba(245,247,251,.94);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+  display:flex;gap:4px;overflow-x:auto;margin-bottom:26px;
+}
+.modnav a{
+  color:var(--muted);text-decoration:none;font-size:13.5px;padding:12px 14px;
+  border-bottom:2px solid transparent;white-space:nowrap;transition:.15s;
+}
+.modnav a:hover{color:var(--text)}
+.modnav a.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+
+/* 指标卡 */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px}
+.metric{border-radius:14px;padding:16px 18px;border:1px solid transparent}
+.metric b{display:block;font-size:26px;font-weight:600;line-height:1.2}
+.metric span{font-size:12.5px;opacity:.8}
+.m1{background:#eaf0fe;color:#1d4ed8;border-color:#d6e2fd}
+.m2{background:#e6f5ef;color:#0f7a5a;border-color:#cfeade}
+.m3{background:#fdf3e3;color:#a8580f;border-color:#f7e6c8}
+.m4{background:#f2eefd;color:#5b3fc4;border-color:#e3dafb}
+
+/* 面板 */
+section{margin-bottom:30px;scroll-margin-top:60px}
+.panel{background:var(--panel);border-radius:15px;padding:26px 28px;border:1px solid var(--line)}
+h2{font-size:17px;font-weight:600;margin-bottom:6px;letter-spacing:-.2px}
+.sub{font-size:13.5px;color:var(--muted);margin-bottom:18px}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{
+  text-align:left;font-weight:500;color:var(--muted);font-size:12.5px;
+  padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.n{color:var(--accent);font-weight:500;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.mod{font-weight:500}
+
+/* 课时卡 */
+.lesson{
+  background:var(--panel);border:1px solid var(--line);border-radius:13px;
+  padding:18px 22px;margin-bottom:12px;
+}
+.lh{display:flex;align-items:baseline;gap:12px;margin-bottom:12px}
+.num{
+  font-size:12px;font-weight:500;color:var(--accent);background:var(--accent-soft);
+  padding:2px 8px;border-radius:6px;flex:none;font-variant-numeric:tabular-nums;
+}
+.lh h3{font-size:15.5px;font-weight:600;letter-spacing:-.1px}
+.dur{margin-left:auto;font-size:12px;color:var(--muted);flex:none}
+dl{display:grid;grid-template-columns:74px 1fr;gap:8px 14px;font-size:14px}
+dt{color:var(--muted);font-size:12.5px;padding-top:2px}
+dd{color:var(--text)}
+dd code{
+  background:#f1f4f9;padding:1px 5px;border-radius:4px;
+  font-family:ui-monospace,"Cascadia Code",Consolas,monospace;font-size:12.5px;
+}
+.cp dd{color:var(--ok);font-weight:500}
+
+/* 模块标题 */
+.modhead{
+  display:flex;align-items:center;gap:12px;margin:32px 0 14px;
+}
+.modhead h2{margin:0}
+.modhead .cnt{
+  font-size:12px;color:var(--muted);border:1px solid var(--line);
+  padding:2px 9px;border-radius:20px;background:#fff;
+}
+.modlead{
+  margin:0 0 16px;padding:10px 15px;font-size:13.5px;line-height:1.85;
+  background:#f8faff;border-left:3px solid var(--accent);border-radius:0 8px 8px 0;
+}
+.modlead b{color:var(--accent)}
+
+/* 卡片组 */
+.cards{display:grid;gap:12px}
+.card{
+  background:var(--panel);border:1px solid var(--line);border-radius:13px;
+  padding:18px 22px;
+}
+.card h4{font-size:14.5px;font-weight:600;margin-bottom:8px}
+.card p{font-size:14px;color:#3c4a5e}
+.card ul{margin:6px 0 0 18px;font-size:14px;color:#3c4a5e}
+.card li{margin-bottom:5px}
+
+.note{
+  background:#fff8ec;border:1px solid #f7e6c8;border-radius:11px;
+  padding:14px 18px;font-size:13.5px;color:#6b4a12;margin-top:14px;
+}
+.note b{color:#a8580f}
+.quote{
+  border-left:3px solid var(--accent);background:var(--accent-soft);
+  padding:14px 18px;border-radius:0 10px 10px 0;font-size:14px;color:#1d3f8a;
+  margin-top:14px;
+}
+
+/* 回到顶部 */
+.totop{
+  position:fixed;right:26px;bottom:26px;width:42px;height:42px;border-radius:50%;
+  background:#fff;border:1px solid var(--line);cursor:pointer;display:none;
+  align-items:center;justify-content:center;color:var(--muted);font-size:17px;
+  box-shadow:0 4px 16px rgba(20,40,80,.08);font-family:inherit;
+}
+.totop.show{display:flex}
+.totop:hover{color:var(--accent);border-color:var(--accent)}
+
+@media(max-width:720px){
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  dl{grid-template-columns:1fr;gap:2px 0}
+  dt{margin-top:8px}
+  .panel{padding:20px 18px}
+}
+
+@media print{
+  body{background:#fff;font-size:12.5px}
+  .modnav,.totop,.print-btn{display:none!important}
+  .wrap{max-width:none;padding:0}
+  .panel,.lesson,.card{border-color:#ccc;break-inside:avoid;page-break-inside:avoid}
+  .lesson{break-inside:avoid;page-break-inside:avoid}
+  section{break-inside:auto}
+  .metrics{break-inside:avoid}
+  @page{margin:14mm}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="topbar">
+  <div class="mark">法</div>
+  <div>
+    <h1>法律大模型微调实战</h1>
+    <p>sft-law 微调工程 · 15 正课 + L00 前导 · 每节 45 分钟</p>
+  </div>
+  <button class="print-btn" onclick="window.print()">打印 / 导出 PDF</button>
+</header>
+
+<nav class="modnav" id="nav">
+  <a href="#overview" class="on">课程概览</a>
+  <a href="#plan">课时总表</a>
+  <a href="#m0">前导 L00</a>
+  <a href="#m1">模块一 定位</a>
+  <a href="#m2">模块二 数据</a>
+  <a href="#m3">模块三 训练</a>
+  <a href="#m4">模块四 评测</a>
+  <a href="#m5">模块五 落地</a>
+  <a href="#lines">贯穿线</a>
+  <a href="#rules">教学规则</a>
+</nav>
+
+<section id="overview">
+  <div class="metrics">
+    <div class="metric m1"><b>16</b><span>节 · 15 正课 + 1 前导</span></div>
+    <div class="metric m2"><b>5</b><span>模块 · 定位→数据→训练→评测→落地</span></div>
+    <div class="metric m3"><b>3</b><span>贯穿全课的主线</span></div>
+    <div class="metric m4"><b>16</b><span>张理论图卡</span></div>
+  </div>
+
+  <div class="panel">
+    <h2>课程定位</h2>
+    <p class="sub">不教「怎么训」，教「怎么判断该不该训、训完有没有变好」</p>
+
+    <table>
+      <tr><th style="width:90px">面向对象</th><td>零基础学员。会写最基础的 Python、能照着改脚本、看得懂报错即可，不需要机器学习背景，不需要推导公式</td></tr>
+      <tr><th>主线项目</th><td><b>sft-law</b> —— 独立的微调工程，不含检索系统与业务系统。自带 23,331 条训练对、6,432 条法条语料（50 部法）、2,563 道遗忘检测题。产出只有一个：一个能把大白话翻成法条语体的适配器</td></tr>
+      <tr><th>技术主线</th><td>QLoRA（4bit 加载 + LoRA 微调）+ Qwen3-1.7B-Instruct + AutoDL 租卡（4090 24G）</td></tr>
+      <tr><th>训练目标</th><td>训练一个 <b>HyDE 翻译器</b>：输入一句生活语言的法律问题，输出一段适合向量检索的法条语体文本</td></tr>
+      <tr><th>最终交付</th><td>一个能接进任意法律 RAG 检索前面、有评测数据支撑、能说清「为什么这样调」的适配器</td></tr>
+    </table>
+
+    <div class="quote">
+      <b>为什么主线选 HyDE 而不是法律问答：</b>HyDE 有可量化的检索指标，学员能亲眼看到微调让检索变好了；法律问答训完只能自嗨——答得好不好没法量化，而且这层能力下游系统本来就由大模型负责，小模型训了也接不进去。
+    </div>
+
+    <div class="note">
+      <b>开课前必须知道的三件事：</b>脚本是齐的，但 <b>训练集还没造</b>（原始素材在 <code>data/raw/</code>，23,331 条可用，但不能直接喂给模型，得先抽成「问题 → 法条」对）、<b>GPU 没有</b>（本机 <code>torch.cuda.is_available()</code> 为 False）、<b>基线还没有</b>（要先跑 L02 造尺子、量出基线）。这三件正是课程要解决的。
+    </div>
+  </div>
+</section>
+
+<section id="plan">
+  <div class="panel">
+    <h2>课时总表</h2>
+    <p class="sub">先过一遍 L00 前导建立地图，再进 15 节正课 · 每节课讲 10–15 分钟 · 练 20–27 分钟 · 验收 10 分钟</p>
+    <table>
+      <tr><th style="width:44px">#</th><th style="width:78px">模块</th><th>主题</th><th style="width:210px">核心产出</th></tr>
+      <tr><td class="n">L00</td><td class="mod">前导</td><td>微调全景：概念、什么时候用、与 RAG 的分工、术语、六步流程、框架与平台</td><td>能一句话判断该微调还是该检索</td></tr>
+      <tr><td class="n">L01</td><td class="mod">定位</td><td>项目整体介绍：背景、问题、数据与解决路线</td><td>一张四格表讲清「缺什么、怎么补」</td></tr>
+      <tr><td class="n">L02</td><td class="mod">定位</td><td>造一把尺子，量出真实基线</td><td>口语评测集 + baseline.json + 归因表</td></tr>
+      <tr><td class="n">L03</td><td class="mod">定位</td><td>方法选型：全参 / LoRA / QLoRA</td><td>能说出为什么选 QLoRA</td></tr>
+      <tr><td class="n">L04</td><td class="mod">数据</td><td>三源盘点与获取</td><td>三份原始数据到位</td></tr>
+      <tr><td class="n">L05</td><td class="mod">数据</td><td>三类训练数据构造</td><td>三份 jsonl 落地</td></tr>
+      <tr><td class="n">L06</td><td class="mod">数据</td><td>法律场景清洗与校验</td><td>清洗淘汰率报告</td></tr>
+      <tr><td class="n">L07</td><td class="mod">数据</td><td>切分、版本化、数据卡</td><td>train/val/test + 一页数据卡</td></tr>
+      <tr><td class="n">L08</td><td class="mod">训练</td><td>AutoDL 实操：选卡、镜像、上传</td><td>无卡模式跑通 cuda 检测</td></tr>
+      <tr><td class="n">L09</td><td class="mod">训练</td><td>LoRA 原理与显存账</td><td>能画出 W + A×B</td></tr>
+      <tr><td class="n">L10</td><td class="mod">训练</td><td>第一次训练跑通</td><td>loss 曲线 + adapter 文件</td></tr>
+      <tr><td class="n">L11</td><td class="mod">训练</td><td>调参与排障</td><td>一份排障手册</td></tr>
+      <tr><td class="n">L12</td><td class="mod">评测</td><td>任务级评测：困惑度不够用</td><td>准确率 + 引用合规率</td></tr>
+      <tr><td class="n">L13</td><td class="mod">评测</td><td>HyDE 检索 A/B 实验</td><td>基线 vs LoRA 对比表</td></tr>
+      <tr><td class="n">L14</td><td class="mod">落地</td><td>接进下游：插到检索前面</td><td>检索链路里跑通并对比</td></tr>
+      <tr><td class="n">L15</td><td class="mod">落地</td><td>结课交付与生产化清单</td><td>15 分钟演示 + 一页复盘</td></tr>
+    </table>
+  </div>
+</section>
+
+<div class="modhead" id="m0"><h2>前导 · 微调全景</h2><span class="cnt">L00</span></div>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L00</span><h3>微调全景：它改什么、什么时候用、在哪跑</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>零基础的人先把地图建起来：微调到底改什么、什么情况下才值得动、跟 RAG 怎么分工、要认哪些词、在哪台机器上能跑。这一节不训任何模型，只解决「我知道这件事是怎么回事、该不该做」</dd>
+    <dt>内容</dt><dd><b>① 改什么</b>　预训练给「会说话」，微调给「会按这个场合说话」，对齐给「什么不该说」。微调动的是表达不是知识，所以新政策塞不进去<br><b>② 什么时候用</b>　一条判据：问题是「不知道」还是「不会说」。不知道归检索，不会说才归微调，表达小毛病先归 prompt。附六行现象对照表与三条「先别急着微调」<br><b>③ 与 RAG 的分工</b>　一个开卷、一个改口音。六维对比：解决什么、要准备什么、更新成本、能否溯源、出错怎么查、典型翻车。结论是两个都要，本项目先微调改语体、再检索找法条<br><b>④ 术语</b>　十四个词各配一句人话：基座、参数量、token、epoch、batch、step、学习率、loss、过拟合、灾难性遗忘、LoRA、量化、OOM，每个标了细讲在哪一节<br><b>⑤ 六步流程</b>　定任务 → 备数据 → 选基座 → 选方法 → 训练 → 评测，评测不过回流到备数据。真正决定成败的是第一步和第六步，训练反而最标准<br><b>⑥ 在哪跑</b>　四套框架（官方三件套 / LLaMA-Factory / ms-swift / Unsloth）+ 三种机器（自己电脑 / 魔搭免费 Notebook / AutoDL 按小时租）</dd>
+    <dt>节奏</dt><dd>讲 30 · 练 10 · 验收 5（切片见下方）</dd>
+    <dt>练习</dt><dd>拿自己手上任何一个需求，填一行判断表：现象 / 真正缺的是知识还是行为 / 该微调还是该检索 / 为什么。再跑一次 <code>nvidia-smi</code>，把显卡型号和显存记下来，对照三种机器选一条起步路线</dd>
+    <dt class="cp">验收</dt><dd class="cp">口述一分钟：我这个需求为什么该走微调（或该走检索），下一步在哪台机器、用哪个框架跑，大概花多少钱。三问答不全，说明地图还没建立</dd>
+  </dl>
+  <div class="note">
+    <b>45 分钟切片（讲 30 / 练 10 / 验收 5）：</b>0–4 从一次失败的检索开场　·　4–12 三层能力与「改表达不改知识」　·　12–19 判断该不该：知识问题还是行为问题　·　<b>19–27 与 RAG 的分工 + 六维对比</b>　·　27–32 十四个术语速览（不逐个讲，标好去哪个节细看）　·　<b>32–38 六步流程与两处关键</b>　·　38–40 框架与平台选型　·　<b>40–45 练习与 Checkpoint</b>
+  </div>
+  <div class="quote" style="margin:12px 0 0">
+    这一节的作用是<b>防止后面十五节白学</b>：判错了「该不该微调」，后面每一步都在给一个错误的目标打工。
+  </div>
+</article>
+
+<div class="modhead" id="m1"><h2>模块一 · 定位与决策</h2><span class="cnt">L01–L03</span></div>
+
+<div class="modlead">
+  <b>三节课是一条收窄的线，别讲重：</b>L01 给<b>全局账</b>（背景、问题、数据、路线，点到为止）→ L02 <b>把问题量出来</b>（造口语评测集、建最小检索、跑出这个项目自己的基线）→ L03 给<b>工具</b>（全参 / LoRA / QLoRA 选哪个、为什么）。
+</div>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L01</span><h3>项目整体介绍：背景、问题、数据与解决路线</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>开篇只讲五件事：这个系统在做什么、它卡在哪、为什么非微调不可、手上有什么数据、这 15 节课怎么走。学员下课时必须知道「我在修什么、拿什么修」</dd>
+    <dt>内容</dt><dd><b>① 背景</b>　sft-law 是一个独立的微调工程，<b>范围只有一格</b>：把一句生活语言的法律问题，翻成一段法条语体文本，交给检索。不做路由、不做工具调用、不做回答生成。家底：23,331 条训练对、6,432 条法条（50 部法）、2,563 道遗忘检测题、79,692 条书面语问答<br><b>② 问题</b>　用户说「老板让我天天加班不给钱」，法条写「延长工作时间支付百分之一百五十的工资报酬」——两句话字面零重叠，检索命中不了。业界已有解法 HyDE，但通行实现是每次检索都调一次云端大模型：慢、贵、断网即废、版本锁不住<br><b>③ 为什么只能微调</b>　规则与同义词穷举不完；Prompt 改写仍要调大模型，慢和贵原封不动；增加法条不解决问题（6,432 条已在库，缺的不是知识）；换更大 embedding 只是让两句话变近，不能让一句话变成另一句。四条排掉，剩微调<br><b>④ 数据有什么</b>　<b>四类，用途完全不同</b>：<b>训练对</b> Triplet 23,331 条（问题 + 对应法条，100% 可解析）；<b>法条语料</b> 去重后 6,432 条 / 50 部法，就是检索要命中的目标库；<b>遗忘检测</b> DISC-Law-Eval 2,563 题；<b>考卷</b> 暂时没有——这是一个必须当面说清的缺口：DISC-Law 的问题本身是书面语（平均 68.6 字、带「民事责任」这类术语），拿它测检索会虚高，口语评测集要在 L02 现造。另外两点：① 这个数据集<b>没有随附检索评测集</b>，DISC-Law-Eval 考的是司法考试选择题，没有「该命中哪条法条」这一列；② 数据<b>偏商事金融</b>——被引最多的是民法典、刑法、刑诉、民诉，紧跟着海商法、证券法、公司法，与日常咨询错配，训练前必须往日常场景拉<br><b>⑤ 怎么解决</b>　造数据（L4–L7）→ 租卡训练（L8–L11）→ 评测（L12–L13）→ 接入下游（L14–L15），一张路线图把 15 节课钉在墙上</dd>
+    <dt>节奏</dt><dd>讲 28 · 练 12 · 验收 5（切片见下方）</dd>
+    <dt>练习</dt><dd>填一张「项目现状四格表」——背景 / 问题 / 数据 / 方案，每格用自己的话写两句，不许抄课件；顺手跑 <code>torch.cuda.is_available()</code>，打开 <code>data/raw/</code> 数一眼有什么、没什么</dd>
+    <dt class="cp">验收</dt><dd class="cp">对着四格表讲 1 分钟：这个系统缺什么、为什么缺、这 15 节课打算怎么补。讲不顺，说明地图没建立</dd>
+  </dl>
+  <div class="note">
+    <b>45 分钟切片（讲 28 / 练 12 / 验收 5）：</b>0–3 开场与交付物　·　3–9 背景与系统全景（一张图）　·　9–16 问题：一次检索为什么失败 + HyDE 的四笔账　·　16–21 排除四条替代方案　·　21–26 数据账：三源清单 + 偏科问题　·　26–28 路线图，把 15 节课串成一条线　·　<b>28–40 练习：填四格表</b>　·　<b>40–45 Checkpoint</b>
+  </div>
+  <div class="quote" style="margin:12px 0 0">
+    这节课不解决任何技术问题，只解决一件事：让学员知道<b>自己站在哪、要往哪走</b>。
+  </div>
+</article>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L02</span><h3>造一把尺子，量出真实基线</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>把 L01 说的「听不懂人话」变成一个数字和一个文件。难点不在跑，在<b>先有尺子</b>——这个项目没有现成考卷，所以这一节要连评测集一起造。产出的 <code>baseline.json</code> 是 L13 做 A/B 对比的唯一对照组，没有它，「提升了多少」全是空话</dd>
+    <dt>内容</dt><dd><b>① 为什么不能直接拿 Triplet 的问题当考卷</b>　抽一条真实样本摆出来：「李先生在路上遇到一位昏倒的老人，他自愿进行紧急救助……」——书面语、带术语、贴着法条写，而真实用户说的是「我救了人把人弄伤了要不要赔」。<b>已实测</b>：同一批 40 条，书面语 hit_rate 0.775、首位命中 87%；改写成口语后 0.725、首位命中 66%。<b>掉得最狠的不是命中率，是排序</b><br><b>② 造尺子三步</b>　抽 400 条 Triplet → 把问题改写成口语（<b>标注原样保留</b>，法条不变）→ 人工抽查 10%。改写会引入噪声，但标注不用重标，这是唯一不花钱又能量出口语水平的办法<br><b>③ 只讲一个指标</b>　hit_rate@5 = 前 5 条里有没有一条对上。不讲 MRR 公式、不讲 precision / recall，这三个留到 L13<br><b>④ 建最小检索</b>　6,432 条法条做语料，embedding 编码，余弦相似度取 top-5。<b>不用数据库</b>——一个 numpy 数组就够，六千多条法条乘四百条问题的矩阵，几秒钟算完<br><b>⑤ 跑第一次并归因</b>　得到基线数字，翻未命中样本，分三类：<b>知识缺失</b>（库里确实没有）／<b>说法不同</b>（库里有，但用户不这么讲）／<b>标注问题</b>（reference 本身就对不上）。<b>这一类必须留</b>——实测 40 条里有 7 条两种问法都失败，翻标注才发现是标错了（家暴题标到立法目的条款、怀孕拒录标到村委会义务条款），不揪出来就会拿错的靶子去调模型</dd>
+    <dt>节奏</dt><dd>讲 10 · 练 28 · 验收 7（切片见下方）</dd>
+    <dt>练习</dt><dd>跑通造尺子三步；建索引跑出 hit_rate；存 <code>baseline.json</code>；挑 10 条未命中填归因表（问题 / 应命中 / 实际命中 / 失败类型 / 一句话判断）</dd>
+    <dt class="cp">验收</dt><dd class="cp">能报出自己的 hit_rate、失败条数、其中多少条属于「说法不同」，并交出 <code>baseline.json</code>。说不出数字 = 这节课白上</dd>
+  </dl>
+  <div class="note">
+    <b>45 分钟切片（讲 10 / 练 28 / 验收 7）：</b>0–4 承接 L01，抛问题「到底差多少」　·　4–10 为什么不能直接拿书面语测　·　<b>10–18 造尺子：抽 400 条 + 改写 + 抽查</b>　·　<b>18–30 建索引、跑出 hit_rate</b>　·　<b>30–40 翻失败样本、归因填表</b>　·　<b>40–45 存基线 + Checkpoint</b>
+  </div>
+  <div class="note" style="background:#f5f7fb;border-color:#e2e8f2;color:#42506a">
+    <b style="color:#2f6df6">环境风险要提前兜住：</b>这一节<b style="color:#42506a">故意不依赖数据库</b>——法条库只有 6,432 条，用 <code>sentence-transformers</code> 编码后存成 numpy 数组，余弦相似度直接算。装一个包就能跑完，不会卡在起 Postgres 上。真正要紧的是 embedding 模型第一次下载（几百 MB），课前统一拉好。
+  </div>
+  <div class="quote" style="margin:12px 0 0">
+    定性靠讲，定量靠跑。<b>「首位命中只有 66%」比「你检索不太准」有力一百倍。</b>
+  </div>
+</article>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L03</span><h3>选型：先选方法，再选框架</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>知道选哪个，更知道为什么不能选别的；两个维度分清楚——<b>方法</b>决定跑不跑得动，<b>框架</b>决定写多少代码</dd>
+    <dt>内容</dt><dd><b>① 方法谱系</b>（20 分钟）　参数谱系（改 100% → 改 0.1%）；全参的代价：7B fp16 权重 15G + 梯度 + 优化器状态 ≈ 60G 起步，4090 跑不动，且有灾难性遗忘；Adapter / Prefix / P-Tuning 已被取代，带过；LoRA 讲透；QLoRA 只改加载精度不改训练逻辑；DPO / RLHF 属对齐层，法律场景慎用<br><b>② 框架选型</b>（5 分钟，只看一张表）　<b>主线用项目脚本那套 <code>transformers + peft + trl</code></b>——loss 怎么算的看得见，出问题能查；LLaMA-Factory 是 YAML 一条命令、批量跑多种模型快，但黑盒，0 基础学员出问题查不了；Unsloth 省显存 40%+，卡实在不够时作后路；ms-swift 国产、Qwen 系友好。结论一句话：<b>跟项目脚本走，其余三个知道名字和适用场景就够</b></dd>
+    <dt>节奏</dt><dd>讲 25 · 练 12 · 验收 8（切片见下方）</dd>
+    <dt>练习</dt><dd>算一笔显存账：fp16 加载 vs 4bit 加载，同样 4090 24G 分别能开多大 batch；再对着框架表，给自己一句话选型理由</dd>
+    <dt class="cp">验收</dt><dd class="cp">能说出「为什么选 QLoRA」，且知道全参不是更高级、是卡跑不动；能回答「为什么不直接用 LLaMA-Factory」</dd>
+  </dl>
+  <div class="note">
+    <b>45 分钟切片（讲 25 / 练 12 / 验收 8）：</b>0–4 全参为什么贵、为什么忘　·　4–6 Adapter / Prefix / P-Tuning 带过　·　6–17 LoRA + QLoRA 讲透　·　17–22 框架选型决策表　·　22–25 DPO / RLHF 带过　·　<b>25–37 练：算显存账</b>　·　<b>37–45 验收</b>
+  </div>
+  <div class="note" style="background:#f5f7fb;border-color:#e2e8f2;color:#42506a">
+    <b style="color:#2f6df6">为什么框架只给 5 分钟：</b>框架会换版本，原理不会。LoRA 永远是 r / alpha / target_modules 三个数，换成哪个框架都是这三个数。<b style="color:#42506a">教框架是把学员绑在一个工具上，教参数才是教能力。</b>学员在外面刷到 LLaMA-Factory 教程会回来问，这张表就是答案。
+  </div>
+  <div class="quote" style="margin:12px 0 0">
+    一句话记牢：<b>LoRA 和 QLoRA 不是两个选项，是一个选项的两种加载方式；框架也不是选型难题，是跟着项目脚本走就行。</b>
+  </div>
+</article>
+
+<div class="modhead" id="m2"><h2>模块二 · 数据工程</h2><span class="cnt">L04–L07</span></div>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L04</span><h3>三源盘点与获取</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>把三份原始素材弄清楚，知道各自能干什么、不能干什么</dd>
+    <dt>内容</dt><dd>DISC-Law 两个文件的真实结构（Pair 是 <code>input→output</code>，Triplet 是 <code>input + reference[] → output</code>）；本次要用的法条语料怎么从 <code>reference</code> 抽出来（去重后 6,432 条 / 50 部法）；口语评测集的四个字段含义</dd>
+    <dt>节奏</dt><dd>讲 10 · 练 25 · 验收 10</dd>
+    <dt>练习</dt><dd>下载数据集；把脚本里的 macOS 路径改成自己的；跑通读取，打印前 3 条样本</dd>
+    <dt class="cp">验收</dt><dd class="cp">三份数据都能被脚本读进来，能说出「Triplet 的 reference 是哪来的、能用来干嘛」</dd>
+  </dl>
+  <div class="note"><b>预埋坑：</b>项目所有训练脚本的默认路径都是 macOS 的绝对路径，Linux 和 Windows 上都会报 <code>FileNotFoundError</code>。这不是学员的错，但会成为他第一个放弃点——必须在这一课时当面拆掉。</div>
+</article>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L05</span><h3>三类训练数据构造</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>从「原始素材」变成「能喂给模型的训练集」</dd>
+    <dt>内容</dt><dd><b>HyDE 数据</b>：目标是检索文本不是答案，Triplet 的 <code>reference[]</code>（法条原文）才是理想目标，Pair 的答案要剔掉建议句式；<b>query rewrite 数据</b>：口语问题 → 关键词串，源是 Triplet 的 23,331 条问题 + <code>reference</code> 标注，LLM 扩写到几千条，人工抽查 10%；<b>带上下文问答</b>：把法条原文塞进 prompt，训「用好检索结果」而不是「背法条」</dd>
+    <dt>节奏</dt><dd>讲 8 · 练 27 · 验收 10</dd>
+    <dt>练习</dt><dd>生成三份 jsonl（HyDE 3–5k、rewrite 2–5k、QA 1w+），各抽 5 条人工看</dd>
+    <dt class="cp">验收</dt><dd class="cp">三份文件落地，能指出自己数据里一条不合格样本并说明理由</dd>
+  </dl>
+</article>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L06</span><h3>法律场景清洗与校验</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>这是法律微调和通用微调最大的区别所在</dd>
+    <dt>内容</dt><dd>五道关卡：法条编号是否存在、是否现行有效、是否混入建议体、长度分布是否合理、问题是否重复；法条号回查方法（正则抽「第 X 条」对照从 <code>reference</code> 抽出的 6,432 条法条）；时效对照最新校验报告</dd>
+    <dt>节奏</dt><dd>讲 8 · 练 27 · 验收 10</dd>
+    <dt>练习</dt><dd>写五段校验函数，跑全量，统计每道关卡的淘汰率</dd>
+    <dt class="cp">验收</dt><dd class="cp">产出淘汰率报告，能解释「为什么法律场景不能直接用公开数据集」</dd>
+  </dl>
+  <div class="note"><b>关键细节：</b>训练脚本用 response-only loss（<code>labels = [-100] * prompt_len + input_ids[prompt_len:]</code>），样本超长被截断时，<b>丢的是答案的后半段甚至整段</b>。所以长度必须卡在数据侧，不能指望训练脚本兜底。</div>
+</article>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L07</span><h3>切分、版本化与数据卡</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>让数据可复现、可追溯</dd>
+    <dt>内容</dt><dd>train 8 : val 1 : test 1；口语评测集<b>只进 val/test</b>，训练集全靠合成；数据卡要写清来源、条数、清洗规则、已知缺陷、生成时间</dd>
+    <dt>节奏</dt><dd>讲 8 · 练 27 · 验收 10</dd>
+    <dt>练习</dt><dd>切分并落盘；写一页数据卡；给文件打版本号（如 <code>hyde_v1_20261113</code>）</dd>
+    <dt class="cp">验收</dt><dd class="cp">拿到数据卡就能复现出同一份训练集</dd>
+  </dl>
+  <div class="note"><b>最致命的一个坑：</b>把评测集混进训练集，指标会虚高到 0.9 以上，上线全崩。真实数据只做验证，是硬规矩。</div>
+</article>
+
+<div class="modhead" id="m3"><h2>模块三 · 训练</h2><span class="cnt">L08–L11</span></div>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L08</span><h3>AutoDL 实操：选卡、镜像、上传、无卡模式</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>能独立开出一台能训练的机器，且不浪费钱</dd>
+    <dt>内容</dt><dd>为什么租卡（承接 L01 的 GPU 诊断）；选 4090 24G 的理由；按量计费与关机停费；<b>无卡模式</b>；镜像选择（PyTorch 2.x + CUDA 12.x，base 自带 torch，别急着建 conda 环境）；上传三种方式；系统盘 <code>/root</code> 与数据盘 <code>/root/autodl-tmp</code> 的分工</dd>
+    <dt>节奏</dt><dd>讲 15 · 练 20 · 验收 10</dd>
+    <dt>练习</dt><dd>无卡模式开机 → 传代码与数据 → <code>pip install -r requirements-finetune.txt</code> → 跑通 cuda 检测</dd>
+    <dt class="cp">验收</dt><dd class="cp">无卡模式下 <code>nvidia-smi</code> 可执行、<code>torch.cuda.is_available()</code> 为预期值</dd>
+  </dl>
+  <div class="note">
+    <b>三个必须讲透的点：</b>① 无卡模式配环境传数据，不烧 GPU 钱，这一条不讲学员光配环境就能烧掉几十块；② 15GB 模型必须放数据盘，丢系统盘装到一半就磁盘满；③ <b>关机 ≠ 释放</b>，关机保留磁盘、释放清空数据，要复用环境必须保存自定义镜像。
+  </div>
+</article>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L09</span><h3>LoRA 原理与显存账</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>不推导公式，也能说清「为什么这样能省」</dd>
+    <dt>内容</dt><dd>用「书改不动就贴便利贴」建立直觉 → 拆结构（W 冻结 + A×B 可训练）→ 回答「为什么窄的就够」（调音量不用重造音响）→ r / alpha / dropout 三个旋钮 → 4bit 是「毫米尺换厘米尺」→ 显存账（fp16 约 15G vs 4bit 约 4.5G）</dd>
+    <dt>节奏</dt><dd>讲 18 · 练 17 · 验收 10</dd>
+    <dt>练习</dt><dd>画出 W + A×B 结构图；改一次 r 值观察可训练参数量变化；训完删掉 adapter，看模型变回原样</dd>
+    <dt class="cp">验收</dt><dd class="cp">能讲清 r=16 是什么、删掉 adapter 为什么模型会复原</dd>
+  </dl>
+  <div class="quote" style="margin:12px 0 0">
+    数学恐惧先拆掉：这门课一个公式都不用推，<b>你只要会看三张图——loss 曲线、显存占用、评测对比表。</b>
+  </div>
+</article>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L10</span><h3>第一次训练跑通</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>跑出第一个 adapter，并且会看它在干嘛</dd>
+    <dt>内容</dt><dd>参数逐项过：<code>max_length 1536</code>、<code>epoch 1</code>、<code>lr 2e-4</code>、<code>batch 1</code>、<code>梯度累积 8</code>、<code>r 16 / alpha 32 / dropout 0.05</code>、7 个 target_modules、cosine 调度 + warmup 3%；<code>nohup</code> 后台跑防断连；<code>watch -n 1 nvidia-smi</code> 看显存；断点续训；只下载 adapter</dd>
+    <dt>节奏</dt><dd>讲 8 · 练 27 · 验收 10</dd>
+    <dt>练习</dt><dd>带 <code>--use-4bit</code> 启动训练；另开终端盯显存；跑完下载 adapter</dd>
+    <dt class="cp">验收</dt><dd class="cp">拿到 loss 曲线截图 + adapter 目录，能说出「loss 从多少掉到多少」</dd>
+  </dl>
+  <div class="note"><b>成本提醒：</b>训练跑起来后先算预计时长，再决定关机策略。按量计费下忘了关机是最常见的浪费。</div>
+</article>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L11</span><h3>调参与排障</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>训练挂了能自己救，不用等老师</dd>
+    <dt>内容</dt><dd>四类高频故障：OOM（降 <code>max_length</code> / 降 batch / 开 4bit / 加梯度累积）、loss 不降（lr 太小、mask 没生效、数据格式错）、过拟合（epoch 太多、r 太大、数据重复）、灾难性遗忘（lr 太大、数据太窄）；每个故障给「现象 → 判断 → 动作」三段式</dd>
+    <dt>节奏</dt><dd>讲 12 · 练 23 · 验收 10</dd>
+    <dt>练习</dt><dd>故意把 lr 调到 2e-2 看 loss 变 NaN；故意把 max_length 开到 4096 触发 OOM；各修一次</dd>
+    <dt class="cp">验收</dt><dd class="cp">一份自己写的排障手册，覆盖四类故障</dd>
+  </dl>
+  <div class="quote" style="margin:12px 0 0">
+    亲眼见过 loss 变 NaN 的人，以后看到 NaN 不会慌。<b>制造故障比解释故障有效。</b>
+  </div>
+</article>
+
+<div class="modhead" id="m4"><h2>模块四 · 评测</h2><span class="cnt">L12–L13</span></div>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L12</span><h3>任务级评测：困惑度不够用</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>知道「loss 低」不等于「答得好」</dd>
+    <dt>内容</dt><dd>困惑度只测「像不像人话」，不测「对不对」；法律问答要测两件事——答案准确率（抽样人工打分）、引用合规率（引用的条号是否存在且与问题相关）</dd>
+    <dt>节奏</dt><dd>讲 12 · 练 23 · 验收 10</dd>
+    <dt>练习</dt><dd>抽 30 条做人工打分；写一个引用校验脚本，自动检查条号是否在那 6,432 条法条中存在</dd>
+    <dt class="cp">验收</dt><dd class="cp">产出一张评测表，并指出「哪几条是 loss 低但答错了」</dd>
+  </dl>
+</article>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L13</span><h3>HyDE 检索 A/B 实验</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>用数据证明微调真的有用</dd>
+    <dt>内容</dt><dd>四个指标：hit_rate@5、MRR、precision、recall；用 L02 造的口语评测集对比「原始问题检索」与「HyDE 生成文本检索」；控制变量（同 query、同 top_k、同 reranker、同阈值）；<b>对照组直接用 L02 存下的 <code>baseline.json</code></b></dd>
+    <dt>节奏</dt><dd>讲 10 · 练 25 · 验收 10</dd>
+    <dt>练习</dt><dd>接入 LoRA 后跑一次，与本组 L02 的 baseline 做对比；拉对比表，逐条核对基线里失败的样本有多少被救回来了，又有多少反而变差了</dd>
+    <dt class="cp">验收</dt><dd class="cp">一张对比表 + 一句话结论（提升了多少、在哪些问题上反而变差）</dd>
+  </dl>
+  <div class="note"><b>L02 的基线在这里结账：</b>不许重新跑一遍「微调前」当对照——必须用 L02 存的那个文件。学员当初偷懒没存，这节课就得重做，这个痛感比讲十遍「要有基线」管用。</div>
+  <div class="note"><b>不许只报好数字：</b>要求学员必须找出「变差的样本」，并给出猜测原因。这比多涨两个点更有价值。</div>
+</article>
+
+<div class="modhead" id="m5"><h2>模块五 · 落地</h2><span class="cnt">L14–L15</span></div>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L14</span><h3>接进下游：把适配器插到检索前面</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>从「训好一个模型」到「系统真的用它」</dd>
+    <dt>内容</dt><dd>接入只需三步：加载基座 + 挂 adapter、封装成一次函数调用、替换掉原来那次云端请求。参数只留四个：adapter 路径、<code>MAX_NEW_TOKENS</code>、<code>TEMPERATURE</code>、超时；merge 与 adapter 的取舍（生产建议加载 adapter 即可，不必合并，几十 MB 好管理）；本地推理的延迟与显存代价</dd>
+    <dt>节奏</dt><dd>讲 8 · 练 27 · 验收 10</dd>
+    <dt>练习</dt><dd>接入后跑同一批问题，记录延迟与显存；与接入前对比</dd>
+    <dt class="cp">验收</dt><dd class="cp">系统里能走通，且能说出「接入后慢了多久、值不值」</dd>
+  </dl>
+</article>
+
+<article class="lesson">
+  <div class="lh"><span class="num">L15</span><h3>结课交付与生产化清单</h3><span class="dur">45′</span></div>
+  <dl>
+    <dt>目标</dt><dd>把 14 课时的碎片收成一条完整链路</dd>
+    <dt>内容</dt><dd>学员演示完整链路（问题 → 检索 → 回答 → 前后对比）；生产化三件事：adapter 版本管理、每次改动跑回归评测、小流量灰度；一页复盘——<b>以 L02 存的基线为起点，把整门课的数字变化画成一条线</b>，写清什么有效、什么无效、下一步</dd>
+    <dt>节奏</dt><dd>讲 5 · 演示 30 · 点评 10</dd>
+    <dt>练习</dt><dd>每人 3 分钟演示 + 提交复盘页</dd>
+    <dt class="cp">验收</dt><dd class="cp">15 分钟完整演示，且能回答「如果数据量翻十倍，你会改哪一步」</dd>
+  </dl>
+</article>
+
+<section id="lines">
+  <div class="panel">
+    <h2>三条贯穿全课的主线</h2>
+    <p class="sub">这三条线在每节课都会出现一次，不要当成额外内容</p>
+    <div class="cards" style="margin-top:16px">
+      <div class="card">
+        <h4>一、跨机器工作流</h4>
+        <p>Windows 造数据 → 上传 AutoDL → Linux 训练 → 下载 adapter → 拷回 Windows 项目 → 改 .env 接入。</p>
+        <p style="margin-top:6px;color:#6b7a90">为什么必须画出来：项目脚本里全是 macOS 绝对路径，本地是 Windows、训练机是 Linux，<b>同一份脚本要改三次路径</b>。L08 开头画一次，L15 收尾时回看一次。</p>
+      </div>
+      <div class="card">
+        <h4>二、理论图卡</h4>
+        <p>15 张 16:9 图卡，每张一个概念，配「一句话比喻 + 一个 30 秒实验」。</p>
+        <ul>
+          <li>单次理论块不超过 8 分钟</li>
+          <li>每张图卡后面必须跟一个可动手的观察</li>
+          <li>公式一律不上图卡，术语给中英对照</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>三、评测闭环</h4>
+        <p>任何一次参数改动，都要有指标支撑，不许「我感觉变好了」。</p>
+        <p style="margin-top:6px;color:#6b7a90">从 <b>L02 把基线钉死</b>（自己造的口语评测集 + baseline.json）开始，每改一次训练配置就重跑一次对比表。到 L15 时，学员手里应该是一串数字从基线往上走，而不是一堆印象。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="rules">
+  <div class="panel">
+    <h2>教学规则</h2>
+    <table>
+      <tr><th style="width:180px">规则</th><th>原因</th></tr>
+      <tr><td>单次理论块 ≤ 8 分钟</td><td>超过 8 分钟，零基础学员注意力必然掉</td></tr>
+      <tr><td>每课时前 3 分钟回扣上节</td><td>微调概念是链式的，断一节后面全懵</td></tr>
+      <tr><td>每 3 课时做一次串联</td><td>L03 / L07 / L11 / L14 末尾，把前面的概念拉成一条线</td></tr>
+      <tr><td>公式一律不写，术语给中英对照</td><td>不写公式，但 <code>epoch</code>、<code>batch size</code> 这些会出现在报错里</td></tr>
+      <tr><td>每节课必须有 Checkpoint</td><td>没有验收点的课，学员会以为自己懂了</td></tr>
+    </table>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <h2>交付物清单</h2>
+    <table>
+      <tr><th style="width:150px">对象</th><th>内容</th></tr>
+      <tr><td>讲师</td><td>16 张理论图卡、每节课话术脚本（讲什么 / 停在哪 / 抛什么问题）、演示用标准答案与对比数据</td></tr>
+      <tr><td>学员</td><td>AutoDL 操作 checklist、数据校验脚本骨架、排障手册模板、评测表模板</td></tr>
+      <tr><td>课程首页</td><td>一份「公式黑名单」——明确告诉学员哪些不用会，先拆掉数学恐惧</td></tr>
+    </table>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <h2>前置条件与风险</h2>
+    <table>
+      <tr><th style="width:120px">项</th><th>说明</th></tr>
+      <tr><td>学员基础</td><td>能读写最基础的 Python、看得懂报错、会用命令行。不要求机器学习背景</td></tr>
+      <tr><td>账号</td><td>AutoDL 注册并完成实名认证（学生认证有优惠）</td></tr>
+      <tr><td>预算</td><td>按量计费。配置环境与传数据走无卡模式，只有真正训练时才开 GPU</td></tr>
+      <tr><td>风险一</td><td>4090 实例紧张时租不到，需提前预约或退到 3090 24G（方案不变）</td></tr>
+      <tr><td>风险二</td><td>数据集下载受网络影响，建议提前离线分发给学员</td></tr>
+      <tr><td>风险三</td><td>零基础学员最容易死在环境配置，L08 必须留足 20 分钟实操时间</td></tr>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<button class="totop" id="totop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部">↑</button>
+
+<script>
+const links = [...document.querySelectorAll('#nav a')];
+const targets = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+const totop = document.getElementById('totop');
+
+function sync(){
+  const y = window.scrollY + 90;
+  let idx = 0;
+  targets.forEach((t, i) => { if (t.offsetTop <= y) idx = i; });
+  links.forEach(a => a.classList.remove('on'));
+  if (links[idx]) links[idx].classList.add('on');
+  totop.classList.toggle('show', window.scrollY > 400);
+}
+window.addEventListener('scroll', sync, {passive:true});
+window.addEventListener('resize', sync);
+sync();
+
+document.querySelectorAll('#nav a').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const el = document.querySelector(a.getAttribute('href'));
+    if (el) window.scrollTo({top: el.offsetTop - 50, behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# IDE
+.idea/
+.vscode/
+
+# 临时文件与工具缓存
+.tmp/
+.playwright-mcp/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+Thumbs.db
+
+# WorkBuddy 本地运行数据
+.workbuddy/
+
+# 历史版本备份堆（不作为正式内容）
+_backup/
+course/_backup/
