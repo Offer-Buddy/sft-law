@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L06 · 魔搭实战：50 类部法分类</title>
+<style>
+:root{
+  --primary:#0d9488; --primary-d:#0f766e; --blue:#2563eb; --blue-d:#1d4ed8;
+  --bg:#eef2f7; --card:#ffffff; --text:#1e293b; --muted:#64748b;
+  --line:#e2e8f0; --soft:#f8fafc; --warn:#b45309; --warn-bg:#fffbeb;
+  --deep:#163a5f; --code-bg:#0e1a2b; --code-fg:#dbe6ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.78;padding:24px 16px 40px;
+  font-size:15px;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;}
+
+/* ── 课时头 ── */
+.chead{background:linear-gradient(135deg,#0f766e 0%,#155e93 52%,#1d4ed8 100%);color:#fff;border-radius:16px;padding:26px 30px 20px;position:relative;overflow:hidden;}
+.chead::after{content:"";position:absolute;right:-46px;top:-58px;width:180px;height:180px;background:rgba(255,255,255,.10);border-radius:28px;transform:rotate(18deg);}
+.chead::before{content:"";position:absolute;right:86px;bottom:-58px;width:110px;height:110px;background:rgba(255,255,255,.07);border-radius:50%;}
+.kicker{display:flex;align-items:center;gap:9px;flex-wrap:wrap;position:relative;z-index:1;margin-bottom:9px;}
+.lid{background:rgba(255,255,255,.95);color:#0f766e;font-weight:800;font-size:12.4px;padding:2px 10px;border-radius:6px;letter-spacing:.6px;}
+.lname{font-size:12.2px;color:#d6ecff;letter-spacing:.4px;}
+.ltotal{margin-left:auto;font-size:11.8px;color:#a8cdf0;}
+.chead h1{font-size:27px;line-height:1.36;letter-spacing:-.4px;font-weight:800;position:relative;z-index:1;}
+.chead .sub{font-size:13.4px;color:#d5e8fb;margin-top:7px;max-width:760px;position:relative;z-index:1;}
+
+/* ── 正文容器 ── */
+main{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 28px 20px;margin-top:14px;box-shadow:0 1px 3px rgba(15,23,42,.05);}
+h2{font-size:19px;font-weight:800;margin:26px 0 10px;color:#0f2f4d;line-height:1.45;display:flex;align-items:center;gap:9px;}
+h2:first-child{margin-top:0;}
+h2[id]{scroll-margin-top:64px;}
+h2::before{content:"";width:4px;height:17px;background:linear-gradient(180deg,var(--primary),var(--blue));border-radius:2px;flex:0 0 auto;}
+h3{font-size:15.2px;font-weight:800;margin:20px 0 8px;color:#173a5c;line-height:1.5;}
+p{margin:9px 0;font-size:14.3px;}
+strong,b{color:#0b2a45;}
+.hl{background:linear-gradient(transparent 62%,#d7f2ee 62%);font-weight:700;padding:0 1px;}
+ul,ol{margin:8px 0 8px 20px;font-size:14.2px;}
+li{margin:4px 0;line-height:1.75;}
+
+/* ── 决策卡 ── */
+.dec{border:1px solid #d9e6f6;border-radius:11px;overflow:hidden;margin:14px 0 6px;background:#fff;}
+.dec .hd{background:#eff5ff;padding:8px 14px;font-size:12.4px;font-weight:800;color:#1d4ed8;letter-spacing:.3px;}
+.dec .row{display:grid;grid-template-columns:82px 1fr;gap:10px;padding:9px 14px;border-top:1px solid #eef2f8;font-size:13.4px;}
+.dec .row .k{color:var(--muted);font-weight:700;font-size:12.3px;padding-top:1px;}
+.dec .row .v{line-height:1.72;}
+.dec .row.no .v{color:#b91c1c;}
+.dec .row.yes .v{color:#0f766e;}
+
+/* ── 提示块 ── */
+.why{background:#f0fbf9;border-left:3px solid var(--primary);border-radius:0 9px 9px 0;padding:11px 15px;margin:13px 0;font-size:13.8px;line-height:1.75;}
+.why .tag{display:inline-block;background:var(--primary);color:#fff;font-size:11.4px;font-weight:700;padding:1px 8px;border-radius:5px;margin-right:8px;}
+.pit{background:var(--warn-bg);border:1px solid #fde68a;border-radius:9px;padding:10px 14px;margin:12px 0;font-size:13.5px;color:#78350f;line-height:1.75;}
+.pit b{color:var(--warn);margin-right:5px;}
+.chk{background:#f0fdfa;border:1px solid #99f6e4;border-radius:9px;padding:11px 14px;margin:14px 0 4px;font-size:13.5px;line-height:1.75;}
+.chk b{color:#0f766e;}
+
+/* ── 双栏对比 ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0;}
+.two .col{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column;}
+.two .col .hd{padding:7px 12px;font-size:12.2px;font-weight:800;letter-spacing:.2px;}
+.two .bad{border-color:#fecaca;}
+.two .bad .hd{background:#fef2f2;color:#b91c1c;border-bottom:1px solid #fecaca;}
+.two .good{border-color:#99f6e4;}
+.two .good .hd{background:#f0fdfa;color:#0f766e;border-bottom:1px solid #99f6e4;}
+.two .col .bd{padding:10px 12px;font-family:Consolas,"Courier New",monospace;font-size:12.1px;line-height:1.75;white-space:pre-wrap;word-break:break-word;flex:1;}
+.two .col .ft{padding:7px 12px;font-size:12.3px;line-height:1.68;border-top:1px dashed #eef2f8;font-family:-apple-system,"PingFang SC",sans-serif;}
+.two .bad .ft{color:#b91c1c;background:#fffafa;}
+.two .good .ft{color:#0f766e;background:#fafffe;}
+
+/* ── 实操工位 ── */
+.lab{border:1px solid #bbf7d0;border-radius:11px;overflow:hidden;margin:15px 0 8px;background:#fff;}
+.lab .h{display:flex;gap:9px;align-items:center;background:#f0fdf4;padding:8px 13px;border-bottom:1px solid #dcfce7;flex-wrap:wrap;}
+.lab .h .k{background:#15803d;color:#fff;font-size:11px;font-weight:800;padding:1px 7px;border-radius:5px;letter-spacing:.4px;}
+.lab .h .t{font-size:13px;font-weight:800;color:#14532d;}
+.lab .h .m{margin-left:auto;font-size:11.4px;color:#16a34a;font-weight:600;}
+.lab ol.st{list-style:none;margin:0;padding:2px 0;}
+.lab ol.st>li{display:grid;grid-template-columns:22px 1fr;gap:9px;padding:7px 14px;font-size:13.2px;line-height:1.72;border-top:1px solid #f1f5f9;}
+.lab ol.st>li:first-child{border-top:none;}
+.lab ol.st .n{width:20px;height:20px;border-radius:50%;background:#dcfce7;color:#15803d;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:3px;}
+.lab .see{display:block;color:#0f766e;font-size:12.4px;margin-top:3px;line-height:1.66;}
+.lab .see::before{content:"看到 ";color:#0d9488;font-weight:700;}
+.lab .judge{padding:9px 14px;background:#f0fdfa;border-top:1px solid #ccfbf1;font-size:13px;line-height:1.72;}
+.lab .judge b{color:#0f766e;font-size:12.2px;letter-spacing:.3px;}
+.lab .stuck{padding:8px 14px;background:var(--warn-bg);border-top:1px solid #fde68a;font-size:12.8px;color:#78350f;line-height:1.7;}
+.lab .stuck b{color:var(--warn);}
+
+/* ── 顶部章节导航 ── */
+.modnav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:12px;margin-top:14px;box-shadow:0 2px 10px rgba(15,23,42,.06);}
+.modnav .in{display:flex;gap:2px;overflow-x:auto;padding:0 8px;scrollbar-width:none;}
+.modnav .in::-webkit-scrollbar{display:none;}
+.modnav a{flex:0 0 auto;padding:10px 11px 9px;font-size:12.7px;font-weight:700;color:#64748b;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;letter-spacing:.2px;}
+.modnav a .n{display:inline-block;min-width:14px;margin-right:4px;font-size:10.6px;font-weight:800;color:#a8b6c8;font-variant-numeric:tabular-nums;letter-spacing:0;}
+.modnav a:hover{color:#0f766e;}
+.modnav a.on{color:#0f766e;border-bottom-color:#0d9488;}
+.modnav a.on .n{color:#0d9488;}
+.modnav + main{margin-top:10px;}
+
+/* ── 课程目标表 ── */
+.goal{border:1px solid #d9e6f6;border-radius:11px;overflow:hidden;background:#fff;margin:0 0 4px;}
+.goal .gh{background:#eff5ff;padding:8px 14px;font-size:12.4px;font-weight:800;color:#1d4ed8;letter-spacing:.3px;}
+.goal .gh em{font-style:normal;font-weight:600;color:#64748b;font-size:12px;margin-left:8px;letter-spacing:0;}
+.goal .tbl{margin:0;}
+.goal .tbl th{padding:8px 14px;background:#f7fafd;}
+.goal .tbl td{padding:10px 14px;}
+.goal .tbl td:first-child{white-space:nowrap;}
+.goal .tier{display:inline-block;font-size:11.6px;font-weight:800;color:#fff;padding:2px 9px;border-radius:5px;letter-spacing:.4px;}
+.goal .tier.a{background:#0d9488;}
+.goal .tier.b{background:#2563eb;}
+.goal .tier.c{background:#b45309;}
+.goal .tbl b{color:#0b2a45;}
+
+/* ── 提示词卡 ── */
+.pr{border:1px solid #c9d4fb;border-radius:11px;overflow:hidden;margin:15px 0 8px;background:#fff;}
+.pr .h{display:flex;align-items:center;gap:9px;background:#eef2ff;padding:8px 13px;border-bottom:1px solid #dbe3fd;flex-wrap:wrap;}
+.pr .h .n{background:#4338ca;color:#fff;font-size:11px;font-weight:800;padding:1px 7px;border-radius:5px;letter-spacing:.4px;}
+.pr .h .t{font-size:13px;font-weight:800;color:#312e81;}
+.pr .h .m{margin-left:auto;font-size:11.4px;color:#6366f1;font-weight:600;}
+.pr pre{background:#fbfcff;padding:12px 15px 13px;font-family:"PingFang SC","Microsoft YaHei",Consolas,monospace;font-size:12.9px;line-height:1.9;white-space:pre-wrap;word-break:break-word;color:#1e2a3a;border-bottom:1px dashed #dbe3fd;}
+.pr pre .v{color:#b45309;font-weight:700;}
+.pr pre .cm{color:#94a3b8;}
+.pr .f{padding:8px 14px;font-size:13.1px;line-height:1.74;border-top:1px solid #eef2f8;}
+.pr .f:first-of-type{border-top:none;}
+.pr .f b{font-size:12.2px;letter-spacing:.3px;margin-right:5px;}
+.pr .f.why2 b{color:#0f766e;}
+.pr .f.bad b{color:#b91c1c;}
+.pr .f.ok{background:#f7fdfb;}
+.pr .f.ok b{color:#0f766e;}
+
+/* ── 代码 ── */
+pre.code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:12px 15px;font-family:"JetBrains Mono",Consolas,"Courier New",monospace;font-size:12.4px;line-height:1.82;overflow-x:auto;margin:11px 0;white-space:pre;}
+pre.code .c{color:#7c8fa8;}
+pre.code .k{color:#7dd3fc;}
+pre.code .s{color:#a5e8b0;}
+pre.code .f{color:#fcd34d;}
+code{font-family:Consolas,monospace;}
+p code,li code,td code{background:#eef2f7;padding:1px 5px;border-radius:4px;font-size:12.2px;color:#0f766e;}
+.fname{font-family:Consolas,monospace;font-size:12px;color:var(--muted);margin:12px 0 -4px;}
+.fname::before{content:"▤ ";color:var(--primary);}
+
+/* ── 终端输出 ── */
+pre.term{background:#f6f8fb;border:1px dashed #cbd5e1;border-radius:9px;padding:10px 14px;font-family:Consolas,"Courier New",monospace;font-size:12.3px;line-height:1.78;color:#334155;overflow-x:auto;white-space:pre;margin:10px 0;}
+pre.term .d{color:#0f766e;}
+
+/* ── 表格 ── */
+.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+.tbl th{text-align:left;padding:8px 10px;background:#f4f7fb;color:#334155;font-weight:700;font-size:12.4px;border-bottom:1px solid var(--line);}
+.tbl td{padding:8px 10px;border-bottom:1px solid #eef2f7;vertical-align:top;line-height:1.7;}
+.tbl tr:last-child td{border-bottom:none;}
+.tblwrap{overflow-x:auto;margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#fff;}
+.tblwrap .tbl{width:100%;min-width:560px;margin:0;}
+.goal .tblwrap{border:none;border-radius:0;margin:0;background:transparent;}
+
+/* ── 图 ── */
+figure{margin:16px 0 6px;background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:14px 14px 8px;}
+figure svg{display:block;width:100%;height:auto;}
+figcaption{font-size:12.2px;color:var(--muted);text-align:center;margin-top:6px;padding-bottom:2px;}
+.bx{fill:#fff;stroke:#94a3b8;stroke-width:1.4;}
+.bxA{fill:#eef5ff;stroke:#2563eb;stroke-width:1.6;}
+.bxG{fill:#eefbf7;stroke:#0d9488;stroke-width:1.6;}
+.bxW{fill:#fff8e8;stroke:#d97706;stroke-width:1.5;}
+.lb{font-size:12.4px;fill:#0f2f4d;font-weight:700;}
+.lb2{font-size:11.4px;fill:#475569;}
+.sm{font-size:10.8px;fill:#64748b;}
+.ar{stroke:#64748b;stroke-width:1.5;fill:none;}
+
+/* ── 补充说明块 ── */
+.exp{background:#f0fdfa;border:1px solid #99f6e4;border-left:3px solid var(--primary);border-radius:9px;padding:10px 14px;margin:12px 0;font-size:13.3px;line-height:1.75;}
+.exp b{color:#0f766e;}
+.exp pre.code{margin:8px 0 2px;font-size:12px;}
+
+/* ── 章号块 ── */
+h2 .num{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:8px;background:#eaf0ff;color:var(--blue-d);font-size:13px;font-weight:800;flex:0 0 auto;}
+h2:has(.num)::before{display:none;}
+
+/* ── 一句话带走 ── */
+.takeaway{background:var(--deep);color:#eaf3ff;border-radius:10px;padding:11px 16px;margin-top:18px;display:flex;align-items:center;gap:11px;font-size:13.6px;line-height:1.6;}
+.takeaway span.t{flex:0 0 auto;background:var(--primary);color:#fff;font-size:11.2px;font-weight:800;padding:2px 9px;border-radius:999px;letter-spacing:.4px;}
+
+/* ── 章末小结 ── */
+.recap{background:var(--soft);border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:10px;padding:11px 15px;margin:16px 0 0;font-size:13.2px;line-height:1.72;}
+.recap ul{margin:0 0 0 17px;}
+.recap li{margin:3px 0;}
+
+/* ── 结论条 ── */
+.lede{background:#eef4ff;border-left:3px solid var(--blue);border-radius:0 9px 9px 0;padding:10px 15px;margin:0 0 12px;font-size:14px;line-height:1.7;color:#12305c;font-weight:600;}
+.lede b{display:inline-block;margin-right:8px;background:var(--blue);color:#fff;font-size:11.2px;font-weight:800;padding:1px 8px;border-radius:999px;letter-spacing:.4px;vertical-align:1px;}
+.lede code{background:#dde9ff;color:#0b3d91;border-color:#c9dbfb;}
+
+/* ── 上下课导航 ── */
+.nav{display:flex;gap:12px;margin-top:16px;}
+.nav a{flex:1;display:block;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 15px;text-decoration:none;color:var(--text);transition:.15s;}
+.nav a:hover{border-color:#b9cde6;box-shadow:0 2px 8px rgba(15,23,42,.07);}
+.nav .dir{font-size:11.4px;color:var(--muted);font-weight:700;letter-spacing:.4px;}
+.nav .tt{font-size:13.4px;font-weight:700;color:#12406b;margin-top:2px;}
+.nav .nx{text-align:right;}
+.nav .ph{flex:1;border:1px dashed var(--line);border-radius:11px;padding:11px 15px;color:#b6c2d2;font-size:12.4px;}
+
+.footnote{text-align:center;font-size:12px;color:#94a3b8;margin-top:22px;}
+
+@media (max-width:900px){
+  .chead{padding:22px 20px 18px;}
+  .chead h1{font-size:22.5px;}
+  main{padding:20px 17px;}
+  .dec .row{grid-template-columns:1fr;gap:2px;}
+  .nav{flex-direction:column;}
+  .two{grid-template-columns:1fr;}
+  main table{display:block;overflow-x:auto;}
+  main table.tbl th,main table.tbl td{min-width:104px;}
+  .goal .tbl th[style]{width:auto !important;}
+  .goal .tbl td code{overflow-wrap:anywhere;}
+  pre.code{font-size:11.4px;}
+  .pr pre{font-size:12px;}
+  .pr .h .m{margin-left:0;}
+}
+@media print{
+  body{background:#fff;padding:0;font-size:11.5px;}
+  .chead{border-radius:0;}
+  main{box-shadow:none;border:none;padding:0;margin-top:8px;}
+  .nav,.footnote,.modnav{display:none;}
+  .dec,.chk,.recap,.takeaway,.exp,.lede,figure,h2,h3,.pr,.lab,.two{break-inside:avoid;page-break-inside:avoid;}
+  h2,h3{break-after:avoid;page-break-after:avoid;}
+  pre.code{background:#f5f7fa;color:#1e293b;border:1px solid #dbe3ec;}
+  pre.code .c{color:#7a8699;} pre.code .k{color:#0b5cbf;} pre.code .s{color:#0f766e;} pre.code .f{color:#a16207;}
+  pre.term{background:#f8fafc;border:1px solid #e2e8f0;color:#334155;}
+  .pr pre{background:#fbfcff;border:1px solid #e6ebf7;}
+  .takeaway{background:#163a5f !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  @page{size:A4;margin:12mm;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="chead">
+  <div class="kicker"><span class="lid">L06</span><span class="lname">法律大模型微调实战</span><span class="ltotal">实战线 · 魔搭</span></div>
+  <h1>在魔搭把 50 类分类训出来</h1>
+  <p class="sub">从注册到拿到准确率，一条链走到底：18,338 条「问题→部法」训练对，免费 A10 24G，ms-swift 一条命令起训。不用信用卡，不用自己配环境。</p>
+</header>
+
+<nav class="modnav"><div class="in">
+  <a href="#s-map" class="on"><span class="n">1</span>这一课做什么</a>
+  <a href="#s-signup"><span class="n">2</span>注册领额度</a>
+  <a href="#s-nb"><span class="n">3</span>开 Notebook 装框架</a>
+  <a href="#s-data"><span class="n">4</span>准备数据</a>
+  <a href="#s-train"><span class="n">5</span>一条命令起训</a>
+  <a href="#s-loss"><span class="n">6</span>看 loss 拿 adapter</a>
+  <a href="#s-infer"><span class="n">7</span>验它学会了</a>
+  <a href="#s-wrap"><span class="n">8</span>小结</a>
+</div></nav>
+
+<main>
+
+<div class="goal">
+  <div class="gh">课程目标<em>三档都达成，这一课才算过</em></div>
+  <table class="tbl">
+    <tr><th style="width:86px">档位</th><th>学完你能做什么</th><th style="width:250px">怎么算达成</th></tr>
+    <tr><td><span class="tier a">跑通</span></td><td>在魔搭里用 ms-swift 训完 50 类分类，拿到 adapter</td><td>输出目录里出现 <code>adapter_model</code> 权重文件</td></tr>
+    <tr><td><span class="tier b">量出来</span></td><td>跑出 zero-shot 基线，再跑出微调后的 test 准确率</td><td><code>eval_cls.py</code> 两次运行各打印一行 <code>accuracy</code>，后一次明显更高</td></tr>
+    <tr><td><span class="tier c">说清</span></td><td>讲清为什么只传 train 不传 val 会踩坑、为什么 loss 数值不能跨任务比</td><td>合上文档能复述，并指出本课两处容易踩空的地方</td></tr>
+  </table>
+</div>
+
+<h2 id="s-map"><span class="num">1</span>这一课做什么</h2>
+<div class="lede"><b>结论</b>把 18,338 条「问题→部法」训练对喂给 Qwen3-1.7B，在魔搭免费 GPU 上训一个 50 选 1 的分类器。</div>
+
+<p>这条链和你之前跑过的微调没有本质差别，只是任务从「生成一段文本」换成了「输出一个词」。</p>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:132px">对比项</th><th>生成任务（改写 / 问答）</th><th>这一课（50 类分类）</th></tr>
+  <tr><td>训练数据</td><td>几百到几千条 demo</td><td><b>18,338 条</b>，约 6 MB</td></tr>
+  <tr><td>输出长度</td><td>几十到几百字</td><td><b>一个部法名</b>，2~10 个 token</td></tr>
+  <tr><td>max_length</td><td>1024 起</td><td><b>512</b> 足够（问题最长 333 字）</td></tr>
+  <tr><td>怎么算学会</td><td>只能人眼看像不像</td><td><b>准确率</b>，一算就有</td></tr>
+  <tr><td>训练耗时</td><td>十几分钟</td><td>约 1 小时（两轮）</td></tr>
+</table>
+</div>
+
+<figure>
+  <svg viewBox="0 0 680 128" role="img" aria-label="魔搭五步链路：注册、装框架、传数据、起训、评测">
+    <defs>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+    </defs>
+    <rect class="bxA" x="16" y="34" width="112" height="58" rx="10"/>
+    <text class="lb" x="72" y="58" text-anchor="middle">① 注册</text>
+    <text class="lb2" x="72" y="78" text-anchor="middle">绑阿里云</text>
+    <line class="ar" x1="130" y1="63" x2="148" y2="63" marker-end="url(#ah)"/>
+
+    <rect class="bxA" x="150" y="34" width="112" height="58" rx="10"/>
+    <text class="lb" x="206" y="58" text-anchor="middle">② 装框架</text>
+    <text class="lb2" x="206" y="78" text-anchor="middle">ms-swift</text>
+    <line class="ar" x1="264" y1="63" x2="282" y2="63" marker-end="url(#ah)"/>
+
+    <rect class="bxA" x="284" y="34" width="112" height="58" rx="10"/>
+    <text class="lb" x="340" y="58" text-anchor="middle">③ 传数据</text>
+    <text class="lb2" x="340" y="78" text-anchor="middle">train + val</text>
+    <line class="ar" x1="398" y1="63" x2="416" y2="63" marker-end="url(#ah)"/>
+
+    <rect class="bxG" x="418" y="34" width="106" height="58" rx="10"/>
+    <text class="lb" x="471" y="58" text-anchor="middle">④ 起训</text>
+    <text class="lb2" x="471" y="78" text-anchor="middle">swift sft</text>
+    <line class="ar" x1="526" y1="63" x2="544" y2="63" marker-end="url(#ah)"/>
+
+    <rect class="bxG" x="546" y="34" width="118" height="58" rx="10"/>
+    <text class="lb" x="605" y="58" text-anchor="middle">⑤ 评测</text>
+    <text class="lb2" x="605" y="78" text-anchor="middle">算准确率</text>
+  </svg>
+  <figcaption>五步里有四步是环境与数据，真正的训练只有一条命令——时间花在前面。</figcaption>
+</figure>
+
+<div class="dec">
+  <div class="hd">这一课结束时，你手上有的三样东西</div>
+  <div class="row yes"><div class="k">模型</div><div class="v">一个 LoRA 适配器，几十 MB，能卸能装，不占 3 GB 的基座空间</div></div>
+  <div class="row yes"><div class="k">数字</div><div class="v">zero-shot 与微调后两组 accuracy / macro-F1 / top-3</div></div>
+  <div class="row yes"><div class="k">尺子</div><div class="v"><code>eval_cls.py</code> 一套脚本，换数据换模型都能重跑</div></div>
+</div>
+<div class="recap"><ul>
+  <li>分类任务比生成任务轻：输出一个词，max_length 512 就够。</li>
+  <li>18,338 条训练对在免费 A10 上能跑完两轮，成本为零。</li>
+  <li>这条链跑通后，换 AutoDL 只是换环境，步骤一模一样。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>免费额度足够训一个 1.7B 分类器——挡在前面的从来不是算力，是数据和评测没准备好。</span></div>
+
+<h2 id="s-signup"><span class="num">2</span>注册领额度</h2>
+<div class="lede"><b>结论</b>手机号注册 + 绑定阿里云账号，就能领到免费 GPU 实例，不需要信用卡。</div>
+
+<div class="lab">
+  <div class="h"><span class="k">STEP</span><span class="t">领免费算力</span><span class="m">约 10 分钟</span></div>
+  <ol class="st">
+    <li><span class="n">1</span><div>打开 <code>modelscope.cn</code>，右上角注册，用手机号收验证码登录。</div></li>
+    <li><span class="n">2</span><div>登录后点右上角头像 → <b>账号设置</b> → <b>阿里云绑定</b>，把阿里云账号绑上。<span class="see">页面出现「已绑定」字样，且显示剩余免费时长。</span></div></li>
+    <li><span class="n">3</span><div>绑定时的授权页<b>把权限全勾上</b>，漏勾会导致后面创建实例失败。</div></li>
+    <li><span class="n">4</span><div>进 <b>我的 Notebook</b> → <b>创建</b>，选 GPU 规格 <b>A10 / 24GB</b>，镜像选 <b>PyTorch 2.x + CUDA</b>。<span class="see">实例列表里出现一条「运行中」，GPU 型号写着 A10。</span></div></li>
+  </ol>
+  <div class="judge"><b>额度规则</b>免费额度按 GPU 小时算，单次运行上限约 10 小时，空闲 1 小时自动关机。够训完这一课，但别开着不干活。</div>
+  <div class="stuck"><b>创建失败先看这里</b>报「无可用资源」不是额度没了，是当前时段 A10 被领完——换个时段再试，或换其他可用区。授权没全勾也会报权限错误。</div>
+</div>
+
+<div class="pit"><b>别用 CPU 实例试</b>免费 CPU 实例能开，但 1.7B 模型在 CPU 上一步要几十秒，训 2,000 步是几天的事。认准 GPU 规格再创建。</div>
+
+<div class="recap"><ul>
+  <li>免费额度绑阿里云就到手，不需要付费凭证。</li>
+  <li>单次上限约 10 小时，空闲 1 小时自动关——本课约 1 小时，够用。</li>
+  <li>创建失败多半是资源占满或授权漏勾，不是账号问题。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>免费额度的真实限制不是时长，是「一次性」——关掉再开，环境要从头装一遍。</span></div>
+
+<h2 id="s-nb"><span class="num">3</span>开 Notebook 装框架</h2>
+<div class="lede"><b>结论</b>一条 <code>pip install</code> 装好 ms-swift，装完先验 GPU 再验命令，两样都过才往下走。</div>
+
+<p>进实例后点「打开 Notebook」，新建一个 Python 3 内核的 notebook。先确认卡是通的：</p>
+
+<pre class="code"><span class="c"># 确认 GPU 与框架版本</span>
+python -c <span class="s">"import torch; print(torch.__version__, torch.cuda.is_available())"</span>
+nvidia-smi</pre>
+
+<pre class="term"><span class="d">$</span> python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+2.5.1+cu121 True
+<span class="d">$</span> nvidia-smi
+NVIDIA A10  24576MiB</pre>
+
+<p><code>True</code> 和 <code>A10</code> 两样对上，再装框架：</p>
+
+<pre class="code">pip install ms-swift -U
+swift --help</pre>
+
+<pre class="term"><span class="d">$</span> swift --help
+usage: swift [-h] {sft,infer,export,web-ui,...} ...</pre>
+
+<div class="pit"><b>装完 <code>swift</code> 命令找不到</b>装了但提示 <code>command not found</code>，多半是装进了别的 Python 环境。用 <code>python -m pip install ms-swift -U</code> 重装，或 <code>python -m swift --help</code> 直接调模块——Notebook 里跑 <code>!</code> 开头的命令行时尤其容易踩这个。</div>
+
+<div class="chk"><b>这一步的判据</b>不是「装完了」，是「<code>swift --help</code> 能打出一屏用法」。打不出来就别往下走，后面每条命令都会连环失败。</div>
+
+<div class="recap"><ul>
+  <li>先验 GPU 再装框架，两样都过才继续。</li>
+  <li><code>swift</code> 找不到命令 = 装错环境，用 <code>python -m swift</code> 兜底。</li>
+  <li>Notebook 里跑命令加 <code>!</code>，但 <code>pip</code> 建议用 <code>%pip</code>，避免装到别的内核。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>环境问题的判断标准永远是「命令能不能跑出一个结果」，不是「装的时候有没有报错」。</span></div>
+
+<h2 id="s-data"><span class="num">4</span>准备数据</h2>
+<div class="lede"><b>结论</b>传 <code>train.jsonl</code> 和 <code>val.jsonl</code> 两个文件到持久化目录，ms-swift 原生吃 <code>query</code>/<code>response</code>，不用转格式。</div>
+
+<p>本地跑一条命令先把数据备好：</p>
+
+<pre class="code"><span class="c"># 在项目根目录执行，产出 data/cls/export/ 下的平台数据</span>
+python scripts/export_platform_data.py</pre>
+
+<pre class="term"><span class="d">$</span> python scripts/export_platform_data.py
+导出完成
+  ms_swift      train=18338  val=2292
+  llamafactory  train=18338  val=2292
+  test_eval     2292 条（只含 question / label）</pre>
+
+<p>魔搭只需要 <code>ms_swift</code> 那两个文件。每行长这样：</p>
+
+<div class="pr">
+  <div class="h"><span class="n">1</span><span class="t">data/cls/export/ms_swift/train.jsonl</span><span class="m">query / response</span></div>
+  <pre><span class="cm"># query</span>
+请判断以下法律问题应适用哪部法律。只输出法律名称，不要解释。
+
+问题：小王是一家个人独资企业的投资人，他的企业已经解散，
+但仍有未偿还的债务，他需要承担什么样的偿还责任？
+
+<span class="cm"># response</span>
+个人独资企业法</pre>
+  <div class="f ok"><b>指令就两句</b>任务 + 输出约束。指令越长，模型越爱在输出里补解释，评测时就不好对齐。</div>
+  <div class="f why2"><b>response 只有一个词</b>标签本身，不是整句。整句会让每个候选的 token 数不一样，打分时没法公平比。</div>
+</div>
+
+<h3>传上去</h3>
+<p>Notebook 左侧文件树进到 <code>/mnt/workspace/</code>，新建目录 <code>cls</code>，把两个文件拖进去。</p>
+
+<pre class="code"><span class="c"># 传完验一眼：行数对不对、字段名对不对</span>
+wc -l /mnt/workspace/cls/train.jsonl /mnt/workspace/cls/val.jsonl
+head -n 1 /mnt/workspace/cls/train.jsonl</pre>
+
+<pre class="term"><span class="d">$</span> wc -l /mnt/workspace/cls/train.jsonl /mnt/workspace/cls/val.jsonl
+ 18338 /mnt/workspace/cls/train.jsonl
+  2292 /mnt/workspace/cls/val.jsonl
+<span class="d">$</span> head -n 1 /mnt/workspace/cls/train.jsonl
+{"query": "请判断…", "response": "个人独资企业法"}</pre>
+
+<div class="pit"><b>传到 <code>/tmp</code> 等于白传</b><code>/tmp</code> 和 <code>/root</code> 都不是持久化目录，实例一关就没了，重开还得重传 6 MB。认准 <code>/mnt/workspace/</code>——那是持久化盘，下次开机还在。</div>
+
+<div class="pit"><b>只传 train 不传 val</b>训练能跑，但你只能看训练 loss，看不到验证准确率——也就没法判断什么时候该停。分类任务尤其要 val：loss 还在降、验证准确率已经不动了，就是过拟合的开始。</div>
+
+<div class="recap"><ul>
+  <li>ms-swift 原生吃 query/response，不需要转 alpaca。</li>
+  <li>两个文件都要传：train 用来学，val 用来判断什么时候停。</li>
+  <li>只传 <code>/mnt/workspace/</code>，其他目录关了实例就没了。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>数据准备只有两个动作：把答案挡在输入之外，把验证集留在训练集之外。</span></div>
+
+<h2 id="s-train"><span class="num">5</span>一条命令起训</h2>
+<div class="lede"><b>结论</b>一条 <code>swift sft</code> 起训：QLoRA 4bit + LoRA r=16，两轮，约 1 小时。</div>
+
+<pre class="code">swift sft \
+  --model Qwen/Qwen3-1.7B \
+  --tuner_type lora \
+  --quant_method bnb --quant_bits 4 \
+  --dataset /mnt/workspace/cls/train.jsonl \
+  --val_dataset /mnt/workspace/cls/val.jsonl \
+  --torch_dtype bfloat16 \
+  --num_train_epochs 2 \
+  --per_device_train_batch_size 8 \
+  --gradient_accumulation_steps 2 \
+  --learning_rate 2e-4 \
+  --lora_rank 16 --lora_alpha 32 \
+  --target_modules all-linear \
+  --max_length 512 \
+  --eval_steps 100 --save_steps 100 --save_total_limit 2 \
+  --logging_steps 20 \
+  --warmup_ratio 0.05 \
+  --output_dir /mnt/workspace/output/cls_qwen3</pre>
+
+<h3>每个参数为什么这么填</h3>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:196px">参数</th><th style="width:88px">取值</th><th>为什么</th></tr>
+  <tr><td><code>--tuner_type lora</code></td><td>lora</td><td>ms-swift 没有 qlora 这个选项，别去搜</td></tr>
+  <tr><td><code>--quant_bits 4</code></td><td>4</td><td>配合 lora 才叫 QLoRA：量化基座 + 训低秩补丁</td></tr>
+  <tr><td><code>--max_length 512</code></td><td>512</td><td>问题最长 333 字，加指令与标签，512 都富余</td></tr>
+  <tr><td><code>--num_train_epochs 2</code></td><td>2</td><td>50 类收敛快，1 轮常欠、3 轮易过拟合</td></tr>
+  <tr><td><code>batch 8 × accum 2</code></td><td>16</td><td>有效 batch 16，24G 卡显存还剩一半</td></tr>
+  <tr><td><code>--learning_rate 2e-4</code></td><td>2e-4</td><td>QLoRA 常用档；1e-4 偏慢，5e-4 容易抖</td></tr>
+  <tr><td><code>--val_dataset</code></td><td>val.jsonl</td><td>开了才会每 100 步打一次验证准确率</td></tr>
+</table>
+</div>
+
+<div class="exp"><b>模型名为什么是 <code>Qwen/Qwen3-1.7B</code> 而不是 <code>-Instruct</code></b>Qwen3 的发布约定是：<code>Qwen3-1.7B</code> 本身就是后训练版（会听指令），基座版才叫 <code>Qwen3-1.7B-Base</code>。所以这里填 <code>Qwen3-1.7B</code> 就是你要的那个「会听指令」的模型，加 <code>-Instruct</code> 反而找不到。</div>
+
+<h3>跑起来长什么样</h3>
+
+<pre class="term"><span class="d">$</span> swift sft --model Qwen/Qwen3-1.7B ...
+trainable params: ~20 M || all params: ~1.7 B || trainable%: ~1.2
+{'loss': 3.4, 'learning_rate': 1.8e-05, 'epoch': 0.04}
+{'loss': 1.8, 'learning_rate': 4.0e-05, 'epoch': 0.17}
+{'loss': 0.9, 'learning_rate': 5.6e-05, 'epoch': 0.35}
+{'eval_accuracy': 0.6, 'loss': 0.6, 'epoch': 0.52}
+{'loss': 0.4, 'learning_rate': 3.2e-05, 'epoch': 1.10}
+{'eval_accuracy': 0.8, 'loss': 0.3, 'epoch': 1.35}</pre>
+
+<p>这是<strong>形态示意</strong>，不是实测值——你的数一定和这不一样，<span class="hl">看趋势，不看绝对值</span>。</p>
+
+<div class="chk"><b>两个必须盯的数</b>一是 <code>trainable%</code> 应在 1%~2% 之间（说明只训了补丁，基座没动）；二是 <code>eval_accuracy</code> 在涨——只要它还在涨，就不用急着停。</div>
+
+<div class="pit"><b>loss 不能和别的任务比</b>这里起始 loss 约 3.4，因为 50 类里瞎猜的正确率只有 2%，理论起点接近 <code>ln(50)≈3.9</code>。生成任务的 loss 起点通常是 2.x。跨任务比 loss 大小毫无意义，只能和自己同一任务的起点比。</div>
+
+<div class="recap"><ul>
+  <li>ms-swift 里 QLoRA = <code>lora</code> + <code>quant_bits 4</code>，没有单独的 qlora 选项。</li>
+  <li><code>--val_dataset</code> 一定要给，它决定你能不能看见「该停了」。</li>
+  <li>loss 只看自己这条曲线的下降，跨任务比毫无意义。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>训练参数里真正需要你判断的只有三个：学多久（epoch）、一次看多少（batch）、学多快（学习率）。</span></div>
+
+<h2 id="s-loss"><span class="num">6</span>看 loss 拿 adapter</h2>
+<div class="lede"><b>结论</b>训完的产物只有几十 MB，从 <code>checkpoint-*</code> 里挑验证准确率最高那个带走。</div>
+
+<pre class="code">/mnt/workspace/output/cls_qwen3/
+└─ v0-20261118-153012/            <span class="c"># 一次运行的编号目录</span>
+   ├─ checkpoint-600/
+   │  ├─ adapter_config.json      <span class="c"># LoRA 配置</span>
+   │  └─ adapter_model.safetensors <span class="c"># 补丁权重，约 40 MB</span>
+   ├─ checkpoint-800/
+   └─ logging.jsonl               <span class="c"># 完整 loss 与 eval 记录</span></pre>
+
+<p>为什么是几十 MB 而不是 3 GB：训的只是 1.16% 的补丁参数，基座一个字节没改。</p>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:200px">怎么选 checkpoint</th><th>做法</th></tr>
+  <tr><td>看验证准确率</td><td>在 <code>logging.jsonl</code> 里搜 <code>eval_accuracy</code>，挑最高的那个步数</td></tr>
+  <tr><td>没有 val 的时候</td><td>取最后一个 checkpoint（本课不建议，等于蒙）</td></tr>
+  <tr><td>不确定就都留</td><td><code>--save_total_limit 2</code> 已经只留最近两个，不会撑爆盘</td></tr>
+</table>
+</div>
+
+<div class="pit"><b>把整个输出目录打包下载</b>目录里有 log、有多个 checkpoint、有优化器状态，动辄几百 MB。只 <code>tar</code> 你选中的那个 <code>checkpoint-*</code> 目录，几十 MB 就够了。</div>
+
+<pre class="code"><span class="c"># 只打包选中的那个 checkpoint</span>
+cd /mnt/workspace/output/cls_qwen3
+tar -czf cls_adapter.tar.gz v0-20261118-153012/checkpoint-800/</pre>
+
+<div class="recap"><ul>
+  <li>适配器只有几十 MB，不带基座——这是 LoRA 最实用的地方。</li>
+  <li>选 checkpoint 的判据是 <code>eval_accuracy</code>，不是最后一个。</li>
+  <li>只打包选中的那一个目录，别整包下载。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>适配器小不是附赠的好处，是它「只改一小块」这个设计本身的必然结果。</span></div>
+
+<h2 id="s-infer"><span class="num">7</span>验它学会了</h2>
+<div class="lede"><b>结论</b>先跑 zero-shot 基线，再跑微调后，两个 accuracy 摆在一起才叫「学会了」。</div>
+
+<h3>先跑基线</h3>
+<p>不加载适配器，让原始 Qwen3 直接做同样的 50 选 1：</p>
+
+<pre class="code">python scripts/eval_cls.py --no-adapter \
+  --model Qwen/Qwen3-1.7B \
+  --data /mnt/workspace/cls/test_eval.jsonl \
+  --limit 200</pre>
+
+<pre class="term"><span class="d">$</span> python scripts/eval_cls.py --no-adapter --limit 200
+评测集 200 条 · 标签 50 类 · 基座 Qwen/Qwen3-1.7B
+模式：zero-shot 基线
+  100/200  accuracy=0.4
+  200/200  accuracy=0.4
+==============================================
+accuracy : ~0.4
+macro-F1 : ~0.3
+top-3    : ~0.6</pre>
+
+<p>这个数就是天花板之外的地板。<span class="hl">没有它，后面那个 0.8 几的准确率说明不了任何事</span>——你不知道它是模型强，还是任务本来就简单。</p>
+
+<h3>再跑微调后</h3>
+
+<pre class="code">python scripts/eval_cls.py \
+  --model Qwen/Qwen3-1.7B \
+  --adapter /mnt/workspace/output/cls_qwen3/v0-20261118-153012/checkpoint-800 \
+  --data /mnt/workspace/cls/test_eval.jsonl</pre>
+
+<div class="chk"><b>结果怎么读</b>三次数字一起看：accuracy 涨了多少（主指标）、macro-F1 有没有同步涨（小类没被牺牲）、top-3 是不是已经很接近 accuracy（差得远说明模型在瞎猜边缘）。</div>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:150px">指标</th><th style="width:110px">基线</th><th style="width:110px">微调后</th><th>怎么读</th></tr>
+  <tr><td>accuracy</td><td>自己填</td><td>自己填</td><td>主指标，50 选 1 整体对不对</td></tr>
+  <tr><td>macro-F1</td><td>自己填</td><td>自己填</td><td>小类有没有被牺牲</td></tr>
+  <tr><td>top-3</td><td>自己填</td><td>自己填</td><td>「差一点就对」的比例</td></tr>
+</table>
+</div>
+
+<div class="pit"><b>推理时不关 thinking 会算错</b>Qwen3 有思考模式。如果推理时开着它，模型会在给答案前先输出一段「用户问的是……应该属于……」，logprob 打分就全乱了。<code>eval_cls.py</code> 里已经固定 <code>enable_thinking=False</code>，你换成 <code>swift infer</code> 手测时也要记得关。</div>
+
+<h3>换一条小改动确认你真懂</h3>
+<p>把 <code>--limit 200</code> 改成 <code>--limit 2292</code>，看 ratio 变不变。如果 200 条和 2292 条差很多，说明 test 集里小类样本少，随机性大——这本身就是个该记住的结论。</p>
+
+<div class="recap"><ul>
+  <li>基线不是可选项，它是「微调有用」的唯一对照。</li>
+  <li>accuracy 看总分，macro-F1 看公平，top-3 看接近度。</li>
+  <li>Qwen3 的 thinking 模式必须关，否则打分全乱。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>评测不是跑一个准确率，是「先有基线、再看公平、最后能指到最差的那几类」。</span></div>
+
+<h2 id="s-wrap"><span class="num">8</span>小结</h2>
+<div class="lede"><b>结论</b>这一课把分类链在免费云上跑通了：18,338 条数据、一条命令训练、两组可对比的准确率。</div>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:170px">层</th><th style="width:240px">这次动了什么</th><th>没动的部分</th></tr>
+  <tr><td>数据层</td><td>导出 train / val / test_eval 三份</td><td>原始 Triplet 只读，一条没改</td></tr>
+  <tr><td>训练层</td><td>QLoRA 4bit，两轮，max_length 512</td><td>基座一字节没动，只存 40 MB 补丁</td></tr>
+  <tr><td>评测层</td><td>候选打分 + 基线对照 + 三指标</td><td>不建索引、不碰检索</td></tr>
+</table>
+</div>
+
+<h3>三条边界，越过就要重做</h3>
+<ul>
+  <li><b>数据不到持久化盘</b>实例一关全丢，下次开机白手起家。</li>
+  <li><b>不传 val 就开训</b>你只能看到 loss 在降，看不到它什么时候开始变傻。</li>
+  <li><b>不跑基线就报提升</b>只有「微调后 0.8 几」，没有基线垫底，这个数没有任何说服力。</li>
+</ul>
+
+<h3>三条自检</h3>
+<div class="dec">
+  <div class="hd">每一步都能单独验，不用等全跑完</div>
+  <div class="row"><span class="k">① 数据</span><span class="v"><code>wc -l</code> 出来 18338 和 2292，<code>head</code> 出来字段是 query/response</span></div>
+  <div class="row"><span class="k">② 训练</span><span class="v">日志里 <code>trainable%</code> 在 1%~2%，<code>eval_accuracy</code> 在往上涨</span></div>
+  <div class="row"><span class="k">③ 评测</span><span class="v">基线 accuracy 明显低于微调后；差得不多说明任务太简单或数据泄漏</span></div>
+</div>
+
+<div class="why"><span class="tag">下一步</span>这套流程换到 AutoDL 一模一样，差别只在「数据放哪、配置怎么给」。下一课把同一条链搬到按小时计费的机器上，顺便换成 LLaMA-Factory 的 yaml 写法。</div>
+
+<div class="recap"><ul>
+  <li>五步里四步是环境与数据，训练本身只有一条命令。</li>
+  <li>免费额度的限制是「环境一次性」，所以要一次跑完。</li>
+  <li>能证明学会的只有两个数：基线、微调后——缺一个都不算数。</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span><span>换平台时真正要重做的只有三步：数据放哪、配置文件叫什么、命令开头是谁。任务本身一步没变。</span></div>
+
+</main>
+
+<nav class="nav">
+  <a href="L00_项目整体介绍_课时页.html"><div class="dir">← 上一课 · L00</div><div class="tt">一个问题，五十部法</div></a>
+  <a href="L07_AutoDL实战_部法分类_课时页.html" class="nx"><div class="dir">下一课 · L07 →</div><div class="tt">AutoDL + LLaMA-Factory 跑同一条链</div></a>
+</nav>
+
+<div class="footnote">L06 · 法律大模型微调实战 · 魔搭 ms-swift 实战</div>
+</div>
+
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.modnav a'));
+  if(!links.length) return;
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+
+  function spy(){
+    var line=window.scrollY+90, idx=0;
+    for(var i=0;i<secs.length;i++){
+      var el=secs[i];
+      if(el && el.getBoundingClientRect().top+window.scrollY<=line) idx=i;
+    }
+    links.forEach(function(a,i){a.classList.toggle('on',i===idx);});
+  }
+
+  window.addEventListener('scroll',spy,{passive:true});
+  window.addEventListener('resize',spy);
+
+  links.forEach(function(a){
+    a.addEventListener('click',function(e){
+      var t=document.querySelector(a.getAttribute('href'));
+      if(!t) return;
+      e.preventDefault();
+      var far=Math.abs(t.getBoundingClientRect().top)>2400;
+      t.scrollIntoView({behavior:far?'instant':'smooth',block:'start'});
+      if(history.replaceState) history.replaceState(null,'',a.getAttribute('href'));
+    });
+  });
+
+  spy();
+})();
+</script>
+</body>
+</html>

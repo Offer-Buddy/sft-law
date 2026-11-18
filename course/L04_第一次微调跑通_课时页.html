@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>L04 · 第一次微调跑通 · 魔搭</title>
+<title>L04 · 第一次微调跑通 · 部法分类</title>
 <style>
 :root{
   --primary:#0d9488; --primary-d:#0f766e; --blue:#2563eb; --blue-d:#1d4ed8;
@@ -233,9 +233,9 @@ h2:has(.num)::before{display:none;}
 <div class="wrap">
 
 <header class="chead">
-  <div class="kicker"><span class="lid">L04</span><span class="lname">第一次微调跑通 · 魔搭</span><span class="ltotal">15 课 · 第 5 课</span></div>
-  <h1>从注册到 adapter：在魔搭上跑通第一次微调</h1>
-  <p class="sub">一条链走到底：注册领额度、开 Notebook、装 ms-swift、喂一份数据、一条命令起训、看 loss、拿 adapter。照着做，两小时内从「没账号」到「有个会改写的模型」。</p>
+  <div class="kicker"><span class="lid">L04</span><span class="lname">第一次微调跑通 · 部法分类</span><span class="ltotal">15 课 · 第 5 课</span></div>
+  <h1>在魔搭上跑通第一次分类微调</h1>
+  <p class="sub">一条链走到底：注册领额度、开 Notebook、装 ms-swift、喂一份 500 条「问题→部法」、一条命令起训、看 loss、拿 adapter。照着做，两小时内从「没账号」到「有个会判部法的模型」。</p>
 </header>
 
 <nav class="modnav"><div class="in">
@@ -256,19 +256,19 @@ h2:has(.num)::before{display:none;}
   <table class="tbl">
     <tr><th style="width:74px">档位</th><th>学完你能做到</th><th style="width:296px">怎么算达成</th></tr>
     <tr><td><span class="tier a">开通</span></td><td>魔搭账号开好，免费 GPU Notebook 起来</td><td>手机号注册 → 绑阿里云领 36 小时 → <code>nvidia-smi</code> 认到 A10</td></tr>
-    <tr><td><span class="tier b">跑通</span></td><td>一份数据喂进去，一条命令起训，loss 往下走</td><td><code>swift sft</code> 起训，loss 一路降到个位数，<code>output</code> 目录冒出 checkpoint</td></tr>
-    <tr><td><span class="tier c">说清</span></td><td>说清 adapter 是什么、从哪下、怎么验它学会了</td><td><code>swift infer</code> 喂口语问题，输出变出法条语体，adapter 打包下载到本地</td></tr>
+    <tr><td><span class="tier b">跑通</span></td><td>一份分类数据喂进去，一条命令起训，loss 往下走</td><td><code>swift sft</code> 起训，loss 一路降到个位数，<code>output</code> 目录冒出 checkpoint</td></tr>
+    <tr><td><span class="tier c">说清</span></td><td>说清分类任务输出一个部法名、demo 500 条和全量 18,338 是什么关系</td><td><code>swift infer</code> 喂问题，输出变出部法名，adapter 打包下载到本地</td></tr>
   </table>
-  <div class="bound"><b>不处理：</b>数据清洗与构造（L05–L08）、参数怎么调（后面的课）、hit_rate 评测（L12）、AutoDL 正式训练（L03 讲过，后面课）。这一课只在魔搭免费卡上把整条链跑通一遍。</div>
+  <div class="bound"><b>不处理：</b>全量 18,338 条正式训与 val 验证、accuracy / macro-F1 评测（L06 实战线）。这一课只用 500 条 demo 在魔搭免费卡上把分类链跑通一遍。</div>
 </div>
 
-<h2 id="s-map"><span class="num">1</span>这一课只做一件事：把链跑通</h2>
-<div class="lede"><b>结论</b>不追求效果好，只追求整条链通——注册、开机、装框架、喂数据、起训、拿 adapter、验一遍。全通了，后面每课都是在某一环上加码。</div>
+<h2 id="s-map"><span class="num">1</span>这一课只做一件事：把分类链跑通</h2>
+<div class="lede"><b>结论</b>任务不是「写一段法条文本」，是「给一个问题，判它该走哪部法」——50 部里选 1 部，输出就一个词。这一课不追求判得准，只追求整条链通。</div>
 
 <figure>
   <svg viewBox="0 0 680 250" role="img" aria-label="九个步骤的流程：注册、绑阿里云、开 Notebook、装 ms-swift、传数据、起训、看 loss、推理验证、下载 adapter">
     <defs>
-      <marker id="f1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <marker id="f4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
         <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
       </marker>
     </defs>
@@ -289,9 +289,9 @@ h2:has(.num)::before{display:none;}
     <text class="lb" x="523" y="32" text-anchor="middle">装 ms-swift</text>
     <text class="sm" x="523" y="47" text-anchor="middle">pip 一条</text>
 
-    <line class="ar" x1="138" y1="35" x2="158" y2="35" marker-end="url(#f1)"/>
-    <line class="ar" x1="288" y1="35" x2="308" y2="35" marker-end="url(#f1)"/>
-    <line class="ar" x1="438" y1="35" x2="458" y2="35" marker-end="url(#f1)"/>
+    <line class="ar" x1="138" y1="35" x2="158" y2="35" marker-end="url(#f4)"/>
+    <line class="ar" x1="288" y1="35" x2="308" y2="35" marker-end="url(#f4)"/>
+    <line class="ar" x1="438" y1="35" x2="458" y2="35" marker-end="url(#f4)"/>
 
     <rect class="bxG" x="8" y="82" width="130" height="42" rx="8"/>
     <text class="lb" x="73" y="100" text-anchor="middle">传数据</text>
@@ -309,20 +309,20 @@ h2:has(.num)::before{display:none;}
     <text class="lb" x="523" y="100" text-anchor="middle">swift infer</text>
     <text class="sm" x="523" y="115" text-anchor="middle">验它学会了</text>
 
-    <line class="ar" x1="138" y1="103" x2="158" y2="103" marker-end="url(#f1)"/>
-    <line class="ar" x1="288" y1="103" x2="308" y2="103" marker-end="url(#f1)"/>
-    <line class="ar" x1="438" y1="103" x2="458" y2="103" marker-end="url(#f1)"/>
+    <line class="ar" x1="138" y1="103" x2="158" y2="103" marker-end="url(#f4)"/>
+    <line class="ar" x1="288" y1="103" x2="308" y2="103" marker-end="url(#f4)"/>
+    <line class="ar" x1="438" y1="103" x2="458" y2="103" marker-end="url(#f4)"/>
 
-    <line class="ar" x1="73" y1="56" x2="73" y2="82" marker-end="url(#f1)"/>
-    <line class="ar" x1="523" y1="56" x2="523" y2="82" marker-end="url(#f1)"/>
+    <line class="ar" x1="73" y1="56" x2="73" y2="82" marker-end="url(#f4)"/>
+    <line class="ar" x1="523" y1="56" x2="523" y2="82" marker-end="url(#f4)"/>
 
     <rect class="bxD" x="158" y="156" width="300" height="50" rx="8"/>
     <text class="lbw" x="308" y="177" text-anchor="middle">adapter（几十 MB）</text>
     <text class="sm" x="308" y="194" text-anchor="middle" fill="#a8cdf0">下载到本地，这一课就算交账</text>
 
     <line class="ar" x1="523" y1="124" x2="523" y2="140"/>
-    <line class="ar" x1="523" y1="140" x2="458" y2="140" marker-end="url(#f1)"/>
-    <line class="ar" x1="308" y1="140" x2="308" y2="156" marker-end="url(#f1)"/>
+    <line class="ar" x1="523" y1="140" x2="458" y2="140" marker-end="url(#f4)"/>
+    <line class="ar" x1="308" y1="140" x2="308" y2="156" marker-end="url(#f4)"/>
   </svg>
   <figcaption>九步里真正「会卡」的只有两处：绑阿里云授权没勾全，和数据字段名写错。其余都是照着敲。</figcaption>
 </figure>
@@ -334,15 +334,21 @@ h2:has(.num)::before{display:none;}
   <tr><td><b>把链跑通</b></td><td>传数据 + 起训 + 看 loss + 推理 + 下载</td><td>字段名对没对、loss 降没降</td></tr>
 </table>
 
+<div class="dec">
+  <div class="hd">这 500 条和全量 18,338 条是什么关系</div>
+  <div class="row"><div class="k">这一课</div><div class="v">500 条 demo，50 类每类抽 10 条，几分钟训完——目的只是把链走通，<b>不追求判得准</b>。</div></div>
+  <div class="row"><div class="k">L06</div><div class="v">18,338 条全量 + 2,292 条验证集，两轮约 1 小时——那时候才看 accuracy 准不准、什么时候该停。</div></div>
+</div>
+
 <div class="recap"><b>这一章钉住了三件事</b><ul>
-  <li>钉住了：这一课的目标是「链通」，不是「效果好」——别在第一版上抠参数</li>
-  <li>不这么做会：一上来就想训全量 2 万条，光下载和数据预处理就把免费额度烧光</li>
+  <li>钉住了：这一课的目标是「链通」，不是「判得准」——别在 500 条上抠准确率</li>
+  <li>不这么做会：一上来就想训全量 18,338 条，光传数据就把免费额度烧掉一截</li>
   <li>下次遇到同类问题，先问：卡在哪一环——账号、环境、数据、命令，还是下载</li>
 </ul></div>
-<div class="takeaway"><span class="t">带走</span>第一遍只求「通」，不求「好」——链通了，后面每一课都在某一环上加码。</div>
+<div class="takeaway"><span class="t">带走</span>第一遍只求「通」，不求「准」——链通了，L06 再上全量数据把准确率练出来。</div>
 
 <h2 id="s-signup"><span class="num">2</span>注册领额度：手机号 + 绑阿里云</h2>
-<div class="lede"><b>结论</b>注册用手机号；免费 GPU 靠绑阿里云领——<b>36 小时 A10 24G</b>，够把这一课来回跑十几遍。</div>
+<div class="lede"><b>结论</b>注册用手机号；免费 GPU 靠绑阿里云领——<b>36 小时 A10 24G</b>，够把这一课来回跑几十遍。</div>
 
 <table class="tbl">
   <tr><th style="width:34px">#</th><th style="width:150px">动作</th><th>做到什么算成</th></tr>
@@ -359,7 +365,7 @@ h2:has(.num)::before{display:none;}
 <table class="tbl">
   <tr><th style="width:150px">规则</th><th style="width:210px">会怎样</th><th>这一课怎么应对</th></tr>
   <tr><td><b>空闲 1 小时自动关</b></td><td>不敲键盘就停，训练如果还挂着会被掐断</td><td>训练一旦开跑，就让它跑，别离开太久</td></tr>
-  <tr><td><b>单次最长约 10 小时</b></td><td>再长的训练会被强制停</td><td>这一课 500 条只要十几分钟，够不着上限</td></tr>
+  <tr><td><b>单次最长约 10 小时</b></td><td>再长的训练会被强制停</td><td>这一课 500 条只要几分钟，够不着上限</td></tr>
   <tr><td><b>36 小时用完就没了</b></td><td>GPU 开不了，只能退回 CPU 环境</td><td>配环境、传数据这类事，能不开 GPU 就不开</td></tr>
 </table>
 
@@ -403,68 +409,68 @@ swift --help</pre>
 <div class="takeaway"><span class="t">带走</span>先验卡、再装框架——顺序反了，报错时你分不清是谁的锅。</div>
 
 <h2 id="s-data"><span class="num">4</span>准备训练数据：一份 jsonl</h2>
-<div class="lede"><b>结论</b>训练数据是一个 jsonl，每行一对「口语问题 → 法条语体文本」。这一课用 500 条（从 DISC-Law 抽的），上传到 <code>/mnt/workspace</code>。</div>
+<div class="lede"><b>结论</b>训练数据是一个 jsonl，每行一对「问题 → 部法名」。这一课用 500 条 demo（50 类每类 10 条），上传到 <code>/mnt/workspace</code>。</div>
 
 <h3>数据长什么样</h3>
-<pre class="code"><span class="c"># 每行一条 jsonl；query 是改写指令 + 口语问题，response 是法条语体文本</span>
+<pre class="code"><span class="c"># 每行一条 jsonl；query 是「判哪部法」的指令 + 问题，response 是部法名（就一个词）</span>
 {
-  "query": "请根据用户法律问题生成一段用于语义检索的假设性法律文档…\n\n用户问题：老板让我天天加班不给钱怎么办",
-  "response": "《劳动法》第四十一条…延长工作时间…支付不低于工资的百分之一百五十…"
+  "query": "请判断以下法律问题应适用哪部法律。只输出法律名称，不要解释。\n\n问题：小王的企业已经解散，但仍有未偿还的债务…",
+  "response": "个人独资企业法"
 }</pre>
-<p>字段只认 <code>query</code> / <code>response</code>（也能写成 <code>messages</code> 那种对话格式）。<b>名字写错，ms-swift 读不出样本</b>，训练集就是空的。</p>
-<p class="note">这份 <code>demo_hyde_500.jsonl</code> 是本课附带的样例，从 DISC-Law Triplet 抽 500 条、已转好格式，直接上传即可。完整 2 万条怎么造、怎么洗，在 L05–L08 细讲。</p>
+<p>字段只认 <code>query</code> / <code>response</code>。<b>名字写错，ms-swift 读不出样本</b>，训练集就是空的。</p>
+<p class="note">这份 <code>demo_cls_500.jsonl</code> 是本课附带的样例，从 DISC-Law 的 18,338 条训练集里分层抽的——50 部法每部抽 10 条。完整数据怎么洗、怎么切，见 L00 第 3 章。</p>
 
 <div class="dec">
-  <div class="hd">三个字段怎么映射——改写的输入和输出</div>
-  <div class="row"><div class="k">query</div><div class="v">喂给模型的输入：一句「生成检索用文本」的指令，加上用户口语问题。模型要学的就是从这句话出发去改写。</div></div>
-  <div class="row"><div class="k">response</div><div class="v">期望的输出：一段带法条、法律概念、责任类型的书面文本。这就是「法条语体」，检索要命中的目标。</div></div>
-  <div class="row"><div class="k">为什么不是问答</div><div class="v">这一课训的是 HyDE 改写器，不是法律问答。输出是「拿来检索的文本」，不是「给用户的答案」。</div></div>
+  <div class="hd">两个字段怎么理解——分类的输入和输出</div>
+  <div class="row"><div class="k">query</div><div class="v">喂给模型的输入：一句「判哪部法、只输出法名」的指令，加上用户法律问题。模型要学的就是从问题出发判部法。</div></div>
+  <div class="row"><div class="k">response</div><div class="v">期望的输出：<b>一个部法名</b>，如「个人独资企业法」。不是整句，不是解释——就是一个词。</div></div>
+  <div class="row"><div class="k">为什么是一个词</div><div class="v">这一课训的是 50 选 1 分类，不是法律问答。输出是「该走哪部法」，不是「给用户的答案」。</div></div>
 </div>
 
 <h3>把这份数据传上去</h3>
 <table class="tbl">
   <tr><th style="width:130px">方式</th><th style="width:210px">怎么做</th><th>什么时候用</th></tr>
-  <tr><td><b>页面拖拽</b></td><td>JupyterLab 左侧文件树，把 <code>demo_hyde_500.jsonl</code> 拖进 <code>/mnt/workspace/</code></td><td>文件只有几百 KB，最省事</td></tr>
-  <tr><td><b>scp 上传</b></td><td><code>scp demo_hyde_500.jsonl root@实例:/mnt/workspace/</code></td><td>文件大、要批量传</td></tr>
+  <tr><td><b>页面拖拽</b></td><td>JupyterLab 左侧文件树，把 <code>demo_cls_500.jsonl</code> 拖进 <code>/mnt/workspace/</code></td><td>文件只有 170 KB，最省事</td></tr>
+  <tr><td><b>scp 上传</b></td><td><code>scp demo_cls_500.jsonl root@实例:/mnt/workspace/</code></td><td>文件大、要批量传</td></tr>
   <tr><td><b>wget 拉取</b></td><td>数据在网盘 / 对象存储上时，<code>wget</code> 直接拉</td><td>数据托管在线上</td></tr>
 </table>
 
 <pre class="code"><span class="c"># 传完在终端验一眼：行数、头一行</span>
-wc -l /mnt/workspace/demo_hyde_500.jsonl
-head -n 1 /mnt/workspace/demo_hyde_500.jsonl</pre>
-<pre class="term"><span class="d">500 /mnt/workspace/demo_hyde_500.jsonl</span>
-<span class="d">{"query": "…", "response": "…"}</span></pre>
+wc -l /mnt/workspace/demo_cls_500.jsonl
+head -n 1 /mnt/workspace/demo_cls_500.jsonl</pre>
+<pre class="term"><span class="d">500 /mnt/workspace/demo_cls_500.jsonl</span>
+<span class="d">{"query": "…", "response": "个人独资企业法"}</span></pre>
 
 <div class="pit"><b>文件一定放在 <code>/mnt/workspace</code>。</b>这是持久化盘，关机后数据还在；放别的地方，实例一停文件就没了，下次开机要重传。</div>
 
 <div class="recap"><b>这一章钉住了三件事</b><ul>
-  <li>钉住了：数据 = 每行一个 query/response 的 jsonl，放 /mnt/workspace</li>
+  <li>钉住了：数据 = 每行一个 query/response 的 jsonl，response 是部法名，放 /mnt/workspace</li>
   <li>不这么做会：字段名写错，ms-swift 读不出样本，训了个寂寞</li>
   <li>下次遇到同类问题，先 <code>wc -l</code> 数行、<code>head</code> 看字段名</li>
 </ul></div>
 <div class="takeaway"><span class="t">带走</span>数据就三个字——jsonl、query/response、持久化盘。</div>
 
 <h2 id="s-train"><span class="num">5</span>一条命令起训</h2>
-<div class="lede"><b>结论</b>起训就是一条 <code>swift sft</code>，关键参数一只手数得过来：模型、数据、LoRA、量化、学习率、长度。其余照抄。</div>
+<div class="lede"><b>结论</b>起训就是一条 <code>swift sft</code>，关键参数一只手数得过来：模型、数据、LoRA、量化、学习率、长度。分类任务 <code>max_length</code> 只要 512。</div>
 
 <pre class="fname">在 /mnt/workspace 下，一条命令起训（QLoRA）</pre>
 <pre class="code">swift sft \
   --model Qwen/Qwen3-1.7B \
   --tuner_type lora \
   --quant_method bnb --quant_bits 4 \
-  --dataset /mnt/workspace/demo_hyde_500.jsonl \
+  --dataset /mnt/workspace/demo_cls_500.jsonl \
   --torch_dtype bfloat16 \
-  --num_train_epochs 3 \
-  --per_device_train_batch_size 2 \
-  --gradient_accumulation_steps 8 \
-  --learning_rate 1e-4 \
+  --num_train_epochs 2 \
+  --per_device_train_batch_size 8 \
+  --gradient_accumulation_steps 2 \
+  --learning_rate 2e-4 \
   --lora_rank 16 --lora_alpha 32 \
   --target_modules all-linear \
-  --max_length 1024 \
-  --save_steps 50 --save_total_limit 2 \
-  --logging_steps 10 \
+  --max_length 512 \
+  --save_steps 20 --save_total_limit 2 \
+  --logging_steps 5 \
   --warmup_ratio 0.05 \
-  --output_dir /mnt/workspace/output/hyde_qwen3</pre>
+  --output_dir /mnt/workspace/output/cls_demo</pre>
 
 <p class="note">首次跑会自动下载 Qwen3-1.7B（约 3GB），走魔搭内网几分钟下完。这一步不算卡死，是它在拉模型。</p>
 
@@ -474,10 +480,9 @@ head -n 1 /mnt/workspace/demo_hyde_500.jsonl</pre>
   <tr><td><code>--model</code></td><td><code>Qwen/Qwen3-1.7B</code></td><td>基座模型，魔搭官方仓库，内网直下</td></tr>
   <tr><td><code>--tuner_type lora</code></td><td>lora</td><td>只训补丁，不训整个模型</td></tr>
   <tr><td><code>--quant_method bnb --quant_bits 4</code></td><td>bnb + 4bit</td><td>这两行合起来才是 QLoRA——基座压到 4bit，省显存</td></tr>
-  <tr><td><code>--dataset</code></td><td>数据路径</td><td>直接指到那份 jsonl</td></tr>
-  <tr><td><code>--num_train_epochs</code></td><td>3</td><td>500 条跑 3 遍，够看出 loss 下降趋势</td></tr>
-  <tr><td><code>--learning_rate</code></td><td>1e-4</td><td>LoRA 的常用档，比全参大一个量级</td></tr>
-  <tr><td><code>--max_length</code></td><td>1024</td><td>改写文本偏长，够装下；默认 2048 会浪费一半算力</td></tr>
+  <tr><td><code>--num_train_epochs</code></td><td>2</td><td>50 类收敛快，2 轮够看出 loss 下降趋势</td></tr>
+  <tr><td><code>--learning_rate</code></td><td>2e-4</td><td>QLoRA 常用档，比全参大一个量级</td></tr>
+  <tr><td><code>--max_length</code></td><td>512</td><td>问题最长 333 字 + 指令，512 足够，别照搬生成任务的 1024</td></tr>
   <tr><td><code>--output_dir</code></td><td>output 目录</td><td>checkpoint 落这，放持久化盘</td></tr>
 </table>
 
@@ -496,22 +501,22 @@ head -n 1 /mnt/workspace/demo_hyde_500.jsonl</pre>
 <div class="lede"><b>结论</b>loss 一路往下、落到个位数，<code>output</code> 目录冒出 checkpoint，就算训成了。adapter 是几十 MB 的小文件，不是整个模型。</div>
 
 <h3>日志怎么读</h3>
-<pre class="term"><span class="d">{'loss': 2.83, 'learning_rate': 1.9e-05, 'epoch': 0.16}</span>
-<span class="d">{'loss': 1.87, 'learning_rate': 4.1e-05, 'epoch': 0.32}</span>
-<span class="d">{'loss': 1.42, 'learning_rate': 5.2e-05, 'epoch': 0.48}</span>
-<span class="d">{'loss': 1.15, 'learning_rate': 6.0e-05, 'epoch': 0.64}</span></pre>
-<p>只看一件事：<b>loss 是不是一路往下</b>。起点因基座和任务而异，但趋势必须往下、不再反弹，落到个位数（2 以下更稳）就算学到。</p>
+<pre class="term"><span class="d">{'loss': 3.4, 'learning_rate': 1.9e-05, 'epoch': 0.16}</span>
+<span class="d">{'loss': 1.8, 'learning_rate': 4.1e-05, 'epoch': 0.48}</span>
+<span class="d">{'loss': 1.1, 'learning_rate': 5.2e-05, 'epoch': 0.80}</span>
+<span class="d">{'loss': 0.6, 'learning_rate': 6.0e-05, 'epoch': 1.12}</span></pre>
+<p>只看一件事：<b>loss 是不是一路往下</b>。分类任务 50 类里瞎猜只有 2% 对，起点接近 <code>ln(50)≈3.9</code>，一路落到个位数（2 以下更稳）就算学到。</p>
 
 <h3>output 目录里有什么</h3>
-<pre class="code">/mnt/workspace/output/hyde_qwen3/
+<pre class="code">/mnt/workspace/output/cls_demo/
 └─ v0-20261118-123456/        <span class="c"># 一次运行的编号目录</span>
-   ├─ checkpoint-50/          <span class="c"># 每 50 步存一个点</span>
+   ├─ checkpoint-20/          <span class="c"># 每 20 步存一个点</span>
    │  ├─ adapter_config.json  <span class="c"># LoRA 配置</span>
    │  └─ adapter_model.safetensors  <span class="c"># 补丁权重，几十 MB</span>
    └─ logging.jsonl           <span class="c"># 完整 loss 记录</span></pre>
 <p><code>adapter_model.safetensors</code> 就是这一课的成果，几十 MB；基座 3GB 不用下，adapter 要配着基座才能用。</p>
 
-<div class="exp"><b>断了怎么办：</b>训练中实例被停或断连，用 <code>--resume_from_checkpoint /mnt/workspace/output/hyde_qwen3/v0-.../checkpoint-50</code> 重跑，会从那个点接着训，不是从头再来。</div>
+<div class="exp"><b>断了怎么办：</b>训练中实例被停或断连，用 <code>--resume_from_checkpoint /mnt/workspace/output/cls_demo/v0-.../checkpoint-20</code> 重跑，会从那个点接着训，不是从头再来。</div>
 
 <div class="recap"><b>这一章钉住了三件事</b><ul>
   <li>钉住了：看 loss 只看趋势，往下不反弹就算对；成果是 adapter 那个几十 MB 的小文件</li>
@@ -521,81 +526,81 @@ head -n 1 /mnt/workspace/demo_hyde_500.jsonl</pre>
 <div class="takeaway"><span class="t">带走</span>loss 看趋势不看绝对值，成果是几十 MB 的 adapter——不是那个 3GB 的基座。</div>
 
 <h2 id="s-infer"><span class="num">7</span>验它学会了</h2>
-<div class="lede"><b>结论</b>训完先 <code>swift infer</code> 喂一条口语问题，看它是不是真吐出了法条语体——吐得出来，才算学会；吐不出，这一课没交账。</div>
+<div class="lede"><b>结论</b>训完先 <code>swift infer</code> 喂一条法律问题，看它是不是直接吐出部法名——吐得出来，才算学会；吐不出，这一课没交账。</div>
 
 <pre class="code">swift infer \
   --model Qwen/Qwen3-1.7B \
-  --adapters /mnt/workspace/output/hyde_qwen3/v0-.../checkpoint-100 \
+  --adapters /mnt/workspace/output/cls_demo/v0-.../checkpoint-40 \
   --infer_backend pt \
-  --max_new_tokens 256 \
+  --max_new_tokens 16 \
   --stream false</pre>
 
 <h3>前后一对比，效果就出来了</h3>
 <table class="tbl">
-  <tr><th style="width:120px">时机</th><th>输入一句口语</th><th>输出应该长这样</th></tr>
-  <tr><td><b>训练前</b></td><td>老板让我天天加班不给钱，怎么办</td><td>答非所问，或直接给建议（改写器不该做这个）</td></tr>
-  <tr><td><b>训练后</b></td><td>老板让我天天加班不给钱，怎么办</td><td>一段带「延长工作时间」「百分之一百五十工资报酬」的法条语体文本</td></tr>
+  <tr><th style="width:120px">时机</th><th>输入一句法律问题</th><th>输出应该长这样</th></tr>
+  <tr><td><b>训练前</b></td><td>离职后公司一直拖着不发工资，该找哪部法？</td><td>答非所问，或给一段解释、一段建议（分类器不该做这些）</td></tr>
+  <tr><td><b>训练后</b></td><td>离职后公司一直拖着不发工资，该找哪部法？</td><td>直接输出一个部法名，如「劳动法」</td></tr>
 </table>
 
-<div class="chk"><b>判断它学会的硬标准：</b>喂口语，输出是「一段可以拿去检索的书面文本」，不是「给你的建议」。输出里带法条号、法律概念、责任类型，就对了。</div>
+<div class="chk"><b>判断它学会的硬标准：</b>喂问题，输出是「一个部法名」，不是「一段解释或建议」。输出就一两个词、落在 50 部法里，就对了。</div>
 
 <h3>把 adapter 下载到本地</h3>
 <pre class="code"><span class="c"># 在 Notebook 里打包，再从文件树右键下载；别下整个 3GB 模型</span>
-cd /mnt/workspace/output/hyde_qwen3
-tar -czf hyde_adapter.tar.gz v0-.../checkpoint-100/</pre>
-<p>打出来的 <code>hyde_adapter.tar.gz</code> 几十 MB，下载秒完。这一课到这里，整条链走通了。</p>
+cd /mnt/workspace/output/cls_demo
+tar -czf cls_adapter.tar.gz v0-.../checkpoint-40/</pre>
+<p>打出来的 <code>cls_adapter.tar.gz</code> 几十 MB，下载秒完。这一课到这里，整条链走通了。</p>
 
 <div class="recap"><b>这一章钉住了三件事</b><ul>
-  <li>钉住了：验证就是喂口语、看输出，是不是变成了法条语体</li>
+  <li>钉住了：验证就是喂问题、看输出，是不是一个部法名</li>
   <li>不这么做会：不验就打包，结果训歪了都不知道</li>
-  <li>下次遇到同类问题，先喂一条最土的口语，看输出像不像法条</li>
+  <li>下次遇到同类问题，先喂一条最典型的问题，看输出像不像一个部法名</li>
 </ul></div>
-<div class="takeaway"><span class="t">带走</span>别急着庆祝，先喂一句口语——输出变成法条语体，才叫学会。</div>
+<div class="takeaway"><span class="t">带走</span>别急着庆祝，先喂一个问题——输出变成一个部法名，才叫学会。</div>
 
 <h2 id="s-wrap"><span class="num">8</span>小结</h2>
-<div class="lede"><b>结论</b>这一课交出去的是一条「能跑通」的链：账号有了、命令会敲了、adapter 到手了。剩下要做的，就是在这条链的每一环上，把 500 条换成 2 万条、把「通」换成「好」。</div>
+<div class="lede"><b>结论</b>这一课交出去的是一条「能跑通」的分类链：账号有了、命令会敲了、adapter 到手了。剩下要做的，就是把 500 条换成 18,338 条、把「通」换成「准」。</div>
 
 <h3>这一课动了什么</h3>
 <table class="tbl">
   <tr><th style="width:110px">环</th><th style="width:200px">这一课做了什么</th><th>后面课怎么加码</th></tr>
   <tr><td><b>平台</b></td><td>魔搭注册 + 免费 36h A10</td><td>正式训练切 AutoDL 4090</td></tr>
   <tr><td><b>框架</b></td><td>ms-swift，一条命令起训</td><td>AutoDL 上换 LLaMA-Factory</td></tr>
-  <tr><td><b>数据</b></td><td>500 条跑通</td><td>2 万条 + 清洗 + 切分</td></tr>
-  <tr><td><b>验收</b></td><td>肉眼看出法条语体</td><td>hit_rate 量化对比</td></tr>
+  <tr><td><b>数据</b></td><td>500 条 demo 跑通</td><td>18,338 条 + val + 切分</td></tr>
+  <tr><td><b>验收</b></td><td>肉眼看出部法名</td><td>accuracy / macro-F1 量化对比</td></tr>
 </table>
 
 <h3>三条边界，越界就返工</h3>
 <ul>
-  <li><b>第一遍只求通。</b>别在 500 条上抠参数——效果是后面用全量数据调出来的。</li>
+  <li><b>第一遍只求通。</b>别在 500 条上抠准确率——准不准是 L06 用全量数据练出来的。</li>
   <li><b>数据永远放持久化盘。</b>放别处，实例一停就重来。</li>
-  <li><b>验完再下载。</b>不喂一句口语就打包，等于闭着眼交卷。</li>
+  <li><b>验完再下载。</b>不喂一个问题就打包，等于闭着眼交卷。</li>
 </ul>
 
 <h3>三条自检</h3>
 <div class="dec">
   <div class="row"><div class="k">环境</div><div class="v"><code>nvidia-smi</code> 认到 A10，<code>swift --help</code> 有输出</div></div>
   <div class="row"><div class="k">训练</div><div class="v"><code>wc -l</code> 是 500，loss 一路往下，<code>output</code> 出了 checkpoint</div></div>
-  <div class="row"><div class="k">成果</div><div class="v">喂口语出法条语体，adapter 打包下载到本地</div></div>
+  <div class="row"><div class="k">成果</div><div class="v">喂问题输出部法名，adapter 打包下载到本地</div></div>
 </div>
 
-<div class="why"><span class="tag">下一步</span>这条链跑通后，下一步回到数据：<b>500 条怎么变 2 万条</b>、口语样本怎么来、脏数据怎么挡——从「能跑」进到「能训好」。</div>
+<div class="why"><span class="tag">下一步</span>这条链跑通后，下一步换平台：<b>把同一条分类链搬到 AutoDL 上</b>，改用 LLaMA-Factory——任务一步没变，只换环境。</div>
 
 <div class="recap"><b>这门课留下的判据</b><ul>
-  <li>判据一：第一遍只求链通——效果是后面用全量数据调出来的，不是这 500 条能调出来的</li>
+  <li>判据一：第一遍只求链通——准不准是后面用全量数据练出来的，不是这 500 条能练出来的</li>
   <li>判据二：QLoRA 两条参数缺一不可——lora 是方法，bnb + 4bit 是省显存</li>
-  <li>判据三：验它学会的尺子是「喂口语、出法条语体」，不是 loss 那个数字</li>
+  <li>判据三：分类的尺子是「喂问题、出部法名」，不是 loss 那个数字</li>
 </ul></div>
 
-<div class="takeaway"><span class="t">带走</span>这一课留下一条能跑通的链——后面的课，全是在这条链的某一环上加码。</div>
+<div class="takeaway"><span class="t">带走</span>这一课留下一条能跑通的分类链——后面的课，全是在这条链的某一环上加码。</div>
 
 </main>
 
 <nav class="nav">
   <a href="L03_环境框架与脚本_课时页.html"><div class="dir">← 上一课 · L03</div><div class="tt">环境、框架与脚本</div></a>
-  <a href="L05_AutoDL手把手微调_课时页.html"><div class="dir">下一课 · L05 →</div><div class="tt">AutoDL 手把手微调 · LLaMA-Factory</div></a>
+  <a href="L05_AutoDL手把手微调_课时页.html"><div class="dir">下一课 · L05 →</div><div class="tt">AutoDL 手把手微调 · 部法分类</div></a>
 </nav>
 
-<div class="footnote">L04 · 第一次微调跑通 · 魔搭</div>
+<div class="footnote">L04 · 第一次微调跑通 · 部法分类</div>
 </div>
 
 <script>

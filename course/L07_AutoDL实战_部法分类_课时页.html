@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L07 · AutoDL 实战：50 类部法分类</title>
+<style>
+:root{
+  --primary:#0d9488; --primary-d:#0f766e; --blue:#2563eb; --blue-d:#1d4ed8;
+  --bg:#eef2f7; --card:#ffffff; --text:#1e293b; --muted:#64748b;
+  --line:#e2e8f0; --soft:#f8fafc; --warn:#b45309; --warn-bg:#fffbeb;
+  --deep:#163a5f; --code-bg:#0e1a2b; --code-fg:#dbe6ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.78;padding:24px 16px 40px;
+  font-size:15px;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;}
+
+.chead{background:linear-gradient(135deg,#0f766e 0%,#155e93 52%,#1d4ed8 100%);color:#fff;border-radius:16px;padding:26px 30px 20px;position:relative;overflow:hidden;}
+.chead::after{content:"";position:absolute;right:-46px;top:-58px;width:180px;height:180px;background:rgba(255,255,255,.10);border-radius:28px;transform:rotate(18deg);}
+.chead::before{content:"";position:absolute;right:86px;bottom:-58px;width:110px;height:110px;background:rgba(255,255,255,.07);border-radius:50%;}
+.kicker{display:flex;align-items:center;gap:9px;flex-wrap:wrap;position:relative;z-index:1;margin-bottom:9px;}
+.lid{background:rgba(255,255,255,.95);color:#0f766e;font-weight:800;font-size:12.4px;padding:2px 10px;border-radius:6px;letter-spacing:.6px;}
+.lname{font-size:12.2px;color:#d6ecff;letter-spacing:.4px;}
+.ltotal{margin-left:auto;font-size:11.8px;color:#a8cdf0;}
+.chead h1{font-size:27px;line-height:1.36;letter-spacing:-.4px;font-weight:800;position:relative;z-index:1;}
+.chead .sub{font-size:13.4px;color:#d5e8fb;margin-top:7px;max-width:760px;position:relative;z-index:1;}
+
+main{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 28px 20px;margin-top:14px;box-shadow:0 1px 3px rgba(15,23,42,.05);}
+h2{font-size:19px;font-weight:800;margin:26px 0 10px;color:#0f2f4d;line-height:1.45;display:flex;align-items:center;gap:9px;}
+h2:first-child{margin-top:0;}
+h2[id]{scroll-margin-top:64px;}
+h2::before{content:"";width:4px;height:17px;background:linear-gradient(180deg,var(--primary),var(--blue));border-radius:2px;flex:0 0 auto;}
+h3{font-size:15.2px;font-weight:800;margin:20px 0 8px;color:#173a5c;line-height:1.5;}
+p{margin:9px 0;font-size:14.3px;}
+strong,b{color:#0b2a45;}
+.hl{background:linear-gradient(transparent 62%,#d7f2ee 62%);font-weight:700;padding:0 1px;}
+ul,ol{margin:8px 0 8px 20px;font-size:14.2px;}
+li{margin:4px 0;line-height:1.75;}
+
+.dec{border:1px solid #d9e6f6;border-radius:11px;overflow:hidden;margin:14px 0 6px;background:#fff;}
+.dec .hd{background:#eff5ff;padding:8px 14px;font-size:12.4px;font-weight:800;color:#1d4ed8;letter-spacing:.3px;}
+.dec .row{display:grid;grid-template-columns:82px 1fr;gap:10px;padding:9px 14px;border-top:1px solid #eef2f8;font-size:13.4px;}
+.dec .row .k{color:var(--muted);font-weight:700;font-size:12.3px;padding-top:1px;}
+.dec .row .v{line-height:1.72;}
+.dec .row.no .v{color:#b91c1c;}
+.dec .row.yes .v{color:#0f766e;}
+
+.why{background:#f0fbf9;border-left:3px solid var(--primary);border-radius:0 9px 9px 0;padding:11px 15px;margin:13px 0;font-size:13.8px;line-height:1.75;}
+.why .tag{display:inline-block;background:var(--primary);color:#fff;font-size:11.4px;font-weight:700;padding:1px 8px;border-radius:5px;margin-right:8px;}
+.pit{background:var(--warn-bg);border:1px solid #fde68a;border-radius:9px;padding:10px 14px;margin:12px 0;font-size:13.5px;color:#78350f;line-height:1.75;}
+.pit b{color:var(--warn);margin-right:5px;}
+.chk{background:#f0fdfa;border:1px solid #99f6e4;border-radius:9px;padding:11px 14px;margin:14px 0 4px;font-size:13.5px;line-height:1.75;}
+.chk b{color:#0f766e;}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:13px 0;}
+.two .col{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column;}
+.two .col .hd{padding:7px 12px;font-size:12.2px;font-weight:800;letter-spacing:.2px;}
+.two .bad{border-color:#fecaca;}
+.two .bad .hd{background:#fef2f2;color:#b91c1c;border-bottom:1px solid #fecaca;}
+.two .good{border-color:#99f6e4;}
+.two .good .hd{background:#f0fdfa;color:#0f766e;border-bottom:1px solid #99f6e4;}
+.two .col .bd{padding:10px 12px;font-family:Consolas,"Courier New",monospace;font-size:12.1px;line-height:1.75;white-space:pre-wrap;word-break:break-word;flex:1;}
+.two .col .ft{padding:7px 12px;font-size:12.3px;line-height:1.68;border-top:1px dashed #eef2f8;font-family:-apple-system,"PingFang SC",sans-serif;}
+.two .bad .ft{color:#b91c1c;background:#fffafa;}
+.two .good .ft{color:#0f766e;background:#fafffe;}
+
+.lab{border:1px solid #bbf7d0;border-radius:11px;overflow:hidden;margin:15px 0 8px;background:#fff;}
+.lab .h{display:flex;gap:9px;align-items:center;background:#f0fdf4;padding:8px 13px;border-bottom:1px solid #dcfce7;flex-wrap:wrap;}
+.lab .h .k{background:#15803d;color:#fff;font-size:11px;font-weight:800;padding:1px 7px;border-radius:5px;letter-spacing:.4px;}
+.lab .h .t{font-size:13px;font-weight:800;color:#14532d;}
+.lab .h .m{margin-left:auto;font-size:11.4px;color:#16a34a;font-weight:600;}
+.lab ol.st{list-style:none;margin:0;padding:2px 0;}
+.lab ol.st>li{display:grid;grid-template-columns:22px 1fr;gap:9px;padding:7px 14px;font-size:13.2px;line-height:1.72;border-top:1px solid #f1f5f9;}
+.lab ol.st>li:first-child{border-top:none;}
+.lab ol.st .n{width:20px;height:20px;border-radius:50%;background:#dcfce7;color:#15803d;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:3px;}
+.lab .see{display:block;color:#0f766e;font-size:12.4px;margin-top:3px;line-height:1.66;}
+.lab .see::before{content:"看到 ";color:#0d9488;font-weight:700;}
+.lab .judge{padding:9px 14px;background:#f0fdfa;border-top:1px solid #ccfbf1;font-size:13px;line-height:1.72;}
+.lab .judge b{color:#0f766e;font-size:12.2px;letter-spacing:.3px;}
+.lab .stuck{padding:8px 14px;background:var(--warn-bg);border-top:1px solid #fde68a;font-size:12.8px;color:#78350f;line-height:1.7;}
+.lab .stuck b{color:var(--warn);}
+
+.modnav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:12px;margin-top:14px;box-shadow:0 2px 10px rgba(15,23,42,.06);}
+.modnav .in{display:flex;gap:2px;overflow-x:auto;padding:0 8px;scrollbar-width:none;}
+.modnav .in::-webkit-scrollbar{display:none;}
+.modnav a{flex:0 0 auto;padding:10px 11px 9px;font-size:12.7px;font-weight:700;color:#64748b;text-decoration:none;border-bottom:2px solid transparent;white-space:nowrap;letter-spacing:.2px;}
+.modnav a .n{display:inline-block;min-width:14px;margin-right:4px;font-size:10.6px;font-weight:800;color:#a8b6c8;font-variant-numeric:tabular-nums;letter-spacing:0;}
+.modnav a:hover{color:#0f766e;}
+.modnav a.on{color:#0f766e;border-bottom-color:#0d9488;}
+.modnav a.on .n{color:#0d9488;}
+.modnav + main{margin-top:10px;}
+
+.goal{border:1px solid #d9e6f6;border-radius:11px;overflow:hidden;background:#fff;margin:0 0 4px;}
+.goal .gh{background:#eff5ff;padding:8px 14px;font-size:12.4px;font-weight:800;color:#1d4ed8;letter-spacing:.3px;}
+.goal .gh em{font-style:normal;font-weight:600;color:#64748b;font-size:12px;margin-left:8px;letter-spacing:0;}
+.goal .tbl{margin:0;}
+.goal .tbl th{padding:8px 14px;background:#f7fafd;}
+.goal .tbl td{padding:10px 14px;}
+.goal .tbl td:first-child{white-space:nowrap;}
+.goal .tier{display:inline-block;font-size:11.6px;font-weight:800;color:#fff;padding:2px 9px;border-radius:5px;letter-spacing:.4px;}
+.goal .tier.a{background:#0d9488;}
+.goal .tier.b{background:#2563eb;}
+.goal .tier.c{background:#b45309;}
+.goal .tbl b{color:#0b2a45;}
+
+.pr{border:1px solid #c9d4fb;border-radius:11px;overflow:hidden;margin:15px 0 8px;background:#fff;}
+.pr .h{display:flex;align-items:center;gap:9px;background:#eef2ff;padding:8px 13px;border-bottom:1px solid #dbe3fd;flex-wrap:wrap;}
+.pr .h .n{background:#4338ca;color:#fff;font-size:11px;font-weight:800;padding:1px 7px;border-radius:5px;letter-spacing:.4px;}
+.pr .h .t{font-size:13px;font-weight:800;color:#312e81;}
+.pr .h .m{margin-left:auto;font-size:11.4px;color:#6366f1;font-weight:600;}
+.pr pre{background:#fbfcff;padding:12px 15px 13px;font-family:"PingFang SC","Microsoft YaHei",Consolas,monospace;font-size:12.9px;line-height:1.9;white-space:pre-wrap;word-break:break-word;color:#1e2a3a;border-bottom:1px dashed #dbe3fd;}
+.pr pre .v{color:#b45309;font-weight:700;}
+.pr pre .cm{color:#94a3b8;}
+.pr .f{padding:8px 14px;font-size:13.1px;line-height:1.74;border-top:1px solid #eef2f8;}
+.pr .f:first-of-type{border-top:none;}
+.pr .f b{font-size:12.2px;letter-spacing:.3px;margin-right:5px;}
+.pr .f.why2 b{color:#0f766e;}
+.pr .f.bad b{color:#b91c1c;}
+.pr .f.ok{background:#f7fdfb;}
+.pr .f.ok b{color:#0f766e;}
+
+pre.code{background:var(--code-bg);color:var(--code-fg);border-radius:10px;padding:12px 15px;font-family:"JetBrains Mono",Consolas,"Courier New",monospace;font-size:12.4px;line-height:1.82;overflow-x:auto;margin:11px 0;white-space:pre;}
+pre.code .c{color:#7c8fa8;}
+pre.code .k{color:#7dd3fc;}
+pre.code .s{color:#a5e8b0;}
+pre.code .f{color:#fcd34d;}
+code{font-family:Consolas,monospace;}
+p code,li code,td code{background:#eef2f7;padding:1px 5px;border-radius:4px;font-size:12.2px;color:#0f766e;}
+.fname{font-family:Consolas,monospace;font-size:12px;color:var(--muted);margin:12px 0 -4px;}
+.fname::before{content:"▤ ";color:var(--primary);}
+
+pre.term{background:#f6f8fb;border:1px dashed #cbd5e1;border-radius:9px;padding:10px 14px;font-family:Consolas,"Courier New",monospace;font-size:12.3px;line-height:1.78;color:#334155;overflow-x:auto;white-space:pre;margin:10px 0;}
+pre.term .d{color:#0f766e;}
+
+.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+.tbl th{text-align:left;padding:8px 10px;background:#f4f7fb;color:#334155;font-weight:700;font-size:12.4px;border-bottom:1px solid var(--line);}
+.tbl td{padding:8px 10px;border-bottom:1px solid #eef2f7;vertical-align:top;line-height:1.7;}
+.tbl tr:last-child td{border-bottom:none;}
+.tblwrap{overflow-x:auto;margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#fff;}
+.tblwrap .tbl{width:100%;min-width:560px;margin:0;}
+.goal .tblwrap{border:none;border-radius:0;margin:0;background:transparent;}
+
+figure{margin:16px 0 6px;background:var(--soft);border:1px solid var(--line);border-radius:11px;padding:14px 14px 8px;}
+figure svg{display:block;width:100%;height:auto;}
+figcaption{font-size:12.2px;color:var(--muted);text-align:center;margin-top:6px;padding-bottom:2px;}
+.bx{fill:#fff;stroke:#94a3b8;stroke-width:1.4;}
+.bxA{fill:#eef5ff;stroke:#2563eb;stroke-width:1.6;}
+.bxG{fill:#eefbf7;stroke:#0d9488;stroke-width:1.6;}
+.bxW{fill:#fff8e8;stroke:#d97706;stroke-width:1.5;}
+.lb{font-size:12.4px;fill:#0f2f4d;font-weight:700;}
+.lb2{font-size:11.4px;fill:#475569;}
+.sm{font-size:10.8px;fill:#64748b;}
+.ar{stroke:#64748b;stroke-width:1.5;fill:none;}
+
+.exp{background:#f0fdfa;border:1px solid #99f6e4;border-left:3px solid var(--primary);border-radius:9px;padding:10px 14px;margin:12px 0;font-size:13.3px;line-height:1.75;}
+.exp b{color:#0f766e;}
+.exp pre.code{margin:8px 0 2px;font-size:12px;}
+
+h2 .num{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:8px;background:#eaf0ff;color:var(--blue-d);font-size:13px;font-weight:800;flex:0 0 auto;}
+h2:has(.num)::before{display:none;}
+
+.takeaway{background:var(--deep);color:#eaf3ff;border-radius:10px;padding:11px 16px;margin-top:18px;display:flex;align-items:center;gap:11px;font-size:13.6px;line-height:1.6;}
+.takeaway span.t{flex:0 0 auto;background:var(--primary);color:#fff;font-size:11.2px;font-weight:800;padding:2px 9px;border-radius:999px;letter-spacing:.4px;}
+
+.recap{background:var(--soft);border:1px solid var(--line);border-left:3px solid var(--primary);border-radius:10px;padding:11px 15px;margin:16px 0 0;font-size:13.2px;line-height:1.72;}
+.recap ul{margin:0 0 0 17px;}
+.recap li{margin:3px 0;}
+
+.lede{background:#eef4ff;border-left:3px solid var(--blue);border-radius:0 9px 9px 0;padding:10px 15px;margin:0 0 12px;font-size:14px;line-height:1.7;color:#12305c;font-weight:600;}
+.lede b{display:inline-block;margin-right:8px;background:var(--blue);color:#fff;font-size:11.2px;font-weight:800;padding:1px 8px;border-radius:999px;letter-spacing:.4px;vertical-align:1px;}
+.lede code{background:#dde9ff;color:#0b3d91;border-color:#c9dbfb;}
+
+.nav{display:flex;gap:12px;margin-top:16px;}
+.nav a{flex:1;display:block;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px 15px;text-decoration:none;color:var(--text);transition:.15s;}
+.nav a:hover{border-color:#b9cde6;box-shadow:0 2px 8px rgba(15,23,42,.07);}
+.nav .dir{font-size:11.4px;color:var(--muted);font-weight:700;letter-spacing:.4px;}
+.nav .tt{font-size:13.4px;font-weight:700;color:#12406b;margin-top:2px;}
+.nav .nx{text-align:right;}
+.nav .ph{flex:1;border:1px dashed var(--line);border-radius:11px;padding:11px 15px;color:#b6c2d2;font-size:12.4px;}
+
+.footnote{text-align:center;font-size:12px;color:#94a3b8;margin-top:22px;}
+
+@media (max-width:900px){
+  .chead{padding:22px 20px 18px;}
+  .chead h1{font-size:22.5px;}
+  main{padding:20px 17px;}
+  .dec .row{grid-template-columns:1fr;gap:2px;}
+  .nav{flex-direction:column;}
+  .two{grid-template-columns:1fr;}
+  main table{display:block;overflow-x:auto;}
+  main table.tbl th,main table.tbl td{min-width:104px;}
+  .goal .tbl th[style]{width:auto !important;}
+  .goal .tbl td code{overflow-wrap:anywhere;}
+  pre.code{font-size:11.4px;}
+  .pr pre{font-size:12px;}
+  .pr .h .m{margin-left:0;}
+}
+@media print{
+  body{background:#fff;padding:0;font-size:11.5px;}
+  .chead{border-radius:0;}
+  main{box-shadow:none;border:none;padding:0;margin-top:8px;}
+  .nav,.footnote,.modnav{display:none;}
+  .dec,.chk,.recap,.takeaway,.exp,.lede,figure,h2,h3,.pr,.lab,.two{break-inside:avoid;page-break-inside:avoid;}
+  h2,h3{break-after:avoid;page-break-after:avoid;}
+  pre.code{background:#f5f7fa;color:#1e293b;border:1px solid #dbe3ec;}
+  pre.code .c{color:#7a8699;} pre.code .k{color:#0b5cbf;} pre.code .s{color:#0f766e;} pre.code .f{color:#a16207;}
+  pre.term{background:#f8fafc;border:1px solid #e2e8f0;color:#334155;}
+  .pr pre{background:#fbfcff;border:1px solid #e6ebf7;}
+  .takeaway{background:#163a5f !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  @page{size:A4;margin:12mm;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="chead">
+  <div class="kicker"><span class="lid">L07</span><span class="lname">法律大模型微调实战</span><span class="ltotal">实战线 · AutoDL</span></div>
+  <h1>换台按小时的机器，跑同一条链</h1>
+  <p class="sub">用现成镜像 + 一个 yaml + LLaMA-Factory，把 50 类分类再训一遍。重点不是「再训一次」，是看清两个平台到底差在哪：镜像、数据格式、配置形态。</p>
+</header>
+
+<nav class="modnav"><div class="in">
+  <a href="#s-map" class="on"><span class="n">1</span>这一课做什么</a>
+  <a href="#s-signup"><span class="n">2</span>注册充值租卡</a>
+  <a href="#s-image"><span class="n">3</span>开机选镜像</a>
+  <a href="#s-data"><span class="n">4</span>准备数据</a>
+  <a href="#s-train"><span class="n">5</span>一个 yaml 起训</a>
+  <a href="#s-loss"><span class="n">6</span>看 loss 拿 adapter</a>
+  <a href="#s-infer"><span class="n">7</span>验它学会了</a>
+  <a href="#s-wrap"><span class="n">8</span>小结</a>
+</div></nav>
+
+<main>
+
+<div class="goal">
+  <div class="gh">课程目标<em>三档都达成，这一课才算过</em></div>
+  <table class="tbl">
+    <tr><th style="width:86px">档位</th><th>学完你能做什么</th><th style="width:250px">怎么算达成</th></tr>
+    <tr><td><span class="tier a">跑通</span></td><td>在 AutoDL 现成镜像里，用一个 yaml 把 50 类分类训完</td><td><code>llamafactory-cli train</code> 跑完，输出目录出现 <code>checkpoint-*</code></td></tr>
+    <tr><td><span class="tier b">对上号</span></td><td>说清 ms-swift 的 query/response 与 LLaMA-Factory 的 instruction/output 怎么互转</td><td>能自己改 <code>dataset_info.json</code> 里的字段映射并解释为什么</td></tr>
+    <tr><td><span class="tier c">算清账</span></td><td>跑出与 L06 同口径的 accuracy / macro-F1，并算出这次花了多少钱</td><td>两组数字与 L06 可对比，费用能自己算</td></tr>
+  </table>
+</div>
+
+<h2 id="s-map"><span class="num">1</span>这一课做什么</h2>
+<div class="lede"><b>结论</b>同一份数据、同一个基座、同一条分类任务，只换平台与框架——用来对照看清「什么是任务、什么是环境」。</div>
+
+<p>L06 在魔搭用 ms-swift 跑通了。这一课把同样的活搬到 AutoDL，用 LLaMA-Factory 再跑一遍。</p>
+
+<p>为什么值得再跑一遍：<span class="hl">只有换过一次环境，你才知道哪些步骤是任务本身的、哪些只是平台的习惯</span>。</p>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:132px">维度</th><th>魔搭（L06）</th><th>AutoDL（本课）</th></tr>
+  <tr><td>环境</td><td>自己 <code>pip install</code></td><td><b>现成镜像</b>，开箱就有</td></tr>
+  <tr><td>框架</td><td>ms-swift，命令行参数</td><td>LLaMA-Factory，<b>yaml 配置文件</b></td></tr>
+  <tr><td>数据字段</td><td><code>query / response</code></td><td><code>instruction / output</code> + <b>注册进 dataset_info</b></td></tr>
+  <tr><td>数据放哪</td><td><code>/mnt/workspace/</code></td><td><code>/root/autodl-tmp/</code>（数据盘）</td></tr>
+  <tr><td>计费</td><td>免费额度，按小时扣</td><td><b>按小时付费</b>，关机不计费</td></tr>
+  <tr><td>数据量</td><td>18,338 条</td><td>18,338 条（同一条没变）</td></tr>
+</table>
+</div>
+
+<figure>
+  <svg viewBox="0 0 680 140" role="img" aria-label="同一任务在两个平台的差别只在镜像、数据格式、配置形态">
+    <defs>
+      <marker id="bh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+      </marker>
+    </defs>
+    <rect class="bxG" x="18" y="16" width="180" height="46" rx="9"/>
+    <text class="lb" x="108" y="36" text-anchor="middle">不变的三样</text>
+    <text class="lb2" x="108" y="53" text-anchor="middle">数据 · 基座 · 任务</text>
+
+    <rect class="bxW" x="18" y="78" width="180" height="46" rx="9"/>
+    <text class="lb" x="108" y="98" text-anchor="middle">要换的三样</text>
+    <text class="lb2" x="108" y="115" text-anchor="middle">镜像 · 格式 · 配置</text>
+
+    <line class="ar" x1="200" y1="39" x2="238" y2="55" marker-end="url(#bh)"/>
+    <line class="ar" x1="200" y1="101" x2="238" y2="85" marker-end="url(#bh)"/>
+
+    <rect class="bx" x="240" y="14" width="200" height="70" rx="9"/>
+    <text class="lb" x="340" y="38" text-anchor="middle">ms-swift 链</text>
+    <text class="lb2" x="340" y="56" text-anchor="middle">pip 装 → 命令行参数</text>
+    <text class="lb2" x="340" y="73" text-anchor="middle">query / response</text>
+
+    <rect class="bx" x="462" y="56" width="200" height="70" rx="9"/>
+    <text class="lb" x="562" y="80" text-anchor="middle">LLaMA-Factory 链</text>
+    <text class="lb2" x="562" y="98" text-anchor="middle">镜像自带 → yaml</text>
+    <text class="lb2" x="562" y="115" text-anchor="middle">instruction / output</text>
+  </svg>
+  <figcaption>上面两栏不变，下面两栏全换——换平台时真正要动的只有这三处。</figcaption>
+</figure>
+
+<div class="recap"><ul>
+  <li>任务、数据、基座三样不变，变的只有镜像、数据格式、配置形态。</li>
+  <li>换一遍平台的价值是「分清哪些步骤属于任务」，不是多训一个模型。</li>
+  <li>AutoDL 按小时计费，跑完要关机，否则一直在扣。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>换环境时先问：这一步是任务要求，还是这个平台的习惯？分不清就会把平台习惯当成知识背下来。</span></div>
+
+<h2 id="s-signup"><span class="num">2</span>注册充值租卡</h2>
+<div class="lede"><b>结论</b>注册后充 10 元起，按小时计费；本课约 1 小时，成本个位数。</div>
+
+<div class="lab">
+  <div class="h"><span class="k">STEP</span><span class="t">租一张 4090</span><span class="m">约 8 分钟</span></div>
+  <ol class="st">
+    <li><span class="n">1</span><div>打开 <code>autodl.com</code>，手机号注册登录，进 <b>控制台</b>。</div></li>
+    <li><span class="n">2</span><div>点右上角 <b>充值</b>，充 10 元即可（够跑两三节课）。</div></li>
+    <li><span class="n">3</span><div>进 <b>算力市场</b>，地区随便选，GPU 选 <b>RTX 4090 / 24GB</b>。<span class="see">列表里出现单价，4090 大约 2 元/小时上下，以官网实时价为准。</span></div></li>
+    <li><span class="n">4</span><div>点 <b>1 张</b> → 选镜像（下一步细说）→ <b>创建</b>。<span class="see">实例状态变成「运行中」，右侧出现 JupyterLab 入口。</span></div></li>
+  </ol>
+  <div class="judge"><b>计费规则</b>从「运行中」开始按小时计费，<b>关机就停</b>。但关机后数据盘还在，系统盘可能被释放——所以数据要放数据盘。</div>
+  <div class="stuck"><b>创建失败先看这里</b>「该地区暂无资源」是 GPU 被占满，换个地区或换个时段。余额不足会直接拦在创建那一步。</div>
+</div>
+
+<div class="pit"><b>别把实例开着去吃饭</b>按小时计费不看你用不用，只看开没开。1 小时 2 块听着少，挂一晚上就是十几块——跑完立刻关机。</div>
+
+<div class="recap"><ul>
+  <li>10 元起充，本课约 1 小时，成本个位数。</li>
+  <li>计费只看「开没开机」，不看有没有在跑任务。</li>
+  <li>跑完就关机；数据放数据盘，关机不丢。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>按小时计费的机器，最贵的不是算力，是「忘了关」。</span></div>
+
+<h2 id="s-image"><span class="num">3</span>开机选镜像</h2>
+<div class="lede"><b>结论</b>选一个预装 LLaMA-Factory 的社区镜像，省掉整套环境安装——这是 AutoDL 相对魔搭最大的省事点。</div>
+
+<p>创建实例时在「镜像」一栏选 <b>社区镜像</b>，搜 <code>LLaMA-Factory</code>，挑一个更新日期近的。</p>
+
+<p>开机后进 JupyterLab，先确认框架在不在：</p>
+
+<pre class="code">llamafactory-cli version
+ls /root/autodl-tmp</pre>
+
+<pre class="term"><span class="d">$</span> llamafactory-cli version
+LLaMA-Factory, version 0.9.x
+<span class="d">$</span> ls /root/autodl-tmp
+（空目录）</pre>
+
+<div class="exp"><b>镜像里自带的目录在哪</b>大多数 LLaMA-Factory 镜像把代码放在 <code>/root/LLaMA-Factory</code>，<code>data/</code> 是它的数据目录。先用 <code>find / -maxdepth 3 -name "LLaMA-Factory" -type d 2&gt;/dev/null</code> 定位一下，别硬猜。</div>
+
+<div class="pit"><b>镜像选错版本</b>太老的镜像里 <code>llamafactory-cli</code> 可能叫 <code>python src/train.py</code>，参数名也不一样（<code>evaluation_strategy</code> vs <code>eval_strategy</code>）。跑不通先 <code>llamafactory-cli version</code> 看一眼，版本太旧就换镜像，别在旧版本上改参数。</div>
+
+<div class="chk"><b>这一步的判据</b><code>llamafactory-cli version</code> 能打出 0.9 以上的版本号。打不出来说明镜像不对，后面每个命令都会失败。</div>
+
+<div class="recap"><ul>
+  <li>社区镜像自带框架，省掉 pip 装依赖这一步。</li>
+  <li>代码目录一般在 <code>/root/LLaMA-Factory</code>，用 <code>find</code> 定位别硬猜。</li>
+  <li>版本太旧就换镜像，不要在旧版本上迁就参数。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>现成镜像省的是时间，不是理解——它把「装了什么」藏起来了，你得知道里面有什么才算会用。</span></div>
+
+<h2 id="s-data"><span class="num">4</span>准备数据</h2>
+<div class="lede"><b>结论</b>转成 <code>instruction/output</code> 两字段，放进 <code>data/</code>，再在 <code>dataset_info.json</code> 里注册一行——三步缺一不可。</div>
+
+<p>本地先导出（L06 已经跑过这条命令，产物是一样的）：</p>
+
+<pre class="code">python scripts/export_platform_data.py
+ls data/cls/export/llamafactory/</pre>
+
+<p>LLaMA-Factory 认的是另一套字段名。同一个样本，两个平台的写法对照：</p>
+
+<div class="two">
+  <div class="col good">
+    <div class="hd">ms-swift 吃的：query / response</div>
+    <div class="bd">{"query": "请判断…问题：小王是…",
+ "response": "个人独资企业法"}</div>
+    <div class="ft">字段名固定，框架按这个名字找。</div>
+  </div>
+  <div class="col good">
+    <div class="hd">LLaMA-Factory 吃的：instruction / output</div>
+    <div class="bd">{"instruction": "请判断…问题：小王是…",
+ "input": "",
+ "output": "个人独资企业法"}</div>
+    <div class="ft">多一个空 input，是 alpaca 格式的固定位。</div>
+  </div>
+</div>
+
+<h3>上传并注册</h3>
+<p>把两个 jsonl 传到 <code>/root/autodl-tmp/LLaMA-Factory/data/</code>，然后在同目录的 <code>dataset_info.json</code> 里加两行：</p>
+
+<pre class="code">"cls_law": {
+  "file_name": "cls_train.jsonl",
+  <span class="s">"columns"</span>: { <span class="s">"prompt"</span>: <span class="s">"instruction"</span>, <span class="s">"response"</span>: <span class="s">"output"</span> }
+},
+"cls_law_val": {
+  "file_name": "cls_val.jsonl",
+  <span class="s">"columns"</span>: { <span class="s">"prompt"</span>: <span class="s">"instruction"</span>, <span class="s">"response"</span>: <span class="s">"output"</span> }
+}</pre>
+
+<div class="exp"><b><code>columns</code> 这一行在干什么</b>告诉框架「我文件里 <code>instruction</code> 这个字段，就是你要的 <code>prompt</code>」。字段名和框架默认一致时可以不写，但写上更保险——换个数据集字段名不一样时，改这一行就行，不用动文件。</div>
+
+<p>注册完验一眼，注册名和文件都在：</p>
+
+<pre class="code"><span class="c"># 行数 + 字段名 + 注册是否生效</span>
+wc -l /root/autodl-tmp/LLaMA-Factory/data/cls_*.jsonl
+head -n 1 /root/autodl-tmp/LLaMA-Factory/data/cls_train.jsonl
+python -c <span class="s">"import json;d=json.load(open('/root/autodl-tmp/LLaMA-Factory/data/dataset_info.json'));print(list(d))"</span></pre>
+
+<pre class="term"><span class="d">$</span> wc -l .../cls_*.jsonl
+ 18338 .../cls_train.jsonl
+  2292 .../cls_val.jsonl
+<span class="d">$</span> python -c "...print(list(d))"
+['alpaca_...', 'cls_law', 'cls_law_val', ...]</pre>
+
+<div class="pit"><b>三处最容易错的地方</b>① 文件放在 <code>data/</code> 之外（<code>file_name</code> 是相对 <code>data/</code> 的）；② JSON 里多一个逗号导致整个文件解析失败，训练会直接报 <code>dataset not found</code>；③ 改了 <code>dataset_info.json</code> 没重启 notebook 进程，读的还是旧缓存。</div>
+
+<div class="recap"><ul>
+  <li>两个平台字段名不同，互转只改字段名，不动内容。</li>
+  <li><code>dataset_info.json</code> 是「注册表」，不注册框架就找不到文件。</li>
+  <li>文件必须在 <code>data/</code> 下，<code>file_name</code> 写相对路径。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>换框架时先看它「认哪些字段名」——数据本身一个字都不用改，改的是映射。</span></div>
+
+<h2 id="s-train"><span class="num">5</span>一个 yaml 起训</h2>
+<div class="lede"><b>结论</b>把 L06 那串命令行参数翻译成一个 yaml，然后 <code>llamafactory-cli train</code> 一条命令起训。</div>
+
+<p class="fname">cls_qlora.yaml</p>
+<pre class="code"><span class="c">### model</span>
+model_name_or_path: Qwen/Qwen3-1.7B
+trust_remote_code: true
+
+<span class="c">### method</span>
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_rank: 16
+lora_alpha: 32
+lora_target: all
+
+<span class="c">### dataset</span>
+dataset: cls_law
+eval_dataset: cls_law_val
+template: qwen3
+cutoff_len: 512
+preprocessing_num_workers: 8
+
+<span class="c">### output</span>
+output_dir: /root/autodl-tmp/saves/qwen3-1.7b/cls
+logging_steps: 20
+save_steps: 200
+eval_steps: 200
+eval_strategy: steps
+save_total_limit: 2
+plot_loss: true
+
+<span class="c">### train</span>
+per_device_train_batch_size: 8
+gradient_accumulation_steps: 2
+learning_rate: 2.0e-4
+num_train_epochs: 2.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.05
+bf16: true
+
+<span class="c">### QLoRA：两条一起才叫 QLoRA</span>
+quantization_bit: 4
+quantization_method: bnb
+
+<span class="c">### 加速</span>
+use_unsloth: true</pre>
+
+<h3>同一组参数，两个框架怎么对应</h3>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:170px">要调的东西</th><th style="width:230px">ms-swift 写法</th><th>LLaMA-Factory 写法</th></tr>
+  <tr><td>训练数据</td><td><code>--dataset 路径.jsonl</code></td><td><code>dataset: 注册名</code></td></tr>
+  <tr><td>验证数据</td><td><code>--val_dataset 路径.jsonl</code></td><td><code>eval_dataset: 注册名</code></td></tr>
+  <tr><td>QLoRA</td><td><code>--quant_bits 4</code></td><td><code>quantization_bit: 4</code></td></tr>
+  <tr><td>截断长度</td><td><code>--max_length 512</code></td><td><code>cutoff_len: 512</code></td></tr>
+  <tr><td>学几轮</td><td><code>--num_train_epochs 2</code></td><td><code>num_train_epochs: 2.0</code></td></tr>
+  <tr><td>有效 batch</td><td>batch × <code>gradient_accumulation_steps</code></td><td>同左，名字一样</td></tr>
+</table>
+</div>
+
+<p>对完这张表你会发现：<span class="hl">参数几乎一一对应，变的只是写法</span>——一个写在命令行，一个写在文件里。</p>
+
+<h3>跑起来</h3>
+
+<pre class="code">cd /root/LLaMA-Factory
+llamafactory-cli train cls_qlora.yaml</pre>
+
+<pre class="term"><span class="d">$</span> llamafactory-cli train cls_qlora.yaml
+trainable params: ~20 M || all params: ~1.7 B || trainable%: ~1.2
+{'loss': 3.4, 'grad_norm': 1.1, 'learning_rate': 1.8e-05, 'epoch': 0.04}
+{'loss': 1.8, 'grad_norm': 0.9, 'learning_rate': 4.0e-05, 'epoch': 0.17}
+{'loss': 0.9, 'grad_norm': 0.6, 'learning_rate': 5.6e-05, 'epoch': 0.35}
+{'eval_loss': 0.6, 'eval_accuracy': 0.6, 'epoch': 0.52}
+{'loss': 0.4, 'grad_norm': 0.4, 'learning_rate': 3.2e-05, 'epoch': 1.10}
+{'eval_loss': 0.3, 'eval_accuracy': 0.8, 'epoch': 1.35}</pre>
+
+<p>同样是<strong>形态示意</strong>：你的数会不一样，盯 <code>eval_accuracy</code> 的走向就行。</p>
+
+<div class="pit"><b>Unsloth 与 QLoRA 同时开报错</b>部分镜像里的 Unsloth 版本与 4bit 量化会打架。真撞上报 <code>unsloth</code> 相关错误，把 <code>use_unsloth</code> 那行注掉（前面加 <code>#</code>）再跑——慢一点，但能跑完。</div>
+
+<div class="chk"><b>两个必须盯的数</b><code>trainable%</code> 在 1%~2%（说明只训了补丁），<code>eval_accuracy</code> 在涨（说明还没到该停的点）。两个都对，就等它跑完。</div>
+
+<div class="recap"><ul>
+  <li>yaml 是「参数换了个写法」，内容和命令行版本一一对应。</li>
+  <li><code>eval_strategy: steps</code> + <code>eval_steps</code> 才让验证准确率定期打印。</li>
+  <li>Unsloth 与 4bit 打架就注掉那行，能跑完比跑得快重要。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>配置文件不是另一种知识，它只是把命令行参数抄进了文件——看不懂 yaml 时，逐行翻回命令行就懂了。</span></div>
+
+<h2 id="s-loss"><span class="num">6</span>看 loss 拿 adapter</h2>
+<div class="lede"><b>结论</b>产物结构和魔搭一模一样，只是路径在数据盘；挑 <code>eval_accuracy</code> 最高那个 checkpoint。</div>
+
+<pre class="code">/root/autodl-tmp/saves/qwen3-1.7b/cls/
+├── checkpoint-600/
+│   ├── adapter_config.json          <span class="c"># LoRA 配置</span>
+│   └── adapter_model.safetensors    <span class="c"># 补丁权重，约 40 MB</span>
+├── checkpoint-800/
+├── training_loss.png                <span class="c"># plot_loss 画出来的曲线</span>
+└── trainer_log.jsonl                <span class="c"># 完整记录，含 eval_accuracy</span></pre>
+
+<p>挑 checkpoint 的方法和 L06 一致：在 <code>trainer_log.jsonl</code> 里搜 <code>eval_accuracy</code>，取最高那步。</p>
+
+<pre class="code"><span class="c"># 只打包选中的 checkpoint，别整包下载</span>
+cd /root/autodl-tmp/saves/qwen3-1.7b/cls
+tar -czf cls_adapter.tar.gz checkpoint-800/</pre>
+
+<div class="pit"><b>存在系统盘上</b>默认 <code>output_dir</code> 若写在 <code>/root/</code> 下，关机后可能随系统盘一起被释放，白训。所有产出都写进 <code>/root/autodl-tmp/</code>——那是数据盘，关机还在。</div>
+
+<div class="recap"><ul>
+  <li>产物结构与 ms-swift 完全一致：配置 + 补丁权重 + 日志。</li>
+  <li>选 checkpoint 看 <code>eval_accuracy</code>，不看最后一个。</li>
+  <li>所有输出写数据盘，关机才不丢。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>两个框架产出的东西长得一样——因为 LoRA 的产物本来就只由「补丁」决定，跟谁训的无关。</span></div>
+
+<h2 id="s-infer"><span class="num">7</span>验它学会了</h2>
+<div class="lede"><b>结论</b>用同一份 test 集、同一个脚本，跑出与 L06 同口径的数字——这样两平台才可比。</div>
+
+<p>先跑基线，再跑微调后。脚本和评测集都跟 L06 一样：</p>
+
+<pre class="code"><span class="c"># 1) 基线</span>
+python scripts/eval_cls.py --no-adapter \
+  --model Qwen/Qwen3-1.7B \
+  --data data/cls/export/test_eval.jsonl --limit 200
+
+<span class="c"># 2) 微调后</span>
+python scripts/eval_cls.py \
+  --model Qwen/Qwen3-1.7B \
+  --adapter /root/autodl-tmp/saves/qwen3-1.7b/cls/checkpoint-800 \
+  --data data/cls/export/test_eval.jsonl</pre>
+
+<div class="chk"><b>关键在「同口径」</b>同一个 test 集、同一个 prompt、同一套 length-normalized 打分。换了一样就不叫对照——数字涨了也说明不了是模型变好还是尺子变松。</div>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:150px">指标</th><th style="width:120px">魔搭（L06）</th><th style="width:120px">AutoDL（本课）</th><th>怎么读</th></tr>
+  <tr><td>accuracy</td><td>自己填</td><td>自己填</td><td>两个平台的差距应在一个点内</td></tr>
+  <tr><td>macro-F1</td><td>自己填</td><td>自己填</td><td>差很多说明训练没收敛</td></tr>
+  <tr><td>top-3</td><td>自己填</td><td>自己填</td><td>接近 accuracy 说明很有把握</td></tr>
+  <tr><td>用时 / 费用</td><td>约 1 小时 / 免费</td><td>约 1 小时 / 计时长 × 单价</td><td>自己算一遍</td></tr>
+</table>
+</div>
+
+<p>两个平台训同一个任务、同一份数据，准确率应当非常接近。<span class="hl">如果差出好几个点，先怀疑数据或超参不一致，别急着归因到平台</span>。</p>
+
+<div class="pit"><b>忘了关 thinking 或没对齐模板</b>手测时用 <code>llamafactory-cli chat</code> 要带 <code>--template qwen3</code>；模板不对，模型输出格式和训练时不一致，准确率会莫名其妙掉一截。</div>
+
+<div class="recap"><ul>
+  <li>同口径才能对照：同数据、同 prompt、同打分方式。</li>
+  <li>两平台结果应接近；差很多先查数据与超参，再怀疑平台。</li>
+  <li>手测也要对齐 <code>template</code>，否则输入格式和训练时不一样。</li>
+</ul></div>
+<div class="takeaway"><span class="t">一句话带走</span><span>可复现的判据是「别人换台机器跑出同一个数」——差在 0.5 个点以内，说明这条链真的通了。</span></div>
+
+<h2 id="s-wrap"><span class="num">8</span>小结</h2>
+<div class="lede"><b>结论</b>两条链走完，你手里有两组可比的数字，和一张「什么是任务、什么是环境」的对照表。</div>
+
+<div class="tblwrap">
+<table class="tbl">
+  <tr><th style="width:170px">层</th><th style="width:240px">这次动了什么</th><th>没动的部分</th></tr>
+  <tr><td>环境层</td><td>换成 AutoDL 现成镜像，不装依赖</td><td>GPU 型号一样是 24G</td></tr>
+  <tr><td>数据层</td><td>字段名 query/response → instruction/output</td><td>内容一条没改，还是 18,338 条</td></tr>
+  <tr><td>配置层</td><td>命令行参数 → 一个 yaml</td><td>超参数值逐个对应，一个没变</td></tr>
+  <tr><td>任务层</td><td>无</td><td>50 类分类、QLoRA、max_len 512 全部照旧</td></tr>
+</table>
+</div>
+
+<h3>两个平台怎么选</h3>
+
+<div class="dec">
+  <div class="hd">不是「哪个更好」，是「什么时候用哪个」</div>
+  <div class="row"><span class="k">选魔搭</span><span class="v">预算为零、第一次跑通、只需要验证「这条路行不行」——免费额度够用</span></div>
+  <div class="row"><span class="k">选 AutoDL</span><span class="v">要连跑多次、要长期留环境、要换大模型——按小时付费比等免费额度划算</span></div>
+  <div class="row no"><span class="k">别做</span><span class="v">在两个平台间反复搬数据比效果——数据不动、任务不动，效果本来就该一样</span></div>
+</div>
+
+<h3>三条边界</h3>
+<ul>
+  <li><b>产出不写数据盘</b>关机后可能一起没，几小时白跑。</li>
+  <li><b>不注册 dataset_info 就开训</b>框架找不到文件，报错信息还容易误导你以为是路径问题。</li>
+  <li><b>拿两个平台的不同口径比准确率</b>数据集或模板不一样，比出来的差值是假的。</li>
+</ul>
+
+<h3>三条自检</h3>
+<div class="dec">
+  <div class="hd">每一步都能单独验，不用等全跑完</div>
+  <div class="row"><span class="k">① 环境</span><span class="v"><code>llamafactory-cli version</code> 打出 0.9 以上</span></div>
+  <div class="row"><span class="k">② 数据</span><span class="v">注册名在 <code>dataset_info.json</code> 里能查到，<code>wc -l</code> 对得上 18338</span></div>
+  <div class="row"><span class="k">③ 结果</span><span class="v">本课 accuracy 与 L06 相差在 0.5 个点内，超了就回头看数据与模板</span></div>
+</div>
+
+<div class="why"><span class="tag">下一步</span>两条链都通了，接下来该动「尺子」：把 test 集按部法拆开看，找出小类错在哪、混淆矩阵最亮的是哪一格——那才是调参的起点。</div>
+
+<div class="recap"><ul>
+  <li>换平台只动三处：镜像、字段名、配置形态；任务与数据不动。</li>
+  <li>两平台结果应接近，差得远先查数据与模板。</li>
+  <li>按小时计费的机器，跑完就关，产出写数据盘。</li>
+</ul></div>
+<div class="takeaway"><span class="t">带走</span><span>跑通两条链不算本事，能说清「哪一步换平台要改、哪一步不用改」才算真懂——那三处改完，剩下的原件照搬。</span></div>
+
+</main>
+
+<nav class="nav">
+  <a href="L06_魔搭实战_部法分类_课时页.html"><div class="dir">← 上一课 · L06</div><div class="tt">魔搭 ms-swift 跑通分类链</div></a>
+  <div class="ph">这是项目线的最后一课 · 两条链都通了</div>
+</nav>
+
+<div class="footnote">L07 · 法律大模型微调实战 · AutoDL + LLaMA-Factory 实战</div>
+</div>
+
+<script>
+(function(){
+  var links=[].slice.call(document.querySelectorAll('.modnav a'));
+  if(!links.length) return;
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+
+  function spy(){
+    var line=window.scrollY+90, idx=0;
+    for(var i=0;i<secs.length;i++){
+      var el=secs[i];
+      if(el && el.getBoundingClientRect().top+window.scrollY<=line) idx=i;
+    }
+    links.forEach(function(a,i){a.classList.toggle('on',i===idx);});
+  }
+
+  window.addEventListener('scroll',spy,{passive:true});
+  window.addEventListener('resize',spy);
+
+  links.forEach(function(a){
+    a.addEventListener('click',function(e){
+      var t=document.querySelector(a.getAttribute('href'));
+      if(!t) return;
+      e.preventDefault();
+      var far=Math.abs(t.getBoundingClientRect().top)>2400;
+      t.scrollIntoView({behavior:far?'instant':'smooth',block:'start'});
+      if(history.replaceState) history.replaceState(null,'',a.getAttribute('href'));
+    });
+  });
+
+  spy();
+})();
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>L05 · AutoDL 手把手微调 · LLaMA-Factory</title>
+<title>L05 · AutoDL 手把手微调 · 部法分类</title>
 <style>
 :root{
   --primary:#0d9488; --primary-d:#0f766e; --blue:#2563eb; --blue-d:#1d4ed8;
@@ -233,9 +233,9 @@ h2:has(.num)::before{display:none;}
 <div class="wrap">
 
 <header class="chead">
-  <div class="kicker"><span class="lid">L05</span><span class="lname">AutoDL 手把手微调 · LLaMA-Factory</span><span class="ltotal">15 课 · 第 6 课</span></div>
-  <h1>在 AutoDL 上用 LLaMA-Factory 跑通微调</h1>
-  <p class="sub">和 L04 魔搭是同一份任务、换一套跑法：租 4090、选镜像、注册数据、一条命令起训、看 loss、拿 adapter、对话验证。照着做，把「能跑通」从免费卡搬到正式训练卡。</p>
+  <div class="kicker"><span class="lid">L05</span><span class="lname">AutoDL 手把手微调 · 部法分类</span><span class="ltotal">15 课 · 第 6 课</span></div>
+  <h1>在 AutoDL 上用 LLaMA-Factory 跑通分类微调</h1>
+  <p class="sub">和 L04 魔搭是同一份分类任务、换一套跑法：租 4090、选镜像、注册数据、一条命令起训、看 loss、拿 adapter、对话验证。照着做，把「能跑通」从免费卡搬到正式训练卡。</p>
 </header>
 
 <nav class="modnav"><div class="in">
@@ -256,14 +256,14 @@ h2:has(.num)::before{display:none;}
   <table class="tbl">
     <tr><th style="width:74px">档位</th><th>学完你能做到</th><th style="width:296px">怎么算达成</th></tr>
     <tr><td><span class="tier a">开通</span></td><td>注册 AutoDL、充最小额度、租到一张 4090</td><td>手机号注册 → 实名 → 充 10 元 → 租 4090 24G，<code>nvidia-smi</code> 认到卡</td></tr>
-    <tr><td><span class="tier b">跑通</span></td><td>LLaMA-Factory 起训，loss 往下走，output 出 checkpoint</td><td><code>llamafactory-cli train</code> 起训，loss 一路降到个位数，<code>saves/</code> 冒出 checkpoint</td></tr>
-    <tr><td><span class="tier c">说清</span></td><td>说清 alpaca 格式、dataset_info 注册、Unsloth 开关各是什么</td><td><code>llamafactory-cli chat</code> 喂口语出法条语体，adapter 打包下载到本地</td></tr>
+    <tr><td><span class="tier b">跑通</span></td><td>LLaMA-Factory 起训分类，loss 往下走，output 出 checkpoint</td><td><code>llamafactory-cli train</code> 起训，loss 一路降到个位数，<code>saves/</code> 冒出 checkpoint</td></tr>
+    <tr><td><span class="tier c">说清</span></td><td>说清 alpaca 格式、dataset_info 注册、Unsloth 开关各是什么</td><td><code>llamafactory-cli chat</code> 喂问题输出部法名，adapter 打包下载到本地</td></tr>
   </table>
-  <div class="bound"><b>不处理：</b>数据清洗与构造（L05–L08 数据线）、参数怎么调（后面的课）、hit_rate 评测（L12）。这一课只把 L04 那条链，从魔搭免费卡搬到 AutoDL 正式卡上，再跑通一遍。</div>
+  <div class="bound"><b>不处理：</b>全量 18,338 条正式训与 val 验证、accuracy / macro-F1 评测（L07 实战线）。这一课只把 L04 那条分类链，从魔搭免费卡搬到 AutoDL 正式卡上，再跑通一遍。</div>
 </div>
 
-<h2 id="s-map"><span class="num">1</span>这一课：把 L04 的链，搬到 AutoDL 重跑一遍</h2>
-<div class="lede"><b>结论</b>任务没变，还是「口语 → 法条语体」的 HyDE 改写；变的是平台和框架——L04 魔搭配 ms-swift，这一课 AutoDL 配 LLaMA-Factory + Unsloth。</div>
+<h2 id="s-map"><span class="num">1</span>这一课：把 L04 的分类链，搬到 AutoDL 重跑一遍</h2>
+<div class="lede"><b>结论</b>任务没变，还是「给问题判部法，50 选 1」；变的是平台和框架——L04 魔搭配 ms-swift，这一课 AutoDL 配 LLaMA-Factory + Unsloth。</div>
 
 <figure>
   <svg viewBox="0 0 680 250" role="img" aria-label="AutoDL 九步流程：注册、充值、租卡、选镜像、传数据、注册数据、起训、看 loss、验证下载">
@@ -318,7 +318,7 @@ h2:has(.num)::before{display:none;}
 
     <rect class="bxD" x="158" y="156" width="300" height="50" rx="8"/>
     <text class="lbw" x="308" y="177" text-anchor="middle">llamafactory-cli chat 验证</text>
-    <text class="sm" x="308" y="194" text-anchor="middle" fill="#a8cdf0">同一份任务、同一个 adapter，只是换了个平台</text>
+    <text class="sm" x="308" y="194" text-anchor="middle" fill="#a8cdf0">同一份分类任务、同一个 adapter，只是换了个平台</text>
 
     <line class="ar" x1="523" y1="124" x2="523" y2="140"/>
     <line class="ar" x1="523" y1="140" x2="458" y2="140" marker-end="url(#f5)"/>
@@ -338,7 +338,7 @@ h2:has(.num)::before{display:none;}
 </table>
 
 <div class="recap"><b>这一章钉住了三件事</b><ul>
-  <li>钉住了：任务没变，变的是平台（魔搭→AutoDL）和框架（ms-swift→LLaMA-Factory）</li>
+  <li>钉住了：任务没变（50 选 1 分类），变的是平台（魔搭→AutoDL）和框架（ms-swift→LLaMA-Factory）</li>
   <li>不这么做会：把 L04 的命令原样搬到 AutoDL，发现 <code>swift sft</code> 根本不在</li>
   <li>下次遇到同类问题，先问：这个框架吃哪种数据格式、命令入口是什么</li>
 </ul></div>
@@ -355,7 +355,7 @@ h2:has(.num)::before{display:none;}
   <tr><td>4</td><td>租一张 4090</td><td>控制台「租用新实例」：计费按量、地区选近的、GPU 选 <b>RTX 4090 24G</b>、数量 1</td></tr>
 </table>
 
-<p class="note">价格会随供需浮动，4090 现价约 1.9 元/时，下单前看平台实时页。这课 500 条在 4090 上十几分钟训完，烧不了几毛钱。</p>
+<p class="note">价格会随供需浮动，4090 现价约 1.9 元/时，下单前看平台实时页。这课 500 条在 4090 上几分钟训完，烧不了几毛钱。</p>
 
 <div class="pit"><b>充值 ≠ 租卡。</b>充值是往账户存钱，租卡是创建实例开始计费。只充值不租卡不会扣钱；实例显示「运行中」才开始按秒计费，用完记得关机停费。</div>
 
@@ -409,30 +409,30 @@ ls /root/autodl-tmp</pre>
 
 <h3>数据长什么样（和 L04 对比）</h3>
 <pre class="code"><span class="c"># L04 ms-swift 吃的：query / response</span>
-{"query": "请根据用户法律问题生成一段…用户问题：老板让我天天加班不给钱怎么办", "response": "《劳动法》第四十一条…百分之一百五十…"}
+{"query": "请判断…只输出法律名称。\n\n问题：小王的企业解散后有债务…", "response": "个人独资企业法"}
 
 <span class="c"># L05 LLaMA-Factory 吃的：instruction / output</span>
-{"instruction": "请根据用户法律问题生成一段…用户问题：老板让我天天加班不给钱怎么办", "output": "《劳动法》第四十一条…百分之一百五十…"}</pre>
-<p>字段名从 <code>query/response</code> 换成 <code>instruction/output</code>，内容一字不动。本课附件 <code>demo_hyde_500_alpaca.jsonl</code> 已转好，直接上传。</p>
+{"instruction": "请判断…只输出法律名称。\n\n问题：小王的企业解散后有债务…", "output": "个人独资企业法"}</pre>
+<p>字段名从 <code>query/response</code> 换成 <code>instruction/output</code>，内容一字不动。本课附件 <code>demo_cls_500_alpaca.jsonl</code> 已转好，直接上传。</p>
 
 <h3>上传 + 注册，两步</h3>
 <table class="tbl">
   <tr><th style="width:34px">#</th><th style="width:150px">动作</th><th>怎么做</th></tr>
-  <tr><td>1</td><td>上传数据</td><td>JupyterLab 把 <code>demo_hyde_500_alpaca.jsonl</code> 拖进 <code>/root/autodl-tmp/LLaMA-Factory/data/</code></td></tr>
+  <tr><td>1</td><td>上传数据</td><td>JupyterLab 把 <code>demo_cls_500_alpaca.jsonl</code> 拖进 <code>/root/autodl-tmp/LLaMA-Factory/data/</code></td></tr>
   <tr><td>2</td><td>注册进配置</td><td>编辑 <code>data/dataset_info.json</code>，加一个键，指向这份文件</td></tr>
 </table>
 
 <pre class="fname">在 data/dataset_info.json 里，最后一个键后面加：</pre>
-<pre class="code">"hyde_demo": {
-  "file_name": "demo_hyde_500_alpaca.jsonl"
+<pre class="code">"cls_demo": {
+  "file_name": "demo_cls_500_alpaca.jsonl"
 }</pre>
-<p>键名 <code>hyde_demo</code> 就是后面 yaml 里 <code>dataset</code> 要填的名字。<b>没注册，框架找不到这份数据</b>，训练集就是空的。</p>
+<p>键名 <code>cls_demo</code> 就是后面 yaml 里 <code>dataset</code> 要填的名字。<b>没注册，框架找不到这份数据</b>，训练集就是空的。</p>
 
 <pre class="code"><span class="c"># 传完验一眼：行数、字段名</span>
-wc -l /root/autodl-tmp/LLaMA-Factory/data/demo_hyde_500_alpaca.jsonl
-head -n 1 /root/autodl-tmp/LLaMA-Factory/data/demo_hyde_500_alpaca.jsonl</pre>
-<pre class="term"><span class="d">500 .../demo_hyde_500_alpaca.jsonl</span>
-<span class="d">{"instruction": "…", "output": "…"}</span></pre>
+wc -l /root/autodl-tmp/LLaMA-Factory/data/demo_cls_500_alpaca.jsonl
+head -n 1 /root/autodl-tmp/LLaMA-Factory/data/demo_cls_500_alpaca.jsonl</pre>
+<pre class="term"><span class="d">500 .../demo_cls_500_alpaca.jsonl</span>
+<span class="d">{"instruction": "…", "output": "个人独资企业法"}</span></pre>
 
 <div class="exp"><b>手上只有 L04 那份 query/response？</b>不用手动改，一条 python 转：<code>{"instruction": r["query"], "output": r["response"]}</code>。记住这条判据就够了：<b>字段名是框架定的，不是数据定的</b>——换框架，先问它吃哪种格式。</div>
 
@@ -444,9 +444,9 @@ head -n 1 /root/autodl-tmp/LLaMA-Factory/data/demo_hyde_500_alpaca.jsonl</pre>
 <div class="takeaway"><span class="t">带走</span>换框架先问一句「你吃哪种格式」——LLaMA-Factory 的答案是：alpaca + 注册。</div>
 
 <h2 id="s-train"><span class="num">5</span>一条命令起训：一个 yaml + QLoRA + Unsloth</h2>
-<div class="lede"><b>结论</b>起训 = 一个 yaml 配置文件 + 一条 <code>llamafactory-cli train</code>。QLoRA 两条参数、Unsloth 一条开关，其余照抄。</div>
+<div class="lede"><b>结论</b>起训 = 一个 yaml 配置文件 + 一条 <code>llamafactory-cli train</code>。QLoRA 两条参数、Unsloth 一条开关，分类任务 <code>cutoff_len</code> 只要 512。</div>
 
-<pre class="fname">把下面存成 hyde_qlora.yaml，放在 LLaMA-Factory 目录下：</pre>
+<pre class="fname">把下面存成 cls_demo.yaml，放在 LLaMA-Factory 目录下：</pre>
 <pre class="code"><span class="c">### model</span>
 model_name_or_path: Qwen/Qwen3-1.7B
 trust_remote_code: true
@@ -460,21 +460,21 @@ lora_alpha: 32
 lora_target: all
 
 <span class="c">### dataset</span>
-dataset: hyde_demo
+dataset: cls_demo
 template: qwen3
-cutoff_len: 1024
+cutoff_len: 512
 
 <span class="c">### output</span>
-output_dir: /root/autodl-tmp/saves/qwen3-1.7b/hyde
-logging_steps: 10
-save_steps: 50
+output_dir: /root/autodl-tmp/saves/qwen3-1.7b/cls_demo
+logging_steps: 5
+save_steps: 20
 plot_loss: true
 
 <span class="c">### train</span>
-per_device_train_batch_size: 2
-gradient_accumulation_steps: 8
-learning_rate: 1.0e-4
-num_train_epochs: 3.0
+per_device_train_batch_size: 8
+gradient_accumulation_steps: 2
+learning_rate: 2.0e-4
+num_train_epochs: 2.0
 lr_scheduler_type: cosine
 warmup_ratio: 0.05
 bf16: true
@@ -487,7 +487,7 @@ quantization_method: bnb
 use_unsloth: true</pre>
 
 <pre class="code"><span class="c"># 一条命令起训</span>
-llamafactory-cli train hyde_qlora.yaml</pre>
+llamafactory-cli train cls_demo.yaml</pre>
 
 <div class="pit"><b>首次跑会自动下 Qwen3-1.7B（约 3GB），国内走 HF 很慢甚至断。</b>起训前先设下载源，二选一：<code>export HF_ENDPOINT=https://hf-mirror.com</code>（走镜像），或 <code>export USE_MODELSCOPE_HUB=1</code>（让 LLaMA-Factory 从魔搭下）。这一步不是卡死，是它在拉模型。</div>
 
@@ -497,11 +497,11 @@ llamafactory-cli train hyde_qlora.yaml</pre>
   <tr><td><code>model_name_or_path</code></td><td><code>Qwen/Qwen3-1.7B</code></td><td>基座模型，会自动下载（记得先设下载源）</td></tr>
   <tr><td><code>finetuning_type</code></td><td>lora</td><td>只训补丁，不训整个模型</td></tr>
   <tr><td><code>quantization_bit + method</code></td><td>4 + bnb</td><td>两条合起来才是 QLoRA，基座压到 4bit 省显存</td></tr>
-  <tr><td><code>dataset</code></td><td>hyde_demo</td><td>就是第 4 章注册的那个键名</td></tr>
+  <tr><td><code>dataset</code></td><td>cls_demo</td><td>就是第 4 章注册的那个键名</td></tr>
   <tr><td><code>template</code></td><td>qwen3</td><td>对话模板要跟模型家族对上，Qwen3 用 qwen3</td></tr>
-  <tr><td><code>output_dir</code></td><td>数据盘下 saves</td><td>checkpoint 落数据盘，关机不丢</td></tr>
+  <tr><td><code>cutoff_len</code></td><td>512</td><td>分类输出一个词，问题最长 333 字，512 足够</td></tr>
   <tr><td><code>use_unsloth</code></td><td>true</td><td>加速开关，装不上就删掉这一行</td></tr>
-  <tr><td><code>learning_rate</code></td><td>1e-4</td><td>LoRA 常用档，比全参大一个量级</td></tr>
+  <tr><td><code>learning_rate</code></td><td>2e-4</td><td>QLoRA 常用档，比全参大一个量级</td></tr>
 </table>
 
 <div class="chk"><b>起训前自检三句。</b>① <code>nvidia-smi</code> 认到 4090；② <code>wc -l</code> 是 500 且字段是 instruction/output；③ yaml 里 <code>output_dir</code> 在 <code>/root/autodl-tmp</code> 下。三句都过，回车。</div>
@@ -517,22 +517,22 @@ llamafactory-cli train hyde_qlora.yaml</pre>
 <div class="lede"><b>结论</b>loss 一路往下、落到个位数，<code>saves/</code> 目录冒出 checkpoint，就算训成。adapter 还是那个几十 MB 的补丁，不是整个模型。</div>
 
 <h3>日志怎么读</h3>
-<pre class="term"><span class="d">{'loss': 2.68, 'grad_norm': 1.12, 'learning_rate': 1.9e-05, 'epoch': 0.17}</span>
-<span class="d">{'loss': 1.91, 'grad_norm': 0.98, 'learning_rate': 4.2e-05, 'epoch': 0.33}</span>
-<span class="d">{'loss': 1.38, 'grad_norm': 0.81, 'learning_rate': 5.3e-05, 'epoch': 0.50}</span>
-<span class="d">{'loss': 1.12, 'grad_norm': 0.70, 'learning_rate': 6.1e-05, 'epoch': 0.67}</span></pre>
-<p>和 L04 一样只看一件事：<b>loss 是不是一路往下</b>。趋势必须往下、不再反弹，落到个位数（2 以下更稳）就算学到。</p>
+<pre class="term"><span class="d">{'loss': 3.4, 'grad_norm': 1.12, 'learning_rate': 1.9e-05, 'epoch': 0.17}</span>
+<span class="d">{'loss': 1.8, 'grad_norm': 0.98, 'learning_rate': 4.2e-05, 'epoch': 0.50}</span>
+<span class="d">{'loss': 1.1, 'grad_norm': 0.81, 'learning_rate': 5.3e-05, 'epoch': 0.83}</span>
+<span class="d">{'loss': 0.6, 'grad_norm': 0.70, 'learning_rate': 6.1e-05, 'epoch': 1.17}</span></pre>
+<p>和 L04 一样只看一件事：<b>loss 是不是一路往下</b>。分类任务 50 类瞎猜只有 2% 对，起点接近 <code>ln(50)≈3.9</code>，落到个位数（2 以下更稳）就算学到。</p>
 
 <h3>saves 目录里有什么</h3>
-<pre class="code">/root/autodl-tmp/saves/qwen3-1.7b/hyde/
-├── checkpoint-50/              <span class="c"># 每 50 步存一个点</span>
+<pre class="code">/root/autodl-tmp/saves/qwen3-1.7b/cls_demo/
+├── checkpoint-20/              <span class="c"># 每 20 步存一个点</span>
 │   ├── adapter_config.json     <span class="c"># LoRA 配置</span>
 │   └── adapter_model.safetensors  <span class="c"># 补丁权重，几十 MB</span>
-├── checkpoint-100/
+├── checkpoint-40/
 └── training_log.jsonl          <span class="c"># 完整 loss 记录</span></pre>
 <p><code>adapter_model.safetensors</code> 就是这一课的成果，几十 MB。基座 3GB 不用下，adapter 要配着基座才能用。</p>
 
-<div class="exp"><b>断了怎么办：</b>在 yaml 里加 <code>resume_from_checkpoint: saves/qwen3-1.7b/hyde/checkpoint-50</code> 再跑，会从那个点接着训，不是从头再来。</div>
+<div class="exp"><b>断了怎么办：</b>在 yaml 里加 <code>resume_from_checkpoint: saves/qwen3-1.7b/cls_demo/checkpoint-20</code> 再跑，会从那个点接着训，不是从头再来。</div>
 
 <div class="recap"><b>这一章钉住了三件事</b><ul>
   <li>钉住了：看 loss 只看趋势；成果是 adapter 那个几十 MB 的补丁文件</li>
@@ -542,38 +542,38 @@ llamafactory-cli train hyde_qlora.yaml</pre>
 <div class="takeaway"><span class="t">带走</span>loss 看趋势不看绝对值，成果是几十 MB 的 adapter——这条和 L04 一字不差。</div>
 
 <h2 id="s-infer"><span class="num">7</span>验它学会了</h2>
-<div class="lede"><b>结论</b>训完用 <code>llamafactory-cli chat</code> 喂一条口语问题，看它吐不吐法条语体——吐得出来才算学会，吐不出，这一课没交账。</div>
+<div class="lede"><b>结论</b>训完用 <code>llamafactory-cli chat</code> 喂一条法律问题，看它吐不吐部法名——吐得出来才算学会，吐不出，这一课没交账。</div>
 
 <pre class="code">llamafactory-cli chat \
   --model_name_or_path Qwen/Qwen3-1.7B \
-  --adapter_name_or_path /root/autodl-tmp/saves/qwen3-1.7b/hyde/checkpoint-150 \
+  --adapter_name_or_path /root/autodl-tmp/saves/qwen3-1.7b/cls_demo/checkpoint-40 \
   --template qwen3 \
   --infer_backend huggingface</pre>
 
 <h3>前后一对比，效果就出来了</h3>
 <table class="tbl">
-  <tr><th style="width:120px">时机</th><th>输入一句口语</th><th>输出应该长这样</th></tr>
-  <tr><td><b>训练前</b></td><td>老板让我天天加班不给钱，怎么办</td><td>答非所问，或直接给建议（改写器不该做这个）</td></tr>
-  <tr><td><b>训练后</b></td><td>老板让我天天加班不给钱，怎么办</td><td>一段带「延长工作时间」「百分之一百五十工资报酬」的法条语体文本</td></tr>
+  <tr><th style="width:120px">时机</th><th>输入一句法律问题</th><th>输出应该长这样</th></tr>
+  <tr><td><b>训练前</b></td><td>离职后公司一直拖着不发工资，该找哪部法？</td><td>答非所问，或给一段解释、一段建议（分类器不该做这些）</td></tr>
+  <tr><td><b>训练后</b></td><td>离职后公司一直拖着不发工资，该找哪部法？</td><td>直接输出一个部法名，如「劳动法」</td></tr>
 </table>
 
-<div class="chk"><b>判断它学会的硬标准：</b>喂口语，输出是「一段可以拿去检索的书面文本」，不是「给你的建议」。输出带法条号、法律概念、责任类型，就对了。</div>
+<div class="chk"><b>判断它学会的硬标准：</b>喂问题，输出是「一个部法名」，不是「一段解释或建议」。输出就一两个词、落在 50 部法里，就对了。</div>
 
 <h3>把 adapter 下载到本地</h3>
 <pre class="code"><span class="c"># 在终端打包，再从 JupyterLab 文件树右键下载；别下整个 3GB 模型</span>
-cd /root/autodl-tmp/saves/qwen3-1.7b/hyde
-tar -czf hyde_adapter.tar.gz checkpoint-150/</pre>
-<p>打出来的 <code>hyde_adapter.tar.gz</code> 几十 MB，下载秒完。到这里，整条链在 AutoDL 上走通了。</p>
+cd /root/autodl-tmp/saves/qwen3-1.7b/cls_demo
+tar -czf cls_adapter.tar.gz checkpoint-40/</pre>
+<p>打出来的 <code>cls_adapter.tar.gz</code> 几十 MB，下载秒完。到这里，整条链在 AutoDL 上走通了。</p>
 
 <div class="recap"><b>这一章钉住了三件事</b><ul>
-  <li>钉住了：验证就是喂口语、看输出，是不是变成了法条语体</li>
+  <li>钉住了：验证就是喂问题、看输出，是不是一个部法名</li>
   <li>不这么做会：不验就打包，结果训歪了都不知道</li>
-  <li>下次遇到同类问题，先喂一条最土的口语，看输出像不像法条</li>
+  <li>下次遇到同类问题，先喂一条最典型的问题，看输出像不像一个部法名</li>
 </ul></div>
-<div class="takeaway"><span class="t">带走</span>别急着庆祝，先喂一句口语——输出变成法条语体，才叫学会。</div>
+<div class="takeaway"><span class="t">带走</span>别急着庆祝，先喂一个问题——输出变成一个部法名，才叫学会。</div>
 
 <h2 id="s-wrap"><span class="num">8</span>小结</h2>
-<div class="lede"><b>结论</b>这一课交出去的是「同一份任务、换一套跑法」：L04 魔搭免费卡试通，L05 AutoDL 正式卡 + LLaMA-Factory 复现。平台和框架换了，任务和数据没换。</div>
+<div class="lede"><b>结论</b>这一课交出去的是「同一份分类任务、换一套跑法」：L04 魔搭免费卡试通，L05 AutoDL 正式卡 + LLaMA-Factory 复现。平台和框架换了，任务和数据没换。</div>
 
 <h3>这一课动了什么</h3>
 <table class="tbl">
@@ -595,10 +595,10 @@ tar -czf hyde_adapter.tar.gz checkpoint-150/</pre>
 <div class="dec">
   <div class="row"><div class="k">环境</div><div class="v"><code>nvidia-smi</code> 认到 4090，<code>llamafactory-cli --help</code> 有输出</div></div>
   <div class="row"><div class="k">训练</div><div class="v"><code>wc -l</code> 是 500 且字段是 instruction/output，loss 往下，<code>saves/</code> 出了 checkpoint</div></div>
-  <div class="row"><div class="k">成果</div><div class="v">喂口语出法条语体，adapter 打包下载到本地</div></div>
+  <div class="row"><div class="k">成果</div><div class="v">喂问题输出部法名，adapter 打包下载到本地</div></div>
 </div>
 
-<div class="why"><span class="tag">下一步</span>两个平台都跑通了，下一步回到数据：<b>500 条怎么变 2 万条</b>、口语样本怎么来、脏数据怎么挡——从「能跑」进到「能训好」。</div>
+<div class="why"><span class="tag">下一步</span>两个平台都跑通了，下一步进实战线：<b>500 条换 18,338 条全量、加上验证集和 accuracy 评测</b>——从「能跑」进到「能训好」。</div>
 
 <div class="recap"><b>这门课留下的判据</b><ul>
   <li>判据一：换平台先认三样——命令入口、数据格式、下载源，认不清就搬不过去</li>
@@ -611,11 +611,11 @@ tar -czf hyde_adapter.tar.gz checkpoint-150/</pre>
 </main>
 
 <nav class="nav">
-  <a href="L04_第一次微调跑通_课时页.html"><div class="dir">← 上一课 · L04</div><div class="tt">第一次微调跑通 · 魔搭</div></a>
-  <div class="ph nx">下一课 · 数据三源盘点（未写）</div>
+  <a href="L04_第一次微调跑通_课时页.html"><div class="dir">← 上一课 · L04</div><div class="tt">第一次微调跑通 · 部法分类</div></a>
+  <a href="L06_魔搭实战_部法分类_课时页.html"><div class="dir">下一课 · L06 →</div><div class="tt">魔搭实战 · 部法分类</div></a>
 </nav>
 
-<div class="footnote">L05 · AutoDL 手把手微调 · LLaMA-Factory</div>
+<div class="footnote">L05 · AutoDL 手把手微调 · 部法分类</div>
 </div>
 
 <script>
