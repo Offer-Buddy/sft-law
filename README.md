@@ -31,7 +31,7 @@
 | 输入 | 一句生活语言的法律问题，实测平均 68.6 字、最长 333 字 |
 | 输出 | 一个部法名，必须落在 50 类标签集内 |
 | 标签 | 50 部法，来自 Triplet 的 `reference` 字段（零人工标注） |
-| 基座 | Qwen3-1.7B-Instruct（Apache 2.0）+ QLoRA 4bit |
+| 基座 | Qwen3-1.7B（Apache 2.0）+ QLoRA 4bit |
 | 框架 | 主线 LLaMA-Factory（AutoDL）+ Unsloth；魔搭上换 ms-swift |
 | 指标 | accuracy、macro-F1、top-3、混淆矩阵 |
 | 数据 | 22,922 条「问题 → 部法」，train / val / test = 18,338 / 2,292 / 2,292 |
@@ -71,6 +71,7 @@ sft-law/
 │   ├── L05_AutoDL手把手微调_课时页.html   AutoDL + LLaMA-Factory：从开机到出适配器
 │   ├── L06_魔搭实战_部法分类_课时页.html   分类任务在魔搭上的完整一遍
 │   ├── L07_AutoDL实战_部法分类_课时页.html 分类任务在 AutoDL 上的完整一遍
+│   ├── L08_部署上线_课时页.html           项目线收尾：概述 / 选择引擎 / 打包发布 / 测试评估 / 交付与小结
 │   ├── _backup/  .bak/                历史版本堆，不当正式文件读
 │
 ├── data/
@@ -110,6 +111,9 @@ sft-law/
 │   ├── build_cls_dataset.py          【主线】造 50 类数据集：剥法条 → 取多数 → 剔考卷 → 切分
 │   ├── export_platform_data.py       【主线】导出 ms-swift / LLaMA-Factory 两种格式 + test_eval
 │   ├── eval_cls.py                   【主线】候选打分评测：accuracy / macro-F1 / top-3 / 混淆矩阵
+│   ├── serve_cls.py                  【主线】分类服务：FastAPI 薄壳，50 个候选并发打分
+│   ├── bench_cls.py                  【主线】压测：并发 1/8/32 的 P50 / P95 / 吞吐
+│   ├── sweep_checkpoints.py          【主线】扫 checkpoint：val 逐个打分，找出选对率最高的那个
 │   │
 │   ├── build_baseline.py             【支线】抽法条语料 + 抽评测集 + 跑检索基线（corpus/evalset/run）
 │   ├── build_trainset.py             【支线】造 HyDE 训练集：问题 → 法条语体
@@ -212,7 +216,7 @@ python scripts/eval_cls.py --adapter <适配器目录>     # 再量微调后
 pip install ms-swift -U
 # 数据放 /mnt/workspace/cls/，产物落 /mnt/workspace/output/cls_qwen3
 swift sft \
-  --model Qwen/Qwen3-1.7B-Instruct \
+  --model Qwen/Qwen3-1.7B \
   --tuner_type lora \
   --quant_method bnb --quant_bits 4 \
   --dataset /mnt/workspace/cls/train.jsonl \
@@ -235,7 +239,25 @@ llamafactory-cli chat cls_qlora.yaml        # 试聊
 
 yaml 里 dataset 填**注册名**（`cls_law`），不是文件路径——这是最常见的报错来源。完整参数、自检命令、混淆矩阵读法见 [`docs/finetune-qwen-law-sft.md`](docs/finetune-qwen-law-sft.md)。
 
-训练配置（两个平台同一套）：基座 Qwen3-1.7B-Instruct、QLoRA 4bit（NF4 + 双量化）、r=16 / α=32 挂 attention + FFN、lr 2e-4 cosine + warmup、epoch 2、max_len 512。
+### 上线：把补丁挂成服务
+
+```bash
+# 1) 起推理后端：挂 adapter，不合并
+vllm serve Qwen/Qwen3-1.7B --served-model-name cls-base \
+  --enable-lora --lora-modules cls=./cls_adapter --max-lora-rank 16 --max-loras 2 \
+  --max-model-len 1024 --gpu-memory-utilization 0.85 --port 8000
+
+# 2) 起薄壳：50 个候选并发打分，与 eval_cls.py 同一个模板、同一套归一化
+export VLLM_BASE_URL=http://127.0.0.1:8000/v1 CLS_MODEL=cls
+uvicorn scripts.serve_cls:app --host 0.0.0.0 --port 8100
+
+# 3) 压一轮
+python scripts/bench_cls.py --n 20 --conc 1,8,32
+```
+
+口径的判据只有一条：抽 200 条 test 走服务，accuracy 与离线报告差 ≤ 0.5 个点。差得多，回去对模板、候选集、长度归一化这三处。
+
+训练配置（两个平台同一套）：基座 Qwen3-1.7B、QLoRA 4bit（NF4 + 双量化）、r=16 / α=32 挂 attention + FFN、lr 2e-4 cosine + warmup、epoch 2、max_len 512。
 
 显存账（24G 卡真实占用不到三分之一）：基座 ≈0.9G + LoRA 权重/梯度/优化器 ≈0.3G + 激活 ≈2~4G + CUDA 上下文 ≈1~2G = **约 5~7G**。
 

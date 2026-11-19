@@ -442,7 +442,7 @@ nvidia-smi</pre>
 <table class="tbl">
   <tr><th style="width:120px">入口</th><th style="width:194px">装什么</th><th style="width:176px">装完怎么验</th><th>什么情况选它</th></tr>
   <tr><td><b>LLaMA-Factory</b></td><td>仓库 + <code>pip install -e ".[torch,metrics]"</code></td><td><code>llamafactory-cli version</code> 有输出，<code>webui</code> 能打开</td><td class="ok">想最快看到第一个 loss；要给不写代码的人演示</td></tr>
-  <tr><td><b>ms-swift</b></td><td><code>pip install ms-swift -U</code></td><td><code>swift --help</code> 有输出</td><td class="ok">国内网络、用魔搭的模型和免费算力</td></tr>
+  <tr><td><b>ms-swift</b></td><td><code>pip install ms-swift -U</code></td><td><code>swift sft --help</code> 有输出（<code>swift --help</code> 会抛 <code>KeyError</code>，是设计如此）</td><td class="ok">国内网络、用魔搭的模型和免费算力</td></tr>
   <tr><td><b>手写 + peft</b></td><td>只需要那四个核心包</td><td>能 import，<code>get_peft_model</code> 后打印出可训参数</td><td><b>非主线</b>：要改数据拼装、改 loss，或想看清每一步时才用</td></tr>
   <tr><td>Unsloth</td><td><code>pip install unsloth</code></td><td>能 <code>FastLanguageModel.from_pretrained</code></td><td>单卡、显存吃紧、模型在它支持列表里；只认 Linux</td></tr>
 </table>
@@ -510,11 +510,11 @@ lens = [<span class="k">len</span>(tok(text)[<span class="s">"input_ids"</span>]
 </ul></div>
 <div class="takeaway"><span class="t">带走</span>长度决定你花多少算力，显存决定你能开多大——两个数先量出来，再谈配置。</div>
 
-<h2 id="s-config"><span class="num">5</span>配置准备：真正要改的只有六个旋钮</h2>
+<h2 id="s-config"><span class="num">5</span>配置准备：真正要改的只有六个超参数</h2>
 <div class="lede"><b>结论</b>不管用 YAML 还是命令行，翻来覆去就是六个值：挂哪层、秩多大、学多快、吃多长、一批几个、跑几轮。其余字段都是这六个的衍生。</div>
 
 <table class="tbl">
-  <tr><th style="width:118px">旋钮</th><th style="width:104px">YAML 里的名</th><th style="width:196px">初值怎么定</th><th>改错的症状</th></tr>
+  <tr><th style="width:118px">超参数</th><th style="width:104px">YAML 里的名</th><th style="width:196px">初值怎么定</th><th>改错的症状</th></tr>
   <tr><td><b>挂哪层</b></td><td><code>lora_target</code></td><td>先用 <code>all</code>，跑通再收窄到注意力四件套</td><td>只挂 q、v 常常不够；挂错层名会静默少挂</td></tr>
   <tr><td><b>秩</b></td><td><code>lora_rank</code></td><td>16 起步。数据少往 8 降，学不动往 32 升</td><td>太小欠拟合，太大在小数据上直接过拟合</td></tr>
   <tr><td><b>学习率</b></td><td><code>learning_rate</code></td><td>LoRA 用 1e-4 到 2e-4，比全参大一个量级</td><td>沿用全参的 2e-5，loss 几乎不动，以为模型不行</td></tr>
@@ -549,7 +549,7 @@ output_dir: runs/20261117_qwen3-1.7b_qlora_r16</pre>
 <div class="pit"><b>4bit 权重不能直接合并。</b>要合回基座，先把量化权重反量化成 fp16 再 merge。直接在 4bit 上合并，精度掉得比训练本身还多。</div>
 
 <div class="recap"><b>这一章钉住了三件事</b><ul>
-  <li>钉住了：配置就六个旋钮——挂哪层、秩、学习率、长度、批次、轮数</li>
+  <li>钉住了：配置就六个超参数——挂哪层、秩、学习率、长度、批次、轮数</li>
   <li>不这么做会：抄别人的配置但学习率沿用全参量级，loss 不动，误判成模型不行</li>
   <li>下次遇到同类问题，先看：日志里那行可训参数打出来是多少</li>
 </ul></div>
@@ -654,7 +654,7 @@ git rev-parse --short HEAD &gt;&gt; runs/&lt;编号&gt;/note.md</pre>
   <tr><td><b>开好的平台</b></td><td>魔搭 Notebook 能开，AutoDL 账号能开机</td><td><code>nvidia-smi</code> 有输出，免费额度还剩多少心里有数</td></tr>
   <tr><td><b>能跑的环境</b></td><td>平台镜像，或一个 conda 环境 + 锁文件</td><td>验证三行全过，<code>pip freeze</code> 有输出</td></tr>
   <tr><td><b>验过的模型</b></td><td>持久化盘上的权重目录</td><td>模板 decode 过、长度分位有数、显存账算过</td></tr>
-  <tr><td><b>一份配置</b></td><td><code>configs/*.yaml</code></td><td>六个旋钮都有明确依据，可训参数比例正常</td></tr>
+  <tr><td><b>一份配置</b></td><td><code>configs/*.yaml</code></td><td>六个超参数都有明确依据，可训参数比例正常</td></tr>
   <tr><td><b>五个脚本</b></td><td><code>scripts/</code></td><td>一条命令能从头跑到尾，参数全部外置</td></tr>
 </table>
 

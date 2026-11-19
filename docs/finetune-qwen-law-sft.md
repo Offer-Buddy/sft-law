@@ -76,7 +76,7 @@ python scripts/export_platform_data.py
 
 | 项 | 取值 | 为什么 |
 |---|---|---|
-| 基座 | Qwen3-1.7B-Instruct | Apache 2.0，中文友好，1.7B 单卡可训 |
+| 基座 | Qwen3-1.7B | Apache 2.0，中文友好，1.7B 单卡可训 |
 | 方法 | QLoRA 4bit（NF4 + 双量化） | 基座权重 3.4G → 0.9G |
 | LoRA | r=16 / α=32，target all-linear | 分类任务 r=8 也够，16 留余量 |
 | 学习率 | 2e-4，cosine + warmup 0.05 | QLoRA 常用档，高了发散、低了欠拟合 |
@@ -90,7 +90,7 @@ python scripts/export_platform_data.py
 pip install ms-swift -U
 
 swift sft \
-  --model Qwen/Qwen3-1.7B-Instruct \
+  --model Qwen/Qwen3-1.7B \
   --tuner_type lora \
   --quant_method bnb --quant_bits 4 \
   --dataset /mnt/workspace/cls/train.jsonl \
@@ -165,7 +165,7 @@ python scripts/eval_cls.py --adapter output/checkpoint-800
 |---|---|---|
 | `--no-adapter` | 关 | 不加载适配器，量基线 |
 | `--adapter` | 无 | 适配器目录（checkpoint） |
-| `--model` | `Qwen/Qwen3-1.7B-Instruct` | 基座 |
+| `--model` | `Qwen/Qwen3-1.7B` | 基座 |
 | `--data` | `data/cls/export/test_eval.jsonl` | 评测集，`question` / `label` |
 | `--labels-from` | `data/cls/label_stats.json` | 50 个候选标签从这读，不手抄 |
 | `--prompt` | 与训练一致的指令 | 必须与训练时一模一样 |

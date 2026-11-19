@@ -377,7 +377,7 @@ h2:has(.num)::before{display:none;}
 <div class="takeaway"><span class="t">带走</span>授权弹窗全勾上——这一处漏了，后面全白搭。</div>
 
 <h2 id="s-nb"><span class="num">3</span>开 Notebook、装 ms-swift</h2>
-<div class="lede"><b>结论</b>开一个 GPU 环境的 Notebook，镜像用默认（自带 torch 和 CUDA）；装 ms-swift 就一条 <code>pip install</code>，装完验 <code>swift --help</code> 有输出。</div>
+<div class="lede"><b>结论</b>开一个 GPU 环境的 Notebook，镜像用默认（自带 torch 和 CUDA）；装 ms-swift 就一条 <code>pip install</code>，装完验 <code>swift sft --help</code> 有输出。</div>
 
 <h3>开 Notebook 到能敲命令</h3>
 <ol>
@@ -397,14 +397,18 @@ nvidia-smi</pre>
 
 <h3>装 ms-swift，一条命令</h3>
 <pre class="code">pip install ms-swift -U
-swift --help</pre>
-<pre class="term"><span class="d">usage: swift [-h] {sft,infer,export,web-ui,...} ...</span></pre>
-<p>第二行能打印出 <code>sft</code>、<code>infer</code> 这些子命令，就是装好了。装的过程几分钟，别以为卡死。</p>
+
+<span class="c"># 必须跟子命令：swift --help 会报 KeyError，不是装坏了</span>
+swift sft --help | head -20</pre>
+<pre class="term"><span class="d">usage: swift sft [-h] [--model MODEL] [--dataset DATASET] ...</span></pre>
+<p>能打印出这一屏参数，就是装好了。装的过程几分钟，别以为卡死。</p>
+
+<div class="pit"><b><code>swift --help</code> 报 <code>KeyError: '--help'</code></b>这不是装坏了。ms-swift 的命令行只认子命令（<code>sft</code> / <code>infer</code> / <code>export</code>），单给 <code>--help</code> 它去查子命令表查不到，就抛错。想看全部子命令：<code>python -c "from swift.cli.main import route_mapping; print(sorted(route_mapping))"</code>。</div>
 
 <div class="recap"><b>这一章钉住了三件事</b><ul>
-  <li>钉住了：开 GPU Notebook → 验三行 → 装 ms-swift → <code>swift --help</code> 有输出</li>
+  <li>钉住了：开 GPU Notebook → 验三行 → 装 ms-swift → <code>swift sft --help</code> 有输出</li>
   <li>不这么做会：环境没验就装框架，后面报错都不知道是卡的问题还是包的问题</li>
-  <li>下次遇到同类问题，先看：<code>nvidia-smi</code> 认不认卡、<code>swift --help</code> 出不出子命令</li>
+  <li>下次遇到同类问题，先看：<code>nvidia-smi</code> 认不认卡、<code>swift sft --help</code> 出不出一屏参数</li>
 </ul></div>
 <div class="takeaway"><span class="t">带走</span>先验卡、再装框架——顺序反了，报错时你分不清是谁的锅。</div>
 
@@ -578,7 +582,7 @@ tar -czf cls_adapter.tar.gz v0-.../checkpoint-40/</pre>
 
 <h3>三条自检</h3>
 <div class="dec">
-  <div class="row"><div class="k">环境</div><div class="v"><code>nvidia-smi</code> 认到 A10，<code>swift --help</code> 有输出</div></div>
+  <div class="row"><div class="k">环境</div><div class="v"><code>nvidia-smi</code> 认到 A10，<code>swift sft --help</code> 有输出</div></div>
   <div class="row"><div class="k">训练</div><div class="v"><code>wc -l</code> 是 500，loss 一路往下，<code>output</code> 出了 checkpoint</div></div>
   <div class="row"><div class="k">成果</div><div class="v">喂问题输出部法名，adapter 打包下载到本地</div></div>
 </div>

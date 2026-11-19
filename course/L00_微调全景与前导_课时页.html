@@ -482,7 +482,6 @@ h2:has(.num)::before{display:none;}
   <tr><td><b>为什么微调值</b></td><td>口语变体开放，规则穷举不完；高频、封闭、固定输出三合一</td><td>「翻译」是行为不是知识，RAG 和规则都改不动</td></tr>
   <tr><td><b>失败长什么样</b></td><td>分错类 → 进错库，后面全链路空转</td><td>改得不像法条 → 检索命不中，白改</td></tr>
   <tr><td><b>拿什么衡量</b></td><td>分类准确率、混淆矩阵</td><td>命中率 hit_rate、Recall@k</td></tr>
-  <tr><td><b>最该盯的坑</b></td><td>意图集合必须封闭且稳定，加一类就得重训</td><td>别把「改写」和「检索」混成一个任务</td></tr>
 </table>
 
 <p>这两件事为什么都算「最适合微调」？它们同时命中五类判据：<b>输出封闭、调用高频、prompt 压不住、改行为不改知识、好坏能用一个数说清</b>。关键在输出形态——都是短进短出、规整可枚举，只需学会一种转换习惯，不必记住整部法规。这正是「行为能训、知识训不进」的分界。</p>
@@ -718,7 +717,7 @@ h2:has(.num)::before{display:none;}
 <p>这个动作有正式名字：<b>next-token prediction</b>（预测下一个 token）。这类模型叫<b>自回归</b>（autoregressive）——自己吐出来的字，回头当成输入继续接。论文、文档、面试里会换着说「next-token」「自回归」「接龙」，指的都是这一件事；下面几节也一律叫接龙。</p>
 
 <h3>二、loss 是什么：不是错了几个字，是每个字猜得多没底</h3>
-<p>这一节只讲一个数：<b>模型每猜一个字，都会得到一个「这次猜得多没底」的分数</b>。中文叫<b>损失</b>，英文叫 <b>loss</b>，我口语里写作<b>罚分</b>——三个名字，指的是同一个数。算它的公式另有名字，叫<b>损失函数</b>（loss function），<b>公式是公式，数是数</b>。</p>
+<p>「罚分」怎么来的？一句话：<b>每猜一个字，损失函数就给它打一个「猜得多没底」的分</b>。先分清一层关系——公式叫<b>损失函数</b>（loss function），算出来的那个结果才叫 loss：<b>函数是函数，数是数</b>。</p>
 <p>代码里用的几乎都是 <code>CrossEntropyLoss</code>，中文叫<b>交叉熵</b>。名字唬人，规则只有一条：<b>越没底，罚得越重</b>。公式不用背，看这组对照就够了：正确答案是「合」，模型给它下面这些概率时，分别要罚多少分。</p>
 
 <table class="tbl">
@@ -769,6 +768,30 @@ h2:has(.num)::before{display:none;}
 </figure>
 
 <div class="why"><span class="tag">关键</span>正确答案的概率只给了 30%，比只给 0.1% 罚得轻得多。这是好事——它让模型知道「差一点」和「差很远」不是一回事。</div>
+
+<h4>损失函数和梯度：一个是函数，一个是导数</h4>
+<p>上一节把 loss 讲成了「罚分」，那其实是<b>损失函数算出来的一个数</b>。这里补一层最容易被跳过的关系：<b>梯度，就是这个损失函数对每个参数求出来的导数</b>。所以 loss 和梯度不是两件事，是一对——<b>函数给「分」，导数给「方向」</b>：前者回答「现在罚多少」，后者回答「该往哪走、坡多陡」。</p>
+
+<figure>
+  <svg viewBox="0 0 680 232" role="img" aria-label="损失函数曲线上取一个点：竖直读数是对应参数取值下的罚分，切线斜率是梯度即方向和陡度">
+    <line x1="60" y1="196" x2="648" y2="196" stroke="#94a3b8" stroke-width="1.2"/>
+    <line x1="60" y1="196" x2="60" y2="36" stroke="#94a3b8" stroke-width="1.2"/>
+    <text class="sm" x="356" y="222" text-anchor="middle" fill="#0f2f4d">参数取值</text>
+    <text class="sm" x="44" y="32" text-anchor="end" fill="#0f2f4d">loss</text>
+
+    <path d="M 74 60 Q 220 188 340 188 Q 500 188 636 44" fill="none" stroke="#0d9488" stroke-width="2.4"/>
+
+    <circle cx="490" cy="153" r="6" fill="#0d9488" stroke="#fff" stroke-width="2"/>
+    <line x1="490" y1="153" x2="490" y2="196" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>
+    <line x1="412" y1="190" x2="580" y2="110" stroke="#2563eb" stroke-width="2"/>
+
+    <text class="sm" x="502" y="180" fill="#0f766e">高度＝罚分（loss）</text>
+    <text class="sm" x="470" y="98" fill="#2563eb">斜率＝梯度（方向＋陡度）</text>
+  </svg>
+  <figcaption>同一个点，两个读数：竖着读是罚了多少分（函数值），斜着读是往哪走、坡多陡（导数）。loss 是函数，梯度是它的导数——函数给分，导数指路。</figcaption>
+</figure>
+
+<div class="why"><span class="tag">为什么叫「梯度下降」</span>梯度永远指向 loss <b>涨得最快</b>的方向，想降 loss 只能反着走——「下降」两个字就是这么来的：沿梯度的反方向往低处走。反过来，如果目标是<b>最大化</b>（比如 RLHF 训奖励模型，要分数越高越好），就沿梯度正方向走，那叫「梯度上升」。下一节就拆「取负反着走」的每一步。</div>
 
 <h3>三、往哪调、一步迈多大</h3>
 <p>第四步「更新参数」拆开就两句：<b>先问路，再迈步</b>。问路的是反向传播，指路的答案叫梯度，迈多大由学习率定，这么一问一迈重复几千遍，才叫梯度下降。四个词是一条流水线上的四站，不是四个孤立的词。</p>
@@ -998,7 +1021,7 @@ h2:has(.num)::before{display:none;}
     <rect class="bx" x="562" y="178" width="107" height="34" rx="7"/>
     <text class="lb2" x="615" y="200" text-anchor="middle">泛化</text>
   </svg>
-  <figcaption>四层各回答一个问题：阶段问「什么时候」，方法问「改多少」，超参数是你要填的旋钮，现象是仪表盘。注意这一层叫<b>超参数</b>——它和「参数」是两族东西，关系见下一节。</figcaption>
+  <figcaption>四层各回答一个问题：阶段问「什么时候」，方法问「改多少」，超参数是你自己填的那几个数，现象是仪表盘。注意这一层叫<b>超参数</b>——它和「参数」是两族东西：参数是训出来的，超参数是你填进去的。关系见下一节。</figcaption>
 </figure>
 
 <h3>开篇 · 先分清四个词，剩下的才不会混</h3>
@@ -1032,7 +1055,7 @@ h2:has(.num)::before{display:none;}
 
     <text class="sm" x="520" y="160" text-anchor="middle">r 填多大，和左边的参数量没有换算关系</text>
   </svg>
-  <figcaption>左边是模型身上的数，右边是你手上的旋钮。LoRA 干的事只有一件：把左下「会被更新」的那块缩到极小，右边那栏一个都不动。</figcaption>
+  <figcaption>左边是模型身上的数，右边是你自己填的数。LoRA 干的事只有一件：把左下「会被更新」的那块缩到极小，右边那栏一个都不动。</figcaption>
 </figure>
 
 <table class="tbl stack">
@@ -1162,11 +1185,11 @@ h2:has(.num)::before{display:none;}
   <div class="row"><div class="k">量化<br>Quantization<br><span style="color:#b45309;font-size:11px">旁注 · 不是方法</span></div><div class="v"><b>改多少：零</b>——参数一个不少，只是每个数字占的位数少了。把高清照片压成 jpg，肉眼几乎看不出，细节少了：权重从 16 位浮点压到 8 位或 4 位。训练侧用 NF4（4 位正态浮点）加双重量化；推理侧还有 GPTQ、AWQ、GGUF（三种量化与存储格式，部署课展开）。<span class="mix">训练时的 4bit 和推理用的 GPTQ / AWQ 混为一谈。前者为了塞进显卡，后者为了跑得快。</span></div></div>
 </div>
 
-<h3>第三组 · 超参数：配置文件里那几个旋钮</h3>
+<h3>第三组 · 超参数：配置文件里那几个数</h3>
 <p>前面两组是「什么」，这一组是「填多少」。它们没有一个是需要理解的原理，全是你在配置文件里手填的数——知道调大调小会发生什么就够了。<b>注意这层叫超参数，不叫参数</b>：一个你填、一个训练算，区别见本章开篇那张表。这一组你全定下来，训练全程一个都不变。</p>
 
 <div class="dec wide">
-  <div class="hd">超参数层的五个旋钮</div>
+  <div class="hd">超参数层的五个数</div>
   <div class="row"><div class="k">学习率<br>learning rate</div><div class="v"><b>下山时每步迈多大。</b>决定每次更新参数走多远。太大直接跨过最低点，loss 上蹿下跳；太小走得慢，训不完。<span class="mix">照抄预训练的配置。预训练常用 1e-4 以上，全参 SFT 要降到 2e-5 量级，LoRA 反而可以放回 1e-4。</span></div></div>
   <div class="row"><div class="k">epoch<br>轮次</div><div class="v"><b>同一本习题册刷几遍。</b>把训练集完整过一遍算 1 个 epoch。微调通常 1 到 3 轮就停，多了就是在背题。<span class="mix">以为轮数越多学得越透。第 3 轮开始，训练 loss 还在降，验证集已经变差。</span></div></div>
   <div class="row"><div class="k">batch<br>批大小</div><div class="v"><b>一次批改几份卷子。</b>一次前向加反向用多少条样本。显存不够就调小，再攒几次小批量一起更新，凑出等效的大批量。<span class="mix">看到 loss 抖动就以为训练坏了。batch 小的时候抖动本来就大，看趋势不看单点。</span></div></div>
@@ -1210,7 +1233,7 @@ h2:has(.num)::before{display:none;}
 <div class="chk"><b>合上这页，试着回答：</b>① SFT 和 CPT 差在哪，各用多少数据？② SFT 和 PEFT 是什么关系，为什么「用 SFT 还是 LoRA」是伪问题？③ 训练 loss 一直降，该高兴还是该警惕？三条答得出来，后面的课就不会掉队。</div>
 
 <div class="recap"><b>这一章钉住了三件事</b><ul>
-  <li>钉住了：会被训练改的是参数、你自己填的是超参数；二十个词再分四层归位——阶段问「什么时候」，方法问「改多少」，超参数是旋钮，现象是仪表盘</li>
+  <li>钉住了：会被训练改的是参数、你自己填的是超参数；二十个词再分四层归位——阶段问「什么时候」，方法问「改多少」，超参数是你填的数，现象是仪表盘</li>
   <li>不这么做会：把 LoRA、PEFT、QLoRA 当成三个并列的东西，一被问「什么关系」就卡住</li>
   <li>下次遇到生词，先判断：它回答的是「哪一步」还是「怎么改」，再去理解细节</li>
 </ul></div>
@@ -1401,11 +1424,11 @@ h2:has(.num)::before{display:none;}
 
 <div class="why"><span class="tag">本项目</span>为什么是 1.7B 不是 7B——不是跑不动，是<b>跑得完很多轮</b>：1.7B 一轮一两小时，一天能试三四个配置；7B 一轮两小时起，试错成本翻几倍。</div>
 
-<h3>五、三个旋钮</h3>
+<h3>五、三个超参数</h3>
 <p>LoRA 要你填的只有三个数，名字不友好，意思都很朴素——<b>先记住第一个</b>，另外两个有默认值。</p>
 
 <table class="tbl">
-  <tr><th style="width:170px">旋钮</th><th>是什么</th><th style="width:210px">怎么定</th></tr>
+  <tr><th style="width:170px">超参数</th><th>是什么</th><th style="width:210px">怎么定</th></tr>
   <tr class="hot"><td><span class="fq">高频</span>r（秩）</td><td>旁边那块矩阵条的<b>窄边留多宽</b>。留宽了能学更复杂的东西，参数也跟着变多</td><td>常用 8 / 16 / 32；任务越窄越小，16 是安全默认</td></tr>
   <tr><td>alpha（缩放）</td><td>给 ΔW 乘的倍数——决定贴上去这一块影响多大</td><td>起作用的是 alpha/r 的比值，常见 alpha = 2r</td></tr>
   <tr><td>target_modules</td><td>挂在哪些层上</td><td>只挂 q、v 最省；全挂（q/k/v/o + gate/up/down）效果最好</td></tr>

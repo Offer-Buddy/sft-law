@@ -315,7 +315,7 @@ h2:has(.num)::before{display:none;}
 <div class="dec">
   <div class="hd">这个项目产出的三样东西</div>
   <div class="row yes"><div class="k">数据</div><div class="v">22,922 条「问题 → 部法」标注对，50 类，train / val / test 零重叠</div></div>
-  <div class="row yes"><div class="k">模型</div><div class="v">Qwen3-1.7B-Instruct 的 QLoRA 适配器，单卡 4090 一两小时训完</div></div>
+  <div class="row yes"><div class="k">模型</div><div class="v">Qwen3-1.7B 的 QLoRA 适配器，单卡 4090 一两小时训完</div></div>
   <div class="row yes"><div class="k">尺子</div><div class="v">一套可复算的评测：accuracy、macro-F1、top-3、混淆矩阵</div></div>
 </div>
 
@@ -468,14 +468,14 @@ h2:has(.num)::before{display:none;}
 <div class="takeaway"><span class="t">一句话带走</span><span>类别不均衡时，先问「小类错了没」，再看总分——否则总分骗你。</span></div>
 
 <h2 id="s-plan"><span class="num">5</span>训练怎么配</h2>
-<div class="lede"><b>结论</b>Qwen3-1.7B-Instruct + QLoRA 4bit，LLaMA-Factory / Unsloth，单卡 4090 一两小时一轮。</div>
+<div class="lede"><b>结论</b>Qwen3-1.7B + QLoRA 4bit，LLaMA-Factory / Unsloth，单卡 4090 一两小时一轮。</div>
 
 <p>分类任务比生成任务轻：输出只有一个词，不用长上下文。配置可以压得很省。</p>
 
 <div class="tblwrap">
 <table class="tbl">
   <tr><th style="width:120px">项</th><th style="width:220px">取值</th><th>为什么</th></tr>
-  <tr><td>基座</td><td>Qwen3-1.7B-Instruct</td><td>Apache 2.0，中文友好，1.7B 单卡可训</td></tr>
+  <tr><td>基座</td><td>Qwen3-1.7B</td><td>Apache 2.0，中文友好，1.7B 单卡可训</td></tr>
   <tr><td>方法</td><td>QLoRA 4bit（NF4 + 双量化）</td><td>基座权重从 3.4G 压到 0.9G，省下的全给激活值</td></tr>
   <tr><td>框架</td><td>LLaMA-Factory（AutoDL）+ Unsloth</td><td>主线；魔搭上换 ms-swift 同款参数</td></tr>
   <tr><td>LoRA</td><td>r=16 / α=32，attention + FFN</td><td>分类任务 r=8 也够，16 留余量</td></tr>
